@@ -1,0 +1,15 @@
+{
+    "name": "faq-index-plugin",
+    "version": "1.0.0",
+    "description": "A custom Docusaurus plugin that indexes FAQ questions from docs/faq/ at build time",
+    "main": "index.js",
+    "author": "Patricia McPhee",
+    "license": "MIT",
+    "peerDependencies": {
+      "@docusaurus/core": "3.9.2",
+      "react": "^19.0.0"
+    },
+    "dependencies": {
+      "gray-matter": "^4.0.3"
+    }
+  }

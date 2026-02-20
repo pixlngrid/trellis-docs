@@ -1,0 +1,59 @@
+---
+title: Components Overview
+description: Reusable React components included in the Trellis framework.
+keywords: [components, react, glossary, feedback, search, flipping card]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+Trellis includes several reusable React components you can import and use in your MDX files.
+
+## Included Components
+
+| Component | Location | Description |
+|-----------|----------|-------------|
+| [Glossary](/components/glossary/) | `src/components/Glossary.js` | Renders a searchable, alphabetically sorted glossary from a JSON data file |
+| [FaqTableOfContents](/plugins/faq-index/) | `src/components/FaqTableOfContents/` | Renders a searchable FAQ question list from the FAQ index plugin data |
+| [Feedback](/components/feedback/) | `src/components/Feedback/` | Embeddable feedback widget for collecting page-level feedback |
+| FlippingCard | `src/components/FlippingCard/` | Interactive flip cards with quiz/option selection support |
+| CustomSearch | `src/components/CustomSearch/` | Search UI with modal, powered by Fuse.js and the smart search index |
+
+## Using Components in MDX
+
+Import any component at the top of your MDX file:
+
+```mdx
+---
+title: My Page
+---
+
+import Glossary from '@site/src/components/Glossary';
+
+## Glossary
+
+<Glossary />
+```
+
+The `@site` alias resolves to your project root directory.
+
+## CustomSearch
+
+The search component is already wired into the navbar. It renders a search icon that opens a modal with instant search results. You typically don't need to import this directly — it's registered as a navbar item in `docusaurus.config.js`.
+
+## FlippingCard
+
+Interactive cards that flip to reveal content on the back. Supports option selection (radio buttons) for quiz-style interactions. The component uses CSS grid layout and native HTML form elements.
+
+```mdx
+import FlippingCard from '@site/src/components/FlippingCard/FlippingCard';
+
+<FlippingCard
+  cards={[
+    {
+      front: { title: 'Question 1', content: 'What is Docusaurus?' },
+      back: { title: 'Answer', content: 'A static site generator for documentation.' },
+    },
+  ]}
+/>
+```

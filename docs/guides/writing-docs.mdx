@@ -1,0 +1,120 @@
+---
+title: Writing Docs
+description: Learn about supported markdown features and content authoring.
+keywords: [writing, markdown, authoring]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+This guide covers the markdown features available in the Trellis docs framework.
+
+## Headings
+
+Use standard markdown headings (`##`, `###`, `####`). Each heading automatically gets an anchor link with a copy-to-clipboard button on hover.
+
+## Code Blocks
+
+Fenced code blocks support syntax highlighting via Prism:
+
+```javascript title="example.js"
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+```
+
+```yaml title="catalog-info.yaml"
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-service
+  description: A sample service
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+```
+
+## Admonitions
+
+:::note
+This is a **note** admonition. Use it for supplementary information.
+:::
+
+:::tip
+This is a **tip** admonition. Use it for best practices and recommendations.
+:::
+
+:::info
+This is an **info** admonition. Use it for important context.
+:::
+
+:::caution
+This is a **caution** admonition. Use it for things that could cause issues.
+:::
+
+:::danger
+This is a **danger** admonition. Use it for critical warnings.
+:::
+
+## Tabs
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+
+```bash
+npm install @pixlngrid/trellis
+```
+
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+
+```bash
+yarn add @pixlngrid/trellis
+```
+
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+
+```bash
+pnpm add @pixlngrid/trellis
+```
+
+  </TabItem>
+</Tabs>
+
+## Tables
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Smart Search | Available | Full-text search with configurable weights |
+| Lightbox | Available | Click-to-zoom for images |
+| Mermaid | Available | Diagram rendering with pan/zoom |
+| FAQ Index | Available | Auto-generated FAQ table of contents |
+
+## Mermaid Diagrams
+
+```mermaid
+graph LR
+    A[Write Content] --> B[Build Tokens]
+    B --> C[Generate CSS]
+    C --> D[Build Site]
+    D --> E[Deploy]
+```
+
+## Details/Collapsible
+
+<details>
+  <summary>Click to expand</summary>
+
+  This content is hidden by default and shown when the user clicks the summary.
+
+  You can include any markdown content here, including:
+  - Lists
+  - Code blocks
+  - Images
+
+</details>

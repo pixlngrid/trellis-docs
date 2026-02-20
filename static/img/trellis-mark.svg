@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Trellis Mark — Lattice + Leaf -->
+
+  <!-- Diamond lattice structure -->
+  <g stroke="#7c3aed" stroke-width="2" stroke-linecap="round" fill="none">
+    <!-- Forward diagonals -->
+    <line x1="24" y1="20" x2="96" y2="92"/>
+    <line x1="24" y1="52" x2="80" y2="108"/>
+    <line x1="40" y1="12" x2="104" y2="76"/>
+    <!-- Back diagonals -->
+    <line x1="96" y1="20" x2="24" y2="92"/>
+    <line x1="96" y1="52" x2="40" y2="108"/>
+    <line x1="80" y1="12" x2="16" y2="76"/>
+  </g>
+
+  <!-- Lattice nodes -->
+  <g fill="#7c3aed" opacity="0.45">
+    <circle cx="60" cy="36" r="2.5"/>
+    <circle cx="40" cy="56" r="2.5"/>
+    <circle cx="80" cy="56" r="2.5"/>
+    <circle cx="60" cy="76" r="2.5"/>
+    <circle cx="44" cy="92" r="2.5"/>
+    <circle cx="76" cy="92" r="2.5"/>
+  </g>
+
+  <!-- Vine curving through the lattice -->
+  <path
+    d="M 38,105 C 42,88 48,80 54,68 S 64,50 70,42 S 80,28 84,18"
+    fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round"
+  />
+
+  <!-- Leaves -->
+  <g fill="#2dd4bf" opacity="0.85">
+    <path d="M 54,68 C 42,60 37,50 46,48 C 55,46 56,58 54,68 Z"/>
+    <path d="M 72,40 C 82,34 90,30 88,38 C 86,46 78,44 72,40 Z"/>
+  </g>
+
+  <!-- Vine-lattice intersection accents -->
+  <g fill="#2dd4bf">
+    <circle cx="60" cy="56" r="3.5"/>
+  </g>
+</svg>

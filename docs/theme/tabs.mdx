@@ -1,0 +1,94 @@
+---
+title: Tabs
+description: How Trellis tabs work — pill-style design with URL query parameter synchronization.
+keywords: [tabs, url sync, pill style, query parameters]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Trellis tabs have two enhancements over vanilla Docusaurus: **pill-style design** and **URL query parameter synchronization**.
+
+## Pill-Style Tabs
+
+Instead of the default underline-style tabs, Trellis uses pill-shaped tabs with accent colors for the active state. This provides a clearer visual distinction between selected and unselected tabs.
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+
+```bash
+npm install
+```
+
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+
+```bash
+yarn install
+```
+
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+
+```bash
+pnpm install
+```
+
+  </TabItem>
+</Tabs>
+
+## URL Synchronization
+
+When you select a tab, the choice is saved to the URL as a query parameter. This means:
+
+- **Shareable links** — share a URL that opens on the correct tab
+- **Bookmarkable** — browser bookmarks preserve the tab selection
+- **Back/forward** — browser history tracks tab changes
+
+For example, clicking the "yarn" tab above adds `?tabs=yarn` to the URL.
+
+### How It Works
+
+The customization lives in `src/theme/Tabs/index.js`. On tab selection:
+
+1. The component reads the current URL search parameters
+2. Updates the `tabs` parameter (or a custom parameter name if `queryString` is set)
+3. Pushes the new URL to the browser history
+
+On page load, the component checks for a matching query parameter and selects that tab.
+
+### Custom Query Parameter Names
+
+By default, the parameter is named `tabs`. You can customize it per tab group:
+
+```jsx
+<Tabs queryString="package-manager">
+  <TabItem value="npm" label="npm">...</TabItem>
+  <TabItem value="yarn" label="yarn">...</TabItem>
+</Tabs>
+```
+
+This uses `?package-manager=yarn` instead of `?tabs=yarn`.
+
+## Usage
+
+```mdx
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="option-a" label="Option A" default>
+    Content for Option A
+  </TabItem>
+  <TabItem value="option-b" label="Option B">
+    Content for Option B
+  </TabItem>
+</Tabs>
+```
+
+:::tip
+Set `default` on the tab that should be selected when no query parameter is present.
+:::

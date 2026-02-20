@@ -1,0 +1,54 @@
+---
+title: Getting Started
+description: Get up and running with your documentation site.
+keywords: [getting-started, setup, introduction]
+---
+
+Welcome to your new documentation site, built with [Trellis](https://trellis.pixlngrid.com) — an opinionated docs framework on Docusaurus.
+
+## Quick Start
+
+```bash
+# Start the dev server
+yarn start
+```
+
+:::tip
+The dev server runs on port 3001 by default. Visit `http://localhost:3001` to see your docs.
+:::
+
+## Project Structure
+
+```
+your-project/
+├── docs/              # Your documentation content
+├── blog/              # Release notes and blog posts
+├── src/
+│   ├── css/           # Custom CSS and design tokens
+│   ├── theme/         # Customized Docusaurus theme components
+│   ├── components/    # Reusable React components
+│   └── pages/         # Custom pages (homepage)
+├── static/            # Static assets (images, fonts)
+├── packages/          # Local plugins
+│   ├── redirects-plugin/
+│   └── faq-index-plugin/
+├── design-tokens.json # Design token definitions
+└── docusaurus.config.js
+```
+
+## What's Included
+
+- **Custom theme** with last-updated date at the top of each page, heading copy-to-clipboard, pill-style tabs, and custom admonition icons
+- **Design token system** that converts `design-tokens.json` into CSS custom properties
+- **Smart search** with Fuse.js — no external service required
+- **Image lightbox** — click-to-zoom on any image
+- **Mermaid diagrams** with pan and zoom support
+- **FAQ index plugin** — auto-generates FAQ table of contents
+- **Redirect management** via `redirects.json`
+
+## Next Steps
+
+- Edit this page at `docs/getting-started.mdx`
+- Add new docs to the `docs/` directory
+- Customize your brand colors in `design-tokens.json`
+- Update site metadata in `docusaurus.config.js`

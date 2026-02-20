@@ -1,0 +1,10 @@
+.tabItem > *:last-child {
+  margin-bottom: 0;
+}
+
+.tabItemContent {
+  padding: 0.25rem 1rem;
+  border-radius: 0.5rem;
+  border: 0.25px solid var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-background-color);
+}

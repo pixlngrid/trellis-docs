@@ -1,0 +1,1228 @@
+[
+  {
+    "id": "feedback",
+    "title": "Feedback Widget",
+    "description": "How to use the Feedback component for collecting page-level feedback.",
+    "keywords": [
+      "feedback",
+      "widget",
+      "component",
+      "user feedback"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/components/feedback",
+    "content": "\r\nThe Feedback component provides an embeddable widget for collecting page-level feedback from readers.\r\n\r\n## Usage\r\n\r\n\r\nThe widget renders a \"Was this page helpful?\" prompt with thumbs up/down buttons and an optional text input for detailed feedback.\r\n\r\n## How It Works\r\n\r\n1. The user clicks a thumb",
+    "sections": [
+      {
+        "id": "usage",
+        "heading": "Usage",
+        "level": 2,
+        "content": "",
+        "url": "/components/feedback#usage"
+      },
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/components/feedback#how-it-works"
+      },
+      {
+        "id": "api-configuration",
+        "heading": "API Configuration",
+        "level": 2,
+        "content": "",
+        "url": "/components/feedback#api-configuration"
+      },
+      {
+        "id": "feedback-dashboard",
+        "heading": "Feedback Dashboard",
+        "level": 2,
+        "content": "",
+        "url": "/components/feedback#feedback-dashboard"
+      },
+      {
+        "id": "customization",
+        "heading": "Customization",
+        "level": 2,
+        "content": "",
+        "url": "/components/feedback#customization"
+      }
+    ]
+  },
+  {
+    "id": "glossary",
+    "title": "Glossary",
+    "description": "How to use the Glossary component to render a searchable term list from JSON data.",
+    "keywords": [
+      "glossary",
+      "component",
+      "terms",
+      "definitions"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/components/glossary",
+    "content": "\r\nThe Glossary component renders an alphabetically sorted definition list from a JSON data file.\r\n\r\n## Usage\r\n\r\n\r\nThe component reads from `src/data/glossary.json` and renders a `<dl>` (definition list) with terms sorted A-Z.\r\n\r\n## Data Format\r\n\r\n\r\nEach entry has:\r\n- **`term`** — the word or phrase ",
+    "sections": [
+      {
+        "id": "usage",
+        "heading": "Usage",
+        "level": 2,
+        "content": "",
+        "url": "/components/glossary#usage"
+      },
+      {
+        "id": "data-format",
+        "heading": "Data Format",
+        "level": 2,
+        "content": "",
+        "url": "/components/glossary#data-format"
+      },
+      {
+        "id": "adding-terms",
+        "heading": "Adding Terms",
+        "level": 2,
+        "content": "",
+        "url": "/components/glossary#adding-terms"
+      },
+      {
+        "id": "rendered-output",
+        "heading": "Rendered Output",
+        "level": 2,
+        "content": "",
+        "url": "/components/glossary#rendered-output"
+      },
+      {
+        "id": "customization",
+        "heading": "Customization",
+        "level": 2,
+        "content": "",
+        "url": "/components/glossary#customization"
+      }
+    ]
+  },
+  {
+    "id": "components",
+    "title": "Components Overview",
+    "description": "Reusable React components included in the Trellis framework.",
+    "keywords": [
+      "components",
+      "react",
+      "glossary",
+      "feedback",
+      "search",
+      "flipping card"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/components",
+    "content": "\r\nTrellis includes several reusable React components you can import and use in your MDX files.\r\n\r\n## Included Components\r\n\r\n| Component | Location | Description |\r\n|-----------|----------|-------------|\r\n| [Glossary](/components/glossary/) | `src/components/Glossary.js` | Renders a searchable, alpha",
+    "sections": [
+      {
+        "id": "included-components",
+        "heading": "Included Components",
+        "level": 2,
+        "content": "",
+        "url": "/components#included-components"
+      },
+      {
+        "id": "using-components-in-mdx",
+        "heading": "Using Components in MDX",
+        "level": 2,
+        "content": "",
+        "url": "/components#using-components-in-mdx"
+      },
+      {
+        "id": "customsearch",
+        "heading": "CustomSearch",
+        "level": 2,
+        "content": "",
+        "url": "/components#customsearch"
+      },
+      {
+        "id": "flippingcard",
+        "heading": "FlippingCard",
+        "level": 2,
+        "content": "",
+        "url": "/components#flippingcard"
+      }
+    ]
+  },
+  {
+    "id": "customizing",
+    "title": "Customizing Tokens",
+    "description": "How to change brand colors, add new tokens, and rebrand your Trellis documentation site.",
+    "keywords": [
+      "customizing",
+      "tokens",
+      "colors",
+      "branding",
+      "rebranding"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/design-tokens/customizing",
+    "content": "\r\nThis guide walks through customizing design tokens to match your brand.\r\n\r\n## Changing Brand Colors\r\n\r\nOpen `design-tokens.json` and update the `brand` section. The default uses a violet scale:\r\n\r\n\r\nReplace the hex values with your brand's color scale. Use a tool like [Tailwind CSS Colors](https:/",
+    "sections": [
+      {
+        "id": "changing-brand-colors",
+        "heading": "Changing Brand Colors",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens/customizing#changing-brand-colors"
+      },
+      {
+        "id": "changing-accent-colors",
+        "heading": "Changing Accent Colors",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens/customizing#changing-accent-colors"
+      },
+      {
+        "id": "adding-new-tokens",
+        "heading": "Adding New Tokens",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens/customizing#adding-new-tokens"
+      },
+      {
+        "id": "changing-typography",
+        "heading": "Changing Typography",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens/customizing#changing-typography"
+      },
+      {
+        "id": "full-rebranding-checklist",
+        "heading": "Full Rebranding Checklist",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens/customizing#full-rebranding-checklist"
+      },
+      {
+        "id": "token-naming-conventions",
+        "heading": "Token Naming Conventions",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens/customizing#token-naming-conventions"
+      }
+    ]
+  },
+  {
+    "id": "design-tokens",
+    "title": "Design Tokens",
+    "description": "How the Trellis design token system converts JSON definitions into CSS custom properties.",
+    "keywords": [
+      "design tokens",
+      "css variables",
+      "json",
+      "build"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/design-tokens",
+    "content": "\r\nTrellis uses a design token system that converts a single JSON file into CSS custom properties. This gives you a centralized place to define your brand colors, spacing, typography, and other design values.\r\n\r\n## How It Works\r\n\r\n\r\n1. **`design-tokens.json`** defines tokens as nested objects with `v",
+    "sections": [
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens#how-it-works"
+      },
+      {
+        "id": "token-file-structure",
+        "heading": "Token File Structure",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens#token-file-structure"
+      },
+      {
+        "id": "generated-css",
+        "heading": "Generated CSS",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens#generated-css"
+      },
+      {
+        "id": "token-categories",
+        "heading": "Token Categories",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens#token-categories"
+      },
+      {
+        "id": "using-tokens-in-css",
+        "heading": "Using Tokens in CSS",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens#using-tokens-in-css"
+      },
+      {
+        "id": "mapping-to-infima-variables",
+        "heading": "Mapping to Infima Variables",
+        "level": 2,
+        "content": "",
+        "url": "/design-tokens#mapping-to-infima-variables"
+      }
+    ]
+  },
+  {
+    "id": "general",
+    "title": "General",
+    "description": "General questions about the Trellis docs framework.",
+    "keywords": [],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/faq/general",
+    "content": "\r\n### What is Trellis?\r\n\r\nTrellis is an opinionated documentation framework built on top of Docusaurus. It includes a custom theme with UX improvements, a design token system, smart search, and several plugins that enhance the documentation experience.\r\n\r\n### How do I customize the colors?\r\n\r\nEdit `",
+    "sections": [
+      {
+        "id": "what-is-trellis",
+        "heading": "What is Trellis?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#what-is-trellis"
+      },
+      {
+        "id": "how-do-i-customize-the-colors",
+        "heading": "How do I customize the colors?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#how-do-i-customize-the-colors"
+      },
+      {
+        "id": "can-i-use-this-with-an-existing-docusaurus-project",
+        "heading": "Can I use this with an existing Docusaurus project?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#can-i-use-this-with-an-existing-docusaurus-project"
+      },
+      {
+        "id": "how-does-the-search-work",
+        "heading": "How does the search work?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#how-does-the-search-work"
+      },
+      {
+        "id": "how-do-i-add-redirects-when-i-move-a-page",
+        "heading": "How do I add redirects when I move a page?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#how-do-i-add-redirects-when-i-move-a-page"
+      },
+      {
+        "id": "what-are-design-tokens",
+        "heading": "What are design tokens?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#what-are-design-tokens"
+      },
+      {
+        "id": "how-do-i-add-a-new-faq-page",
+        "heading": "How do I add a new FAQ page?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#how-do-i-add-a-new-faq-page"
+      },
+      {
+        "id": "how-many-theme-components-are-ejected",
+        "heading": "How many theme components are ejected?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#how-many-theme-components-are-ejected"
+      },
+      {
+        "id": "how-do-i-deploy-the-site",
+        "heading": "How do I deploy the site?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#how-do-i-deploy-the-site"
+      },
+      {
+        "id": "does-trellis-support-dark-mode",
+        "heading": "Does Trellis support dark mode?",
+        "level": 3,
+        "content": "",
+        "url": "/faq/general#does-trellis-support-dark-mode"
+      }
+    ]
+  },
+  {
+    "id": "faq",
+    "title": "Frequently Asked Questions",
+    "description": "Common questions about the Trellis docs framework.",
+    "keywords": [],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/faq",
+    "content": "\r\nimport FaqTableOfContents from '@site/src/components/FaqTableOfContents';\r\n\r\nCommon questions about the Trellis docs framework. Use the search below to find answers, or browse by topic.\r\n\r\n<FaqTableOfContents />\r\n",
+    "sections": []
+  },
+  {
+    "id": "getting-started",
+    "title": "Getting Started",
+    "description": "Get up and running with the Trellis docs framework.",
+    "keywords": [
+      "getting-started",
+      "setup",
+      "introduction"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/getting-started",
+    "content": "\r\nWelcome to **Trellis** — an opinionated docs framework built on Docusaurus with custom theme enhancements, smart search, and a design token system.\r\n\r\n## What's Included\r\n\r\n| Category | Highlights | Learn More |\r\n|----------|-----------|------------|\r\n| **Theme** | Last-updated at top, heading cop",
+    "sections": [
+      {
+        "id": "whats-included",
+        "heading": "What's Included",
+        "level": 2,
+        "content": "",
+        "url": "/getting-started#whats-included"
+      },
+      {
+        "id": "quick-start",
+        "heading": "Quick Start",
+        "level": 2,
+        "content": "",
+        "url": "/getting-started#quick-start"
+      },
+      {
+        "id": "project-structure",
+        "heading": "Project Structure",
+        "level": 2,
+        "content": "",
+        "url": "/getting-started#project-structure"
+      },
+      {
+        "id": "next-steps",
+        "heading": "Next Steps",
+        "level": 2,
+        "content": "",
+        "url": "/getting-started#next-steps"
+      }
+    ]
+  },
+  {
+    "id": "using-components",
+    "title": "Using Components",
+    "description": "Learn about the interactive React components available in the framework.",
+    "keywords": [
+      "components",
+      "react",
+      "interactive"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/guides/using-components",
+    "content": "\r\nThe Trellis framework includes several reusable React components you can use in your MDX files.\r\n\r\n## Design Tokens\r\n\r\nThe framework uses a design token system that converts a JSON file (`design-tokens.json`) into CSS custom properties at build time.\r\n\r\n\r\nThese become CSS variables like `--brand-p",
+    "sections": [
+      {
+        "id": "design-tokens",
+        "heading": "Design Tokens",
+        "level": 2,
+        "content": "",
+        "url": "/guides/using-components#design-tokens"
+      },
+      {
+        "id": "theme-customizations",
+        "heading": "Theme Customizations",
+        "level": 2,
+        "content": "",
+        "url": "/guides/using-components#theme-customizations"
+      },
+      {
+        "id": "last-updated-at-top",
+        "heading": "Last Updated at Top",
+        "level": 3,
+        "content": "",
+        "url": "/guides/using-components#last-updated-at-top"
+      },
+      {
+        "id": "heading-anchors",
+        "heading": "Heading Anchors",
+        "level": 3,
+        "content": "",
+        "url": "/guides/using-components#heading-anchors"
+      },
+      {
+        "id": "tab-url-sync",
+        "heading": "Tab URL Sync",
+        "level": 3,
+        "content": "",
+        "url": "/guides/using-components#tab-url-sync"
+      },
+      {
+        "id": "custom-admonition-icons",
+        "heading": "Custom Admonition Icons",
+        "level": 2,
+        "content": "",
+        "url": "/guides/using-components#custom-admonition-icons"
+      },
+      {
+        "id": "plugins",
+        "heading": "Plugins",
+        "level": 2,
+        "content": "",
+        "url": "/guides/using-components#plugins"
+      },
+      {
+        "id": "smart-search",
+        "heading": "Smart Search",
+        "level": 3,
+        "content": "",
+        "url": "/guides/using-components#smart-search"
+      },
+      {
+        "id": "redirects",
+        "heading": "Redirects",
+        "level": 3,
+        "content": "",
+        "url": "/guides/using-components#redirects"
+      },
+      {
+        "id": "image-lightbox",
+        "heading": "Image Lightbox",
+        "level": 3,
+        "content": "",
+        "url": "/guides/using-components#image-lightbox"
+      }
+    ]
+  },
+  {
+    "id": "writing-docs",
+    "title": "Writing Docs",
+    "description": "Learn about supported markdown features and content authoring.",
+    "keywords": [
+      "writing",
+      "markdown",
+      "authoring"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/guides/writing-docs",
+    "content": "\r\nThis guide covers the markdown features available in the Trellis docs framework.\r\n\r\n## Headings\r\n\r\nUse standard markdown headings (`##`, `###`, `####`). Each heading automatically gets an anchor link with a copy-to-clipboard button on hover.\r\n\r\n## Code Blocks\r\n\r\nFenced code blocks support syntax h",
+    "sections": [
+      {
+        "id": "headings",
+        "heading": "Headings",
+        "level": 2,
+        "content": "",
+        "url": "/guides/writing-docs#headings"
+      },
+      {
+        "id": "code-blocks",
+        "heading": "Code Blocks",
+        "level": 2,
+        "content": "",
+        "url": "/guides/writing-docs#code-blocks"
+      },
+      {
+        "id": "admonitions",
+        "heading": "Admonitions",
+        "level": 2,
+        "content": "",
+        "url": "/guides/writing-docs#admonitions"
+      },
+      {
+        "id": "tabs",
+        "heading": "Tabs",
+        "level": 2,
+        "content": "",
+        "url": "/guides/writing-docs#tabs"
+      },
+      {
+        "id": "tables",
+        "heading": "Tables",
+        "level": 2,
+        "content": "",
+        "url": "/guides/writing-docs#tables"
+      },
+      {
+        "id": "mermaid-diagrams",
+        "heading": "Mermaid Diagrams",
+        "level": 2,
+        "content": "",
+        "url": "/guides/writing-docs#mermaid-diagrams"
+      },
+      {
+        "id": "detailscollapsible",
+        "heading": "Details/Collapsible",
+        "level": 2,
+        "content": "",
+        "url": "/guides/writing-docs#detailscollapsible"
+      }
+    ]
+  },
+  {
+    "id": "architecture",
+    "title": "Architecture",
+    "description": "How the Trellis framework pieces fit together — design tokens, theme, plugins, and content pipeline.",
+    "keywords": [
+      "architecture",
+      "design tokens",
+      "theme",
+      "plugins",
+      "build"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/overview/architecture",
+    "content": "\r\nTrellis extends the standard Docusaurus architecture with three layers: a design token pipeline, ejected theme components, and bundled plugins.\r\n\r\n## Build Pipeline\r\n\r\n\r\n## Design Token Pipeline\r\n\r\nThe token pipeline converts a single JSON file into CSS custom properties that the entire theme cons",
+    "sections": [
+      {
+        "id": "build-pipeline",
+        "heading": "Build Pipeline",
+        "level": 2,
+        "content": "",
+        "url": "/overview/architecture#build-pipeline"
+      },
+      {
+        "id": "design-token-pipeline",
+        "heading": "Design Token Pipeline",
+        "level": 2,
+        "content": "",
+        "url": "/overview/architecture#design-token-pipeline"
+      },
+      {
+        "id": "theme-layer",
+        "heading": "Theme Layer",
+        "level": 2,
+        "content": "",
+        "url": "/overview/architecture#theme-layer"
+      },
+      {
+        "id": "directory-structure",
+        "heading": "Directory Structure",
+        "level": 3,
+        "content": "",
+        "url": "/overview/architecture#directory-structure"
+      },
+      {
+        "id": "key-modifications",
+        "heading": "Key Modifications",
+        "level": 3,
+        "content": "",
+        "url": "/overview/architecture#key-modifications"
+      },
+      {
+        "id": "plugin-layer",
+        "heading": "Plugin Layer",
+        "level": 2,
+        "content": "",
+        "url": "/overview/architecture#plugin-layer"
+      },
+      {
+        "id": "project-structure",
+        "heading": "Project Structure",
+        "level": 2,
+        "content": "",
+        "url": "/overview/architecture#project-structure"
+      }
+    ]
+  },
+  {
+    "id": "overview",
+    "title": "What is Trellis?",
+    "description": "An opinionated docs framework built on Docusaurus with theme enhancements, smart search, and a design token system.",
+    "keywords": [
+      "trellis",
+      "overview",
+      "framework",
+      "docusaurus"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/overview",
+    "content": "\r\nTrellis is a documentation framework built on [Docusaurus](https://docusaurus.io/) that adds theme enhancements, a design token system, bundled plugins, and reusable components — so you can focus on writing content instead of configuring tooling.\r\n\r\n## Why Trellis?\r\n\r\nDocusaurus is a powerful stat",
+    "sections": [
+      {
+        "id": "why-trellis",
+        "heading": "Why Trellis?",
+        "level": 2,
+        "content": "",
+        "url": "/overview#why-trellis"
+      },
+      {
+        "id": "whats-included",
+        "heading": "What's Included",
+        "level": 2,
+        "content": "",
+        "url": "/overview#whats-included"
+      },
+      {
+        "id": "who-is-it-for",
+        "heading": "Who Is It For?",
+        "level": 2,
+        "content": "",
+        "url": "/overview#who-is-it-for"
+      },
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/overview#how-it-works"
+      },
+      {
+        "id": "next-steps",
+        "heading": "Next Steps",
+        "level": 2,
+        "content": "",
+        "url": "/overview#next-steps"
+      }
+    ]
+  },
+  {
+    "id": "trellis-vs-docusaurus",
+    "title": "Trellis vs Docusaurus",
+    "description": "A feature-by-feature comparison of what Trellis adds on top of vanilla Docusaurus.",
+    "keywords": [
+      "comparison",
+      "docusaurus",
+      "features",
+      "differences"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/overview/trellis-vs-docusaurus",
+    "content": "\r\nTrellis is built **on top of** Docusaurus — it doesn't replace it. Everything Docusaurus provides still works. Trellis adds a layer of theme customizations, bundled plugins, and developer experience improvements.\r\n\r\n## Feature Comparison\r\n\r\n| Feature | Vanilla Docusaurus | Trellis |\r\n|---------|--",
+    "sections": [
+      {
+        "id": "feature-comparison",
+        "heading": "Feature Comparison",
+        "level": 2,
+        "content": "",
+        "url": "/overview/trellis-vs-docusaurus#feature-comparison"
+      },
+      {
+        "id": "what-stays-the-same",
+        "heading": "What Stays the Same",
+        "level": 2,
+        "content": "",
+        "url": "/overview/trellis-vs-docusaurus#what-stays-the-same"
+      },
+      {
+        "id": "when-to-use-trellis",
+        "heading": "When to Use Trellis",
+        "level": 2,
+        "content": "",
+        "url": "/overview/trellis-vs-docusaurus#when-to-use-trellis"
+      }
+    ]
+  },
+  {
+    "id": "faq-index",
+    "title": "FAQ Index",
+    "description": "How the FAQ index plugin automatically generates a searchable table of contents from FAQ pages.",
+    "keywords": [
+      "faq",
+      "index",
+      "plugin",
+      "questions",
+      "table of contents"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/plugins/faq-index",
+    "content": "\r\nThe FAQ index plugin scans your FAQ directory for `###` headings, treats each one as a question, and exposes the data so the `FaqTableOfContents` component can render a searchable, filterable question list.\r\n\r\n## How It Works\r\n\r\n1. **Scans** all `.mdx` and `.md` files in the configured FAQ directo",
+    "sections": [
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/faq-index#how-it-works"
+      },
+      {
+        "id": "configuration",
+        "heading": "Configuration",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/faq-index#configuration"
+      },
+      {
+        "id": "writing-faq-pages",
+        "heading": "Writing FAQ Pages",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/faq-index#writing-faq-pages"
+      },
+      {
+        "id": "faqtableofcontents-component",
+        "heading": "FaqTableOfContents Component",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/faq-index#faqtableofcontents-component"
+      },
+      {
+        "id": "data-structure",
+        "heading": "Data Structure",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/faq-index#data-structure"
+      }
+    ]
+  },
+  {
+    "id": "plugins",
+    "title": "Plugins Overview",
+    "description": "The plugins bundled with Trellis — smart search, FAQ indexer, redirects, image lightbox, and Mermaid pan/zoom.",
+    "keywords": [
+      "plugins",
+      "search",
+      "faq",
+      "redirects",
+      "lightbox",
+      "mermaid"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/plugins",
+    "content": "\r\nTrellis bundles five plugins that extend Docusaurus with search, FAQ indexing, redirects, image zoom, and diagram pan/zoom.\r\n\r\n## Bundled Plugins\r\n\r\n| Plugin | Type | Description |\r\n|--------|------|-------------|\r\n| [Smart Search](/plugins/smart-search/) | Build-time + client | Full-text search w",
+    "sections": [
+      {
+        "id": "bundled-plugins",
+        "heading": "Bundled Plugins",
+        "level": 2,
+        "content": "",
+        "url": "/plugins#bundled-plugins"
+      },
+      {
+        "id": "plugin-registration",
+        "heading": "Plugin Registration",
+        "level": 2,
+        "content": "",
+        "url": "/plugins#plugin-registration"
+      },
+      {
+        "id": "image-lightbox",
+        "heading": "Image Lightbox",
+        "level": 2,
+        "content": "",
+        "url": "/plugins#image-lightbox"
+      },
+      {
+        "id": "configuration",
+        "heading": "Configuration",
+        "level": 3,
+        "content": "",
+        "url": "/plugins#configuration"
+      },
+      {
+        "id": "mermaid-panzoom",
+        "heading": "Mermaid Pan/Zoom",
+        "level": 2,
+        "content": "",
+        "url": "/plugins#mermaid-panzoom"
+      }
+    ]
+  },
+  {
+    "id": "redirects",
+    "title": "Redirects",
+    "description": "How the redirects plugin manages URL redirects via a JSON file.",
+    "keywords": [
+      "redirects",
+      "url",
+      "plugin",
+      "meta refresh"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/plugins/redirects",
+    "content": "\r\nThe redirects plugin reads a JSON file of redirect rules and generates HTML pages with meta-refresh redirects at build time.\r\n\r\n## How It Works\r\n\r\n1. **Reads** redirect definitions from `redirects.json` (or a file specified in config)\r\n2. **Generates** an HTML file for each redirect source at buil",
+    "sections": [
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/redirects#how-it-works"
+      },
+      {
+        "id": "configuration",
+        "heading": "Configuration",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/redirects#configuration"
+      },
+      {
+        "id": "redirect-file-format",
+        "heading": "Redirect File Format",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/redirects#redirect-file-format"
+      },
+      {
+        "id": "fields",
+        "heading": "Fields",
+        "level": 3,
+        "content": "",
+        "url": "/plugins/redirects#fields"
+      },
+      {
+        "id": "trailing-slash-handling",
+        "heading": "Trailing Slash Handling",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/redirects#trailing-slash-handling"
+      },
+      {
+        "id": "autodetection",
+        "heading": "Auto-Detection",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/redirects#autodetection"
+      },
+      {
+        "id": "generated-output",
+        "heading": "Generated Output",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/redirects#generated-output"
+      }
+    ]
+  },
+  {
+    "id": "smart-search",
+    "title": "Smart Search",
+    "description": "How the smart search plugin works — build-time indexing with Fuse.js for fast client-side search.",
+    "keywords": [
+      "search",
+      "fuse.js",
+      "indexing",
+      "smart search"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/plugins/smart-search",
+    "content": "\r\nThe smart search plugin indexes all documentation at build time and provides fast, client-side search using [Fuse.js](https://www.fusejs.io/). No external search service (like Algolia) is required.\r\n\r\n## How It Works\r\n\r\n1. **Build time** — the plugin scans all documentation files, extracts titles,",
+    "sections": [
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/smart-search#how-it-works"
+      },
+      {
+        "id": "configuration",
+        "heading": "Configuration",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/smart-search#configuration"
+      },
+      {
+        "id": "search-weights",
+        "heading": "Search Weights",
+        "level": 3,
+        "content": "",
+        "url": "/plugins/smart-search#search-weights"
+      },
+      {
+        "id": "excluded-content",
+        "heading": "Excluded Content",
+        "level": 3,
+        "content": "",
+        "url": "/plugins/smart-search#excluded-content"
+      },
+      {
+        "id": "adding-keywords",
+        "heading": "Adding Keywords",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/smart-search#adding-keywords"
+      },
+      {
+        "id": "search-ui",
+        "heading": "Search UI",
+        "level": 2,
+        "content": "",
+        "url": "/plugins/smart-search#search-ui"
+      }
+    ]
+  },
+  {
+    "id": "admonitions",
+    "title": "Admonitions",
+    "description": "Custom SVG icons for each admonition type in the Trellis theme.",
+    "keywords": [
+      "admonitions",
+      "icons",
+      "note",
+      "tip",
+      "info",
+      "caution",
+      "danger"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/theme/admonitions",
+    "content": "\r\nTrellis replaces the default Docusaurus admonition icons with custom SVG icons, giving each type a distinct visual identity.\r\n\r\n## Admonition Types\r\n\r\n:::note\r\n**Note** — use for supplementary information that adds context.\r\n:::\r\n\r\n:::tip\r\n**Tip** — use for best practices and recommendations.\r\n:::",
+    "sections": [
+      {
+        "id": "admonition-types",
+        "heading": "Admonition Types",
+        "level": 2,
+        "content": "",
+        "url": "/theme/admonitions#admonition-types"
+      },
+      {
+        "id": "syntax",
+        "heading": "Syntax",
+        "level": 2,
+        "content": "",
+        "url": "/theme/admonitions#syntax"
+      },
+      {
+        "id": "custom-titles",
+        "heading": "Custom Titles",
+        "level": 2,
+        "content": "",
+        "url": "/theme/admonitions#custom-titles"
+      },
+      {
+        "id": "how-the-icons-work",
+        "heading": "How the Icons Work",
+        "level": 2,
+        "content": "",
+        "url": "/theme/admonitions#how-the-icons-work"
+      },
+      {
+        "id": "layout-customization",
+        "heading": "Layout Customization",
+        "level": 2,
+        "content": "",
+        "url": "/theme/admonitions#layout-customization"
+      }
+    ]
+  },
+  {
+    "id": "heading-anchors",
+    "title": "Heading Anchors",
+    "description": "How Trellis heading anchors work — link icon on hover with copy-to-clipboard.",
+    "keywords": [
+      "headings",
+      "anchors",
+      "copy",
+      "clipboard"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/theme/heading-anchors",
+    "content": "\r\nEvery heading in Trellis documentation (`##`, `###`, `####`) automatically gets an anchor link. Hover over any heading to see a link icon — click it to copy the anchor URL to your clipboard.\r\n\r\n## How It Works\r\n\r\nDocusaurus generates an `id` attribute for each heading based on its text content. Tr",
+    "sections": [
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/theme/heading-anchors#how-it-works"
+      },
+      {
+        "id": "anchor-id-generation",
+        "heading": "Anchor ID Generation",
+        "level": 2,
+        "content": "",
+        "url": "/theme/heading-anchors#anchor-id-generation"
+      },
+      {
+        "id": "linking-to-headings",
+        "heading": "Linking to Headings",
+        "level": 2,
+        "content": "",
+        "url": "/theme/heading-anchors#linking-to-headings"
+      }
+    ]
+  },
+  {
+    "id": "theme",
+    "title": "Theme Overview",
+    "description": "How the Trellis theme works — ejected components, customization approach, and directory structure.",
+    "keywords": [
+      "theme",
+      "components",
+      "ejected",
+      "customization"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/theme",
+    "content": "\r\nTrellis includes 107 ejected Docusaurus theme components that provide a customized look and improved UX out of the box.\r\n\r\n## Ejected vs Wrapped\r\n\r\nDocusaurus offers two ways to customize theme components:\r\n\r\n- **Wrapping** — import the original component and render it with modifications (keeps up",
+    "sections": [
+      {
+        "id": "ejected-vs-wrapped",
+        "heading": "Ejected vs Wrapped",
+        "level": 2,
+        "content": "",
+        "url": "/theme#ejected-vs-wrapped"
+      },
+      {
+        "id": "whats-customized",
+        "heading": "What's Customized",
+        "level": 2,
+        "content": "",
+        "url": "/theme#whats-customized"
+      },
+      {
+        "id": "directory-structure",
+        "heading": "Directory Structure",
+        "level": 2,
+        "content": "",
+        "url": "/theme#directory-structure"
+      },
+      {
+        "id": "modifying-theme-components",
+        "heading": "Modifying Theme Components",
+        "level": 2,
+        "content": "",
+        "url": "/theme#modifying-theme-components"
+      }
+    ]
+  },
+  {
+    "id": "last-updated",
+    "title": "Last Updated at Top",
+    "description": "How Trellis moves the last-updated date and edit links to the top of each page.",
+    "keywords": [
+      "last-updated",
+      "edit",
+      "theme",
+      "docitem"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/theme/last-updated",
+    "content": "\r\nIn vanilla Docusaurus, the last-updated date and \"Edit this page\" link appear at the **bottom** of the page, in the footer area. Trellis moves them to the **top**, directly below the page title.\r\n\r\n## Why Top Placement?\r\n\r\nReaders want to know immediately whether the content they're reading is cur",
+    "sections": [
+      {
+        "id": "why-top-placement",
+        "heading": "Why Top Placement?",
+        "level": 2,
+        "content": "",
+        "url": "/theme/last-updated#why-top-placement"
+      },
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 2,
+        "content": "",
+        "url": "/theme/last-updated#how-it-works"
+      },
+      {
+        "id": "configuration",
+        "heading": "Configuration",
+        "level": 2,
+        "content": "",
+        "url": "/theme/last-updated#configuration"
+      },
+      {
+        "id": "the-suggest-an-edit-link",
+        "heading": "The \"Suggest an Edit\" Link",
+        "level": 2,
+        "content": "",
+        "url": "/theme/last-updated#the-suggest-an-edit-link"
+      }
+    ]
+  },
+  {
+    "id": "tabs",
+    "title": "Tabs",
+    "description": "How Trellis tabs work — pill-style design with URL query parameter synchronization.",
+    "keywords": [
+      "tabs",
+      "url sync",
+      "pill style",
+      "query parameters"
+    ],
+    "last_update": {
+      "date": "02/20/2026",
+      "author": "Trellis"
+    },
+    "url": "/theme/tabs",
+    "content": "\r\nimport Tabs from '@theme/Tabs';\r\nimport TabItem from '@theme/TabItem';\r\n\r\nTrellis tabs have two enhancements over vanilla Docusaurus: **pill-style design** and **URL query parameter synchronization**.\r\n\r\n## Pill-Style Tabs\r\n\r\nInstead of the default underline-style tabs, Trellis uses pill-shaped ta",
+    "sections": [
+      {
+        "id": "pillstyle-tabs",
+        "heading": "Pill-Style Tabs",
+        "level": 2,
+        "content": "",
+        "url": "/theme/tabs#pillstyle-tabs"
+      },
+      {
+        "id": "url-synchronization",
+        "heading": "URL Synchronization",
+        "level": 2,
+        "content": "",
+        "url": "/theme/tabs#url-synchronization"
+      },
+      {
+        "id": "how-it-works",
+        "heading": "How It Works",
+        "level": 3,
+        "content": "",
+        "url": "/theme/tabs#how-it-works"
+      },
+      {
+        "id": "custom-query-parameter-names",
+        "heading": "Custom Query Parameter Names",
+        "level": 3,
+        "content": "",
+        "url": "/theme/tabs#custom-query-parameter-names"
+      },
+      {
+        "id": "usage",
+        "heading": "Usage",
+        "level": 2,
+        "content": "",
+        "url": "/theme/tabs#usage"
+      }
+    ]
+  }
+]

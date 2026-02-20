@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Trellis Favicon — Simplified lattice + leaf -->
+
+  <!-- Minimal lattice (just the core diamond) -->
+  <g stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" fill="none">
+    <line x1="6" y1="6" x2="26" y2="26"/>
+    <line x1="26" y1="6" x2="6" y2="26"/>
+    <line x1="6" y1="16" x2="16" y2="6"/>
+    <line x1="16" y1="6" x2="26" y2="16"/>
+    <line x1="6" y1="16" x2="16" y2="26"/>
+    <line x1="16" y1="26" x2="26" y2="16"/>
+  </g>
+
+  <!-- Center node -->
+  <circle cx="16" cy="16" r="2.5" fill="#2dd4bf"/>
+
+  <!-- Single leaf accent -->
+  <path d="M 16,14 C 12,10 10,6 14,6 C 18,6 17,11 16,14 Z" fill="#2dd4bf" opacity="0.9"/>
+</svg>

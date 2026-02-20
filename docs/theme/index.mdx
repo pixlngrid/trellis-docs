@@ -1,0 +1,81 @@
+---
+title: Theme Overview
+description: How the Trellis theme works — ejected components, customization approach, and directory structure.
+keywords: [theme, components, ejected, customization]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+Trellis includes 107 ejected Docusaurus theme components that provide a customized look and improved UX out of the box.
+
+## Ejected vs Wrapped
+
+Docusaurus offers two ways to customize theme components:
+
+- **Wrapping** — import the original component and render it with modifications (keeps upstream updates)
+- **Ejecting** — copy the full component source into your project (full control, manual updates)
+
+Trellis uses the **ejected** approach. This gives complete control over every aspect of rendering — from where the last-updated date appears to what icons admonitions use. The trade-off is that upstream Docusaurus theme updates need to be manually reviewed and merged.
+
+## What's Customized
+
+Most of the 107 components are lightly modified or simply ejected for consistency. The significant customizations are:
+
+| Area | What changed | Details |
+|------|-------------|---------|
+| [Last Updated](/theme/last-updated/) | Date moved to page top | Appears right below the title instead of at the bottom |
+| [Heading Anchors](/theme/heading-anchors/) | Copy-to-clipboard | Click the link icon to copy the heading URL |
+| [Tabs](/theme/tabs/) | URL sync + pill styling | Tab selection saved to URL query params, pill-style design |
+| [Admonitions](/theme/admonitions/) | Custom SVG icons | Each type (note, tip, info, caution, danger) has a unique icon |
+| Edit links | Custom pencil icon + "Suggest Edit" | Pencil SVG replaces default; "Suggest Edit" opens a GitHub issue |
+| Sidebar | Enhanced styling | Accent colors, hover states, active indicators via CSS tokens |
+| Dark mode | Default to dark | Ships with dark mode as default, respects system preference |
+
+## Directory Structure
+
+```
+src/theme/
+├── Admonition/
+│   ├── Icon/          # Note.js, Tip.js, Info.js, Danger.js, Warning.js
+│   ├── Layout/        # Admonition container layout
+│   ├── Type/          # Type-specific rendering (Caution, Danger, Info, Note, Tip, Warning)
+│   ├── Types.js       # Type registry
+│   └── index.js       # Main admonition component
+├── DocItem/
+│   ├── Content/       # ← Main customization: last-updated at top, suggest edit
+│   ├── Footer/
+│   ├── Layout/
+│   ├── Metadata/
+│   ├── Paginator/
+│   └── TOC/
+├── DocRoot/Layout/    # Main page layout + sidebar container
+├── DocSidebar/        # Desktop + mobile sidebar
+├── DocSidebarItem/    # Category, link, and HTML sidebar items
+├── Tabs/              # ← Pill-style tabs with URL sync
+├── Details/           # Collapsible sections with brand colors
+├── Footer/            # Multi-column footer layout
+├── EditThisPage/      # Custom pencil SVG icon
+├── NotFound/          # 404 page
+├── MDXComponents/     # MDX component overrides
+├── MDXContent/
+├── AnnouncementBar/
+├── DocBreadcrumbs/
+├── DocCard/
+├── DocCardList/
+├── PaginatorNavLink/
+├── TabItem/
+└── ErrorPageContent.js
+```
+
+## Modifying Theme Components
+
+To customize a component, edit it directly in `src/theme/`. Docusaurus automatically resolves components from this directory before falling back to the built-in theme.
+
+:::tip
+Before making changes, read the existing component code to understand what it does. Most components import from `@docusaurus/theme-common` or `@docusaurus/theme-common/internal` — check those APIs if you need to understand available hooks and utilities.
+:::
+
+:::caution
+Since these are ejected components, they won't automatically receive Docusaurus upstream updates. When upgrading Docusaurus, check the [changelog](https://docusaurus.io/changelog) for theme component changes that may need to be manually applied.
+:::

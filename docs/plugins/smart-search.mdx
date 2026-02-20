@@ -1,0 +1,80 @@
+---
+title: Smart Search
+description: How the smart search plugin works — build-time indexing with Fuse.js for fast client-side search.
+keywords: [search, fuse.js, indexing, smart search]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+The smart search plugin indexes all documentation at build time and provides fast, client-side search using [Fuse.js](https://www.fusejs.io/). No external search service (like Algolia) is required.
+
+## How It Works
+
+1. **Build time** — the plugin scans all documentation files, extracts titles, headings, descriptions, keywords, and content
+2. **Index generation** — a `searchIndex.json` file is written to the `static/` directory
+3. **Client side** — the search UI loads the index and uses Fuse.js for fuzzy matching with configurable field weights
+
+## Configuration
+
+```js title="docusaurus.config.js"
+['smart-search-plugin', {
+  // Folders to exclude from indexing
+  excludedFolders: ['includes', '_includes'],
+
+  // File prefixes to exclude (e.g., _partial.mdx)
+  excludedPrefixes: ['_'],
+
+  // Field weights for search relevance (0.0 to 1.0)
+  searchWeights: {
+    title: 1.0,              // Page title — highest weight
+    'sections.heading': 1.0, // Section headings — highest weight
+    keywords: 0.8,           // Frontmatter keywords
+    description: 0.6,        // Frontmatter description
+    'sections.content': 0.5, // Section body content
+    content: 0.4,            // Full page content — lowest weight
+  },
+}]
+```
+
+### Search Weights
+
+Weights control how much each field contributes to search relevance. A weight of `1.0` means the field has maximum influence; `0.0` would exclude it entirely.
+
+| Field | Default Weight | Description |
+|-------|---------------|-------------|
+| `title` | 1.0 | The page title from frontmatter |
+| `sections.heading` | 1.0 | Individual section headings (`##`, `###`) |
+| `keywords` | 0.8 | The `keywords` array from frontmatter |
+| `description` | 0.6 | The `description` field from frontmatter |
+| `sections.content` | 0.5 | Text content within each section |
+| `content` | 0.4 | Full page text content |
+
+### Excluded Content
+
+Files are excluded from indexing if:
+- They are in a folder listed in `excludedFolders`
+- Their filename starts with a prefix in `excludedPrefixes`
+- They are `index.mdx` files used as category pages (these are still indexed, but check your content structure)
+
+## Adding Keywords
+
+Add a `keywords` array to your frontmatter to improve search discoverability:
+
+```yaml title="Any .mdx file"
+---
+title: Smart Search
+keywords: [search, fuse.js, indexing, full-text]
+---
+```
+
+Keywords are weighted at `0.8` by default — higher than content but lower than titles. Use them for synonyms or terms that don't appear in the page text.
+
+## Search UI
+
+The search interface is provided by the `CustomSearch` component in `src/components/CustomSearch/`. It renders as a search icon in the navbar that opens a modal with:
+
+- Text input with instant results
+- Highlighted matching text
+- Section-level results (not just page-level)
+- Keyboard navigation support

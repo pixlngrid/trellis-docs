@@ -1,0 +1,74 @@
+/* styles.module.css */
+
+.tabs {
+  padding: 0px 0;
+}
+
+.tabList {
+  margin-bottom: 0;
+}
+
+.tabList ul {
+  margin-bottom: 0px;
+}
+
+.tabList li {
+  margin-bottom: 0px;
+}
+
+.tabList p {
+  margin: 0.75em 0;
+}
+
+.tabList h4 {
+  margin-top: 1.25em;
+}
+
+.tabItem {
+  margin-top: 0rem !important;
+  font-weight: 600;
+  font-size: 17px;
+  padding: 0.25rem 0.75rem 0.2rem 0.75rem;
+  border-radius: 9999px; /* Fully rounded corners */
+  border: none;
+  transition:
+    background-color 0.05s ease,
+    color 0.05s ease,
+    box-shadow 0.05s ease;
+  cursor: pointer;
+  background-color: var(--ifm-background-color);
+}
+
+.tabItem:hover {
+  background-color: var(--ifm-color-primary-lightest);
+  color: #333333;
+}
+
+.roundedTabList {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap; /* Allow tabs to wrap to the next line */
+}
+
+/* Media query to reduce the gap when tabs stack on smaller screens */
+@media (max-width: 768px) {
+  .roundedTabList {
+    gap: 0.35rem; /* Reduce the gap when stacked on smaller screens */
+  }
+}
+
+.activeTabItem {
+  background-color: var(--ifm-color-primary-darker);
+  color: white;
+  /* Prevent hover effect on active tab */
+  pointer-events: none;
+  transition: none;
+}
+
+[data-theme='dark'] .activeTabItem {
+  color: var(--neutral-slate-900-value, #0f172a);
+}
+
+.tabItemContent > *:last-child {
+  margin-bottom: 0;
+}

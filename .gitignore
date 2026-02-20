@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build
+build/
+.docusaurus/
+
+# Generated
+src/css/tokens.css
+
+# System
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local

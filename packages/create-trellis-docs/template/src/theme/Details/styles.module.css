@@ -1,0 +1,52 @@
+/* styles.module.css */
+
+/* Define variables for light mode */
+:root {
+  --details-bg-color: #F6F8FA;
+  --details-border-color: #3856A616;
+  --details-text-color: #333333;
+  --details-link-color: var(--brand-primary-600-value);
+  --details-padding: 16px;
+}
+
+/* Define variables for dark mode */
+[data-theme='dark'] {
+  --details-bg-color: #2E2E2E;
+  --details-border-color: #565656;
+  --details-text-color: #DDDDDD;
+  --details-link-color: var(--accent-teal-400-value);
+  --details-padding: 16px;
+}
+
+.padding {
+  padding: 0 0;
+}
+
+/* details */
+.details {
+  --docusaurus-details-decoration-color: var(--details-link-color);
+  --docusaurus-details-transition: transform var(--ifm-transition-fast) ease;
+  margin: 0 0 var(--ifm-spacing-vertical);
+  border: 0.01px solid var(--details-border-color);
+  color: var(--details-text-color);
+}
+
+.detailsContainer {
+  background-color: var(--details-bg-color);
+
+
+}
+
+.detailsContainer a {
+  color: var(--details-link-color);
+  text-decoration: none;
+}
+
+/* summary */
+.summaryHeading {
+  font-size: 17px;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  vertical-align: bottom;
+}
+

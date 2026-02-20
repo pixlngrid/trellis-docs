@@ -1,0 +1,45 @@
+---
+title: Heading Anchors
+description: How Trellis heading anchors work — link icon on hover with copy-to-clipboard.
+keywords: [headings, anchors, copy, clipboard]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+Every heading in Trellis documentation (`##`, `###`, `####`) automatically gets an anchor link. Hover over any heading to see a link icon — click it to copy the anchor URL to your clipboard.
+
+## How It Works
+
+Docusaurus generates an `id` attribute for each heading based on its text content. Trellis enhances this with:
+
+1. **Visible link icon** — appears on hover to the left of the heading text
+2. **Copy to clipboard** — clicking the icon copies the full URL (including the `#anchor` fragment) to your clipboard
+3. **Keyboard accessible** — the anchor link is focusable and activates on Enter
+
+## Anchor ID Generation
+
+Heading IDs follow Docusaurus conventions:
+
+| Heading | Generated ID |
+|---------|-------------|
+| `## Getting Started` | `#getting-started` |
+| `## How It Works` | `#how-it-works` |
+| `### API Reference (v2)` | `#api-reference-v2` |
+
+You can also set a custom ID:
+
+```markdown
+## My Heading {#custom-id}
+```
+
+## Linking to Headings
+
+Use the generated anchor in markdown links:
+
+```markdown
+See the [configuration section](#configuration) below.
+
+Or link to another page's heading:
+[Smart Search weights](/plugins/smart-search/#configuration)
+```
