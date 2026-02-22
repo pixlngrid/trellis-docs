@@ -26,11 +26,20 @@ export function resolveSidebar(docTitles?: Record<string, string>): ResolvedSide
       }
     }
 
+    if (item.type === 'category') {
+      return {
+        type: 'category',
+        label: item.label,
+        collapsed: item.collapsed,
+        items: item.items.map(resolve),
+      }
+    }
+
+    // type === 'link'
     return {
-      type: 'category',
+      type: 'doc',
       label: item.label,
-      collapsed: item.collapsed,
-      items: item.items.map(resolve),
+      href: item.href,
     }
   }
 
