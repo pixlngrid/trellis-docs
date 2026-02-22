@@ -25,7 +25,8 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci --ignore-platform
 
       - name: Build tokens, search index, and FAQ index
         run: |
