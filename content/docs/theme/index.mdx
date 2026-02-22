@@ -23,7 +23,6 @@ The significant customizations are:
 | [Heading Anchors](/theme/heading-anchors/) | Copy-to-clipboard | Click the link icon to copy the heading URL |
 | [Tabs](/theme/tabs/) | URL sync + pill styling | Tab selection saved to URL query params, pill-style design |
 | [Admonitions](/theme/admonitions/) | Custom SVG icons | Each type (note, tip, info, caution, danger) has a unique icon |
-| Edit links | Custom pencil icon + "Suggest Edit" | Pencil SVG replaces default; "Suggest Edit" opens a GitHub issue |
 | Sidebar | Enhanced styling | Accent colors, hover states, active indicators via CSS tokens |
 | Dark mode | Default to dark | Ships with dark mode as default, respects system preference |
 
@@ -31,36 +30,22 @@ The significant customizations are:
 
 ```
 components/docs/
-├── Admonition/
-│   ├── Icon/          # Note.js, Tip.js, Info.js, Danger.js, Warning.js
-│   ├── Layout/        # Admonition container layout
-│   ├── Type/          # Type-specific rendering (Caution, Danger, Info, Note, Tip, Warning)
-│   ├── Types.js       # Type registry
-│   └── index.js       # Main admonition component
-├── DocItem/
-│   ├── Content/       # ← Main customization: last-updated at top, suggest edit
-│   ├── Footer/
-│   ├── Layout/
-│   ├── Metadata/
-│   ├── Paginator/
-│   └── TOC/
-├── DocRoot/Layout/    # Main page layout + sidebar container
-├── DocSidebar/        # Desktop + mobile sidebar
-├── DocSidebarItem/    # Category, link, and HTML sidebar items
-├── Tabs/              # ← Pill-style tabs with URL sync
-├── Details/           # Collapsible sections with brand colors
-├── Footer/            # Multi-column footer layout
-├── EditThisPage/      # Custom pencil SVG icon
-├── NotFound/          # 404 page
-├── MDXComponents/     # MDX component overrides
-├── MDXContent/
-├── AnnouncementBar/
-├── DocBreadcrumbs/
-├── DocCard/
-├── DocCardList/
-├── PaginatorNavLink/
-├── TabItem/
-└── ErrorPageContent.js
+├── mdx/
+│   ├── index.tsx            # MDX component registry
+│   ├── callout.tsx          # Admonitions (note, tip, info, caution, danger) with custom SVG icons
+│   ├── code-block.tsx       # Shiki syntax highlighting (server component)
+│   ├── code-block-client.tsx # Copy button + word wrap toggle (client component)
+│   ├── heading.tsx          # Heading anchors with copy-to-clipboard
+│   ├── tabs.tsx             # Pill-style tabs with URL sync
+│   ├── image-lightbox.tsx   # Click-to-zoom image modal
+│   └── mermaid.tsx          # Mermaid diagram renderer with pan/zoom
+├── search/
+│   └── search-dialog.tsx    # Cmd+K search modal (Fuse.js)
+├── navbar.tsx               # Top navbar + mobile sidebar drawer
+├── sidebar.tsx              # Desktop sidebar with collapsible categories
+├── breadcrumbs.tsx          # Breadcrumb navigation
+├── toc.tsx                  # Table of contents (right sidebar)
+└── footer.tsx               # Site footer
 ```
 
 ## Modifying Theme Components

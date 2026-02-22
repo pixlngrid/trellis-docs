@@ -73,33 +73,34 @@ Always run `npm run build` before deploying.
 
 ## How the Icons Work
 
-Each admonition type has a dedicated icon component in `components/docs/Admonition/Icon/`:
+All admonition icons and layout are defined in a single file: `components/docs/mdx/callout.tsx`. Each type (note, tip, info, caution, danger, warning) has a dedicated inline SVG stored in an `icons` record:
 
-```
-components/docs/Admonition/Icon/
-├── Note.js      # Information circle icon
-├── Tip.js       # Lightbulb icon
-├── Info.js      # Information circle variant
-├── Danger.js    # Exclamation triangle icon
-└── Warning.js   # Warning triangle icon
-```
-
-Each component exports an SVG element. To customize an icon, edit the corresponding file:
-
-```jsx title="components/docs/Admonition/Icon/Note.js"
-import React from 'react';
-export default function AdmonitionIconNote(props) {
-  return (
-    <svg viewBox="0 0 14 16" {...props}>
-      <path
-        fillRule="evenodd"
-        d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7..."
-      />
+```tsx title="components/docs/mdx/callout.tsx (simplified)"
+const icons: Record<string, React.ReactNode> = {
+  note: (
+    <svg viewBox="0 0 14 16" width="16" height="16" fill="currentColor">
+      <path fillRule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7..." />
     </svg>
-  );
+  ),
+  tip: ( /* lightbulb icon */ ),
+  info: ( /* info circle icon */ ),
+  caution: ( /* warning triangle icon */ ),
+  danger: ( /* fire/flame icon */ ),
 }
 ```
 
-## Layout Customization
+To customize an icon, edit the corresponding SVG in the `icons` record.
 
-The admonition layout (container, heading, content) is defined in `components/docs/Admonition/Layout/index.js`. The type-specific components in `components/docs/Admonition/Type/` combine the icon and layout for each admonition type.
+## Layout
+
+The `Callout` component renders the container, icon, optional title, and content in a single component. Admonition type determines the accent color via a `styles` record that maps each type to Tailwind classes:
+
+```tsx title="components/docs/mdx/callout.tsx (simplified)"
+const styles: Record<string, { border: string; bg: string; text: string }> = {
+  note: { border: 'border-blue-500', bg: 'bg-blue-500/10', text: 'text-blue-500' },
+  tip:  { border: 'border-green-500', bg: 'bg-green-500/10', text: 'text-green-500' },
+  // ... etc.
+}
+```
+
+The `:::` syntax in MDX is processed by a custom remark plugin (`lib/remark-callout.ts`) that converts directive nodes into `<Callout>` components during rendering.

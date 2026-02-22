@@ -15,29 +15,25 @@ Readers want to know immediately whether the content they're reading is current.
 
 ## How It Works
 
-The customization lives in `components/docs/DocItem/Content/index.js`. The key changes:
+The last-updated row is rendered in the doc page layout at `app/(docs)/[...slug]/page.tsx`, directly between the `<h1>` title and the MDX content:
 
-1. **`DocItemHeader` component** — renders a `LastUpdatedRow` with the date, "Edit this page" link, and "Suggest an Edit" link
-2. **Placement** — `DocItemHeader` is rendered inside the `<header>` block, right after the page title heading
-3. **"Suggest an Edit" link** — a Trellis addition that opens a pre-filled GitHub issue using the repo URL from `siteConfig.customFields.repoUrl`
+```tsx title="app/(docs)/[...slug]/page.tsx (simplified)"
+<h1>{doc.meta.title}</h1>
 
-```jsx title="Simplified structure in DocItem/Content/index.js"
-export default function DocItemContent({children}) {
-  const syntheticTitle = useSyntheticTitle();
-  return (
-    <div className="markdown">
-      {syntheticTitle && (
-        <header>
-          <Heading as="h1">{syntheticTitle}</Heading>
-          {/* ← Last-updated row renders here, at the top */}
-          <DocItemHeader />
-        </header>
-      )}
-      <MDXContent>{children}</MDXContent>
-    </div>
-  );
-}
+{doc.meta.last_update && (
+  <div className="text-sm text-muted mb-4">
+    Last updated: {doc.meta.last_update.date}
+    {siteConfig.lastUpdated.showAuthor && doc.meta.last_update.author
+      && ` by ${doc.meta.last_update.author}`}
+  </div>
+)}
+
+<div className="prose">
+  <MDXRemote source={doc.content} ... />
+</div>
 ```
+
+If a page has no `last_update` in its frontmatter, the row is omitted entirely.
 
 ## Configuration
 
@@ -61,16 +57,3 @@ lastUpdated: {
 
 When `showAuthor` is `false` (the default), only the date renders. The author remains in the frontmatter for contributor reference.
 
-## The "Suggest an Edit" Link
-
-The "Suggest an Edit" link is a Trellis feature that creates a pre-filled GitHub issue. It uses the `repoUrl` custom field:
-
-```ts title="config/site.ts"
-customFields: {
-  repoUrl: 'https://github.com/your-org/your-repo',
-},
-```
-
-When clicked, it opens: `{repoUrl}/issues/new?title={pageTitle}&body=Issue with: {pagePermalink}`
-
-To disable it, remove the `repoUrl` custom field.

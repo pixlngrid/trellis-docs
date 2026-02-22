@@ -20,33 +20,25 @@ graph TB
 
     subgraph "Theme Layer"
         C --> D[Custom Components]
-        D --> E[DocItem / Sidebar / Tabs / Admonitions / ...]
+        D --> E[Sidebar / Navbar / MDX Components / ...]
     end
 
-    subgraph "Plugin Layer"
-        F[smart-search-plugin]
-        G[faq-index-plugin]
-        H[redirects-plugin]
-        I[lightbox-image-plugin]
-        J[panzoom plugin]
+    subgraph "Build Scripts"
+        F[build-search-index.js]
+        G[build-faq-index.js]
     end
 
     subgraph "Content"
         K[content/docs/*.mdx]
-        L[blog/*.md]
-        M[app/**/*.tsx]
+        L[app/**/*.tsx]
     end
 
     E --> N[Next.js Build]
     F --> N
     G --> N
-    H --> N
-    I --> N
-    J --> N
     K --> N
     L --> N
-    M --> N
-    N --> O[Static Site]
+    N --> O[Static Site &#40out/&#41]
 ```
 
 ## Design Token Pipeline
@@ -62,7 +54,7 @@ design-tokens.json  →  scripts/build-tokens.js  →  app/tokens.css
 1. `design-tokens.json` defines colors, spacing, border radii, and typography as nested objects with `value` and `type` properties
 2. `scripts/build-tokens.js` recursively traverses the JSON and generates a `:root {}` block with CSS custom properties
 3. The output lands in `app/tokens.css`, which is imported in `app/globals.css`
-4. `globals.css` maps these tokens to CSS variables (e.g., `--ifm-color-primary`)
+4. `globals.css` maps these tokens to semantic CSS variables (e.g., `--primary`, `--muted`)
 
 This means you change colors in one place (`design-tokens.json`) and they propagate everywhere.
 
@@ -74,71 +66,73 @@ Trellis uses custom theme components that provide complete control over renderin
 
 ```
 components/docs/
-├── Admonition/           # Custom SVG icons + layout
-│   ├── Icon/             # Note, Tip, Info, Caution, Danger icons
-│   ├── Layout/
-│   └── Type/
-├── DocItem/
-│   ├── Content/          # Last-updated at top, "Suggest Edit" link
-│   ├── Footer/
-│   ├── Layout/
-│   ├── Metadata/
-│   ├── Paginator/
-│   └── TOC/
-├── DocRoot/              # Main layout + sidebar
-├── DocSidebar/           # Desktop + mobile sidebar
-├── DocSidebarItem/       # Category, link, HTML items
-├── Tabs/                 # Pill-style tabs with URL sync
-├── Details/              # Collapsible sections
-├── Footer/               # Site footer
-├── EditThisPage/         # Custom pencil icon
-├── NotFound/             # 404 page
-└── ...                   # ~107 total components
+├── mdx/
+│   ├── index.tsx            # MDX component registry
+│   ├── callout.tsx          # Admonitions (note, tip, info, caution, danger) with custom SVG icons
+│   ├── code-block.tsx       # Shiki syntax highlighting (server component)
+│   ├── code-block-client.tsx # Copy button + word wrap toggle (client component)
+│   ├── heading.tsx          # Heading anchors with copy-to-clipboard
+│   ├── tabs.tsx             # Pill-style tabs with URL sync
+│   ├── image-lightbox.tsx   # Click-to-zoom image modal
+│   └── mermaid.tsx          # Mermaid diagram renderer with pan/zoom
+├── search/
+│   └── search-dialog.tsx    # Cmd+K search modal (Fuse.js)
+├── navbar.tsx               # Top navbar + mobile sidebar drawer
+├── sidebar.tsx              # Desktop sidebar with collapsible categories
+├── breadcrumbs.tsx          # Breadcrumb navigation
+├── toc.tsx                  # Table of contents (right sidebar)
+└── footer.tsx               # Site footer
 ```
 
-### Key Modifications
+### Key Components
 
-| Component | What changed |
+| Component | What it does |
 |-----------|-------------|
-| `DocItem/Content` | Last-updated row rendered at page **top** instead of bottom. Added "Suggest an Edit" link that opens a pre-filled GitHub issue |
-| `Tabs` | Tab selection synced to URL query parameters. Pill-style CSS with accent colors |
-| `Admonition/Icon/*` | Each admonition type (note, tip, info, caution, danger) uses a custom SVG icon instead of the default |
-| `EditThisPage` | Uses a custom inline SVG pencil icon instead of the default |
-| `Details` | Styled with brand and accent token colors |
+| `callout.tsx` | Each admonition type (note, tip, info, caution, danger) has a custom SVG icon and styled container |
+| `tabs.tsx` | Tab selection synced to URL query parameters; pill-style CSS with accent colors |
+| `heading.tsx` | Heading anchors with click-to-copy URL functionality |
+| `code-block.tsx` | Shiki dual-theme syntax highlighting with line highlighting, diffs, and focus |
+| `code-block-client.tsx` | Copy button and word wrap toggle for code blocks |
 
-## Plugin Layer
+## Build Scripts & Features
 
-Trellis bundles five plugins that hook into different parts of the build lifecycle:
+Trellis uses pre-build scripts and client-side components for additional functionality:
 
-| Plugin | Lifecycle Hook | Purpose |
-|--------|---------------|---------|
-| `smart-search-plugin` | `postBuild` | Indexes all docs at build time, generates `searchIndex.json` for client-side Fuse.js search |
-| `faq-index-plugin` | `loadContent` + `contentLoaded` | Scans FAQ directory for `###` headings, exposes data via `setGlobalData` |
-| `redirects-plugin` | `postBuild` | Reads `redirects.json`, generates HTML files with meta-refresh redirects |
-| `lightbox-image-plugin` | Client-side | Adds click-to-zoom to all `.markdown img` elements |
-| Mermaid pan/zoom | Client-side | Enables pan and zoom on Mermaid diagrams and other supported elements |
+| Script / Component | Runs | Purpose |
+|---------------------|------|---------|
+| `build-search-index.js` | Pre-build | Indexes all docs, generates `public/searchIndex.json` for client-side Fuse.js search |
+| `build-faq-index.js` | Pre-build | Scans FAQ directory for `###` headings, generates `public/faqIndex.json` |
+| `build-tokens.js` | Pre-build | Converts `design-tokens.json` into `app/tokens.css` |
+| `image-lightbox.tsx` | Client-side | Click-to-zoom modal for images in MDX content |
+| `mermaid.tsx` | Client-side | Mermaid diagram renderer with pan and zoom support |
 
 ## Project Structure
 
 ```
 trellis/
 ├── design-tokens.json        # Brand colors, spacing, typography
-├── config/site.ts            # Site configuration + plugin registration
-├── config/sidebar.ts         # Sidebar navigation structure
-├── redirects.json             # URL redirect definitions
+├── config/
+│   ├── site.ts               # Site configuration (metadata, search, color mode)
+│   └── sidebar.ts            # Sidebar navigation structure
+├── redirects.json            # URL redirect definitions
 ├── scripts/
-│   └── build-tokens.js       # Token → CSS converter
+│   ├── build-tokens.js       # Token → CSS converter
+│   ├── build-search-index.js # Search index generator
+│   └── build-faq-index.js    # FAQ index generator
 ├── content/docs/             # Documentation content (MDX)
-├── blog/                     # Blog/release notes (Markdown)
 ├── app/
+│   ├── (docs)/[...slug]/     # Doc page route (dynamic)
+│   ├── blog/                 # Blog page route
+│   ├── release-notes/        # Release notes route
 │   ├── tokens.css            # Generated — do not edit
-│   └── globals.css           # Theme overrides using token variables
+│   ├── globals.css           # Theme + Shiki styles using token variables
+│   └── layout.tsx            # Root layout with providers
 ├── components/
-│   ├── docs/                 # Theme components
-│   ├── custom/               # Reusable React components
-│   └── data/                 # JSON data files (glossary, etc.)
-├── public/                   # Static assets (images, search index)
+│   ├── docs/                 # Theme components (sidebar, navbar, MDX, etc.)
+│   ├── brand/                # Brand assets (logo SVGs)
+│   └── custom/               # Reusable React components
+├── lib/                      # Utilities (content loader, TOC extractor, etc.)
+├── public/                   # Static assets (images, searchIndex.json)
 └── packages/
-    ├── faq-index-plugin/     # FAQ indexing plugin
-    └── redirects-plugin/     # Redirect management plugin
+    └── create-trellis-docs/  # CLI scaffolder (npx create-trellis-docs)
 ```
