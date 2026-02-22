@@ -3,8 +3,6 @@ title: Writing Documentation
 sidebar_position: 1
 ---
 
-# Writing Documentation
-
 Learn how to write and organize your documentation content.
 
 ## File Structure

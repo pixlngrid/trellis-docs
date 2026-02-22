@@ -3,8 +3,6 @@ title: Getting Started
 sidebar_position: 1
 ---
 
-# Getting Started
-
 Welcome to your documentation site powered by **Trellis**.
 
 ## Quick Start
