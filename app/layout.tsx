@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: siteConfig.tagline,
   icons: { icon: { url: siteConfig.favicon, type: 'image/svg+xml' } },
   openGraph: {
-    description: `${siteConfig.title} — an opinionated docs framework by PixlnGrid.`,
+    description: `${siteConfig.title} — an opinionated docs framework by Pixl'n Grid.`,
   },
 }
 
