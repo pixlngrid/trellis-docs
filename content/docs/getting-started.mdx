@@ -1,0 +1,103 @@
+---
+title: Getting Started
+description: Get up and running with the Trellis docs framework.
+keywords: [getting-started, setup, introduction]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+Welcome to **Trellis** — an opinionated docs framework built on Next.js with custom theme enhancements, smart search, and a design token system.
+
+## Prerequisites
+
+Before getting started, make sure you have the following installed:
+
+- **Node.js 18+** — [download here](https://nodejs.org/)
+- **npm**, **yarn**, or **pnpm** — npm comes bundled with Node.js
+- **Git** — [download here](https://git-scm.com/)
+
+You can verify your setup by running:
+
+```bash
+node --version   # Should print v18.x or higher
+npm --version    # Should print 9.x or higher
+git --version
+```
+
+## What's Included
+
+| Category | Highlights | Learn More |
+|----------|-----------|------------|
+| **Theme** | Last-updated at top, heading copy-to-clipboard, pill-style tabs, custom admonition icons | [Theme Overview](/theme/) |
+| **Design Tokens** | JSON-to-CSS pipeline for centralized brand management | [Design Tokens](/design-tokens/) |
+| **Plugins** | Smart search, FAQ indexer, redirects, image lightbox, Mermaid pan/zoom | [Plugins Overview](/plugins/) |
+| **Components** | Glossary, feedback widget, flipping cards, search UI | [Components](/components/) |
+
+New to Trellis? Read [What is Trellis?](/overview/) for the full picture, or see the [feature comparison](/overview/trellis-vs-nextjs/) with vanilla Next.js.
+
+## Quick Start
+
+### Option A: Scaffold a new project
+
+The fastest way to start a new docs site:
+
+```bash
+npx create-trellis-docs my-docs
+cd my-docs
+npm run dev
+```
+
+You'll be prompted for a site title, tagline, URL, and optional GitHub repo URL.
+
+### Option B: Clone the repo
+
+```bash
+git clone https://github.com/pixlngrid/trellis.git
+cd trellis
+
+npm install
+npm run dev
+```
+
+:::tip
+The dev server runs on port 3000 by default. Visit `http://localhost:3000` to see your docs.
+:::
+
+## Project Structure
+
+```
+trellis/
+├── content/
+│   ├── docs/              # Documentation content (MDX files)
+│   ├── blog/              # Blog posts
+│   └── release-notes/     # Version release notes
+├── app/
+│   ├── (docs)/            # Docs layout (navbar, sidebar, footer)
+│   ├── blog/              # Blog pages
+│   ├── release-notes/     # Release notes pages
+│   ├── globals.css        # Global CSS + dark/light mode tokens
+│   └── tokens.css         # Generated design token CSS
+├── components/
+│   ├── docs/              # Layout & MDX components
+│   ├── custom/            # Reusable components (glossary, feedback, etc.)
+│   └── brand/             # Logo components
+├── config/
+│   ├── site.ts            # Site title, logo, search, FAQ settings
+│   ├── sidebar.ts         # Sidebar navigation structure
+│   └── navigation.ts      # Navbar and footer links
+├── lib/                   # Content loading, utilities
+├── public/img/            # Static assets (images, logos, favicon)
+├── scripts/               # Build scripts (tokens, search index, FAQ index)
+├── design-tokens.json     # Design token definitions
+└── package.json
+```
+
+## Next Steps
+
+- [What is Trellis?](/overview/) — understand the framework and what it provides
+- [Trellis vs Next.js](/overview/trellis-vs-nextjs/) — feature comparison
+- [Content Authoring](/guides/content-authoring/) — create pages, blog posts, and release notes
+- [Writing Docs](/guides/writing-docs/) — markdown features (code blocks, admonitions, tabs)
+- [Design Tokens](/design-tokens/customizing/) — customize colors and branding
+- [Deployment](/guides/deployment/) — build and deploy your site

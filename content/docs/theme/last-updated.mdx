@@ -1,0 +1,75 @@
+---
+title: Last Updated at Top
+description: How Trellis moves the last-updated date and edit links to the top of each page.
+keywords: [last-updated, edit, theme, docitem]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+In many documentation frameworks, the last-updated date and "Edit this page" link appear at the **bottom** of the page, in the footer area. Trellis moves them to the **top**, directly below the page title.
+
+## Why Top Placement?
+
+Readers want to know immediately whether the content they're reading is current. Placing the date at the top gives instant context about freshness — no scrolling required. This is especially important for documentation that changes frequently, like API references or configuration guides.
+
+## How It Works
+
+The customization lives in `components/docs/DocItem/Content/index.js`. The key changes:
+
+1. **`DocItemHeader` component** — renders a `LastUpdatedRow` with the date, "Edit this page" link, and "Suggest an Edit" link
+2. **Placement** — `DocItemHeader` is rendered inside the `<header>` block, right after the page title heading
+3. **"Suggest an Edit" link** — a Trellis addition that opens a pre-filled GitHub issue using the repo URL from `siteConfig.customFields.repoUrl`
+
+```jsx title="Simplified structure in DocItem/Content/index.js"
+export default function DocItemContent({children}) {
+  const syntheticTitle = useSyntheticTitle();
+  return (
+    <div className="markdown">
+      {syntheticTitle && (
+        <header>
+          <Heading as="h1">{syntheticTitle}</Heading>
+          {/* ← Last-updated row renders here, at the top */}
+          <DocItemHeader />
+        </header>
+      )}
+      <MDXContent>{children}</MDXContent>
+    </div>
+  );
+}
+```
+
+## Configuration
+
+The last-updated date requires `showLastUpdateTime: true` in your `config/site.ts`:
+
+```ts title="config/site.ts"
+docs: {
+  showLastUpdateTime: true,  // Required for the date to appear
+  editUrl: 'https://github.com/your-org/your-repo/edit/main',
+},
+```
+
+Individual pages can also set the date via frontmatter:
+
+```yaml title="Any .mdx file"
+---
+last_update:
+  date: 02/20/2026
+  author: Your Name
+---
+```
+
+## The "Suggest an Edit" Link
+
+The "Suggest an Edit" link is a Trellis feature that creates a pre-filled GitHub issue. It uses the `repoUrl` custom field:
+
+```ts title="config/site.ts"
+customFields: {
+  repoUrl: 'https://github.com/your-org/your-repo',
+},
+```
+
+When clicked, it opens: `{repoUrl}/issues/new?title={pageTitle}&body=Issue with: {pagePermalink}`
+
+To disable it, remove the `repoUrl` custom field.

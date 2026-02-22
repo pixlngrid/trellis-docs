@@ -47,43 +47,43 @@
   },
   "brand": {
     "primary-50": {
-      "value": "#f5f3ff",
+      "value": "#f0f5fa",
       "type": "color"
     },
     "primary-100": {
-      "value": "#ede9fe",
+      "value": "#dce8f2",
       "type": "color"
     },
     "primary-200": {
-      "value": "#ddd6fe",
+      "value": "#b3cde0",
       "type": "color"
     },
     "primary-300": {
-      "value": "#c4b5fd",
+      "value": "#8bb3cf",
       "type": "color"
     },
     "primary-400": {
-      "value": "#a78bfa",
+      "value": "#7ba4c4",
       "type": "color"
     },
     "primary-500": {
-      "value": "#8b5cf6",
+      "value": "#4a7da8",
       "type": "color"
     },
     "primary-600": {
-      "value": "#7c3aed",
+      "value": "#2a5a82",
       "type": "color"
     },
     "primary-700": {
-      "value": "#6d28d9",
+      "value": "#1a3b5c",
       "type": "color"
     },
     "primary-800": {
-      "value": "#5b21b6",
+      "value": "#122a43",
       "type": "color"
     },
     "primary-900": {
-      "value": "#4c1d95",
+      "value": "#0b1c2e",
       "type": "color"
     }
   },
@@ -114,24 +114,24 @@
     }
   },
   "accent": {
-    "teal-200": {
-      "value": "#99f6e4",
+    "olive-200": {
+      "value": "#dde896",
       "type": "color"
     },
-    "teal-300": {
-      "value": "#5eead4",
+    "olive-300": {
+      "value": "#c8d96e",
       "type": "color"
     },
-    "teal-400": {
-      "value": "#2dd4bf",
+    "olive-400": {
+      "value": "#b4ca4a",
       "type": "color"
     },
-    "teal-500": {
-      "value": "#14b8a6",
+    "olive-500": {
+      "value": "#a2b53a",
       "type": "color"
     },
-    "teal-600": {
-      "value": "#0d9488",
+    "olive-600": {
+      "value": "#8a9a2f",
       "type": "color"
     }
   },

@@ -1,0 +1,247 @@
+@import './tokens.css';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --background: var(--color-neutral-white);
+    --foreground: var(--color-neutral-slate-900);
+    --primary: var(--color-brand-primary-600);
+    --primary-foreground: var(--color-neutral-white);
+    --secondary: var(--color-brand-primary-700);
+    --secondary-foreground: var(--color-neutral-white);
+    --accent: var(--color-accent-olive-500);
+    --accent-foreground: var(--color-neutral-white);
+    --muted: var(--color-neutral-slate-100);
+    --muted-foreground: var(--color-neutral-slate-500);
+    --border: rgba(15, 23, 42, 0.12);
+    --ring: var(--color-brand-primary-500);
+    --destructive: var(--color-utility-red-100);
+    --destructive-foreground: var(--color-neutral-white);
+    --card: var(--color-neutral-white);
+    --card-foreground: var(--color-neutral-slate-900);
+    --popover: var(--color-neutral-white);
+    --popover-foreground: var(--color-neutral-slate-900);
+    --input: var(--color-neutral-slate-200);
+    --sidebar-width: 320px;
+    --navbar-height: 56px;
+  }
+
+  .dark {
+    --background: var(--color-neutral-slate-900);
+    --foreground: var(--color-neutral-slate-100);
+    --primary: var(--color-accent-olive-400);
+    --primary-foreground: var(--color-neutral-slate-900);
+    --secondary: var(--color-brand-primary-400);
+    --secondary-foreground: var(--color-neutral-slate-900);
+    --accent: var(--color-brand-primary-400);
+    --accent-foreground: var(--color-neutral-slate-900);
+    --muted: var(--color-neutral-slate-800);
+    --muted-foreground: var(--color-neutral-slate-400);
+    --border: rgba(241, 245, 249, 0.12);
+    --ring: var(--color-accent-olive-400);
+    --destructive: var(--color-utility-red-100);
+    --destructive-foreground: var(--color-neutral-white);
+    --card: var(--color-neutral-slate-800);
+    --card-foreground: var(--color-neutral-slate-100);
+    --popover: var(--color-neutral-slate-800);
+    --popover-foreground: var(--color-neutral-slate-100);
+    --input: var(--color-neutral-slate-700);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+  }
+
+  /* Prose styles for MDX content */
+  .prose {
+    max-width: 75ch;
+    font-size: 16px;
+  }
+
+  .prose h1 {
+    font-size: 2.618rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+  }
+
+  .prose h1 + p {
+    font-size: 1.2rem;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+
+  .prose h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+  }
+
+  .prose h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-neutral-slate-600);
+  }
+
+  .dark .prose h3 {
+    color: var(--color-neutral-slate-300);
+  }
+
+  .prose h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .prose p {
+    margin: 0.5rem 0;
+  }
+
+  .prose li {
+    font-size: 16px;
+    margin: 12px 0;
+  }
+
+  .prose a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .prose a:hover {
+    opacity: 0.8;
+  }
+
+  .prose blockquote {
+    background-color: var(--color-neutral-slate-100);
+    padding: 3px 16px;
+    border-left: 3px solid var(--primary);
+    margin: 1.5rem 0;
+  }
+
+  .dark .prose blockquote {
+    background-color: var(--color-neutral-slate-800);
+  }
+
+  .prose pre {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  .prose code {
+    font-size: 90%;
+  }
+
+  .prose img {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    max-width: 60%;
+    height: auto;
+    margin-top: 1rem;
+  }
+
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+
+  .prose th {
+    text-align: left;
+    text-transform: uppercase;
+    font-variant: small-caps;
+    font-size: small;
+    padding: 0.75rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .prose td {
+    vertical-align: top;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prose hr {
+    border-color: var(--border);
+    margin: 2rem 0;
+  }
+
+  .dark .prose hr {
+    border-color: var(--color-neutral-slate-700);
+  }
+
+  /* Nested list styles */
+  .prose ol li ol li { list-style-type: lower-alpha; }
+  .prose ol li ol li ol li { list-style-type: lower-roman; }
+  .prose ul li ul { list-style-type: circle; }
+  .prose ul ul li ul { list-style-type: square; }
+
+  /* Shiki line highlighting */
+  .shiki-wrapper .highlighted {
+    background-color: rgba(42, 90, 130, 0.12);
+    display: inline-block;
+    width: 100%;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+  .dark .shiki-wrapper .highlighted {
+    background-color: rgba(180, 202, 74, 0.12);
+  }
+
+  /* Shiki diff lines */
+  .shiki-wrapper .diff.add {
+    background-color: rgba(22, 163, 74, 0.15);
+    display: inline-block;
+    width: 100%;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+  .shiki-wrapper .diff.add::before {
+    content: "+";
+    position: absolute;
+    left: 0.5rem;
+    color: #16a34a;
+  }
+  .shiki-wrapper .diff.remove {
+    background-color: rgba(220, 38, 38, 0.15);
+    display: inline-block;
+    width: 100%;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+  .shiki-wrapper .diff.remove::before {
+    content: "-";
+    position: absolute;
+    left: 0.5rem;
+    color: #dc2626;
+  }
+
+  /* Shiki focused lines (dims unfocused) */
+  .shiki-wrapper .has-focused .line:not(.focused) {
+    opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+  .shiki-wrapper .has-focused:hover .line:not(.focused) {
+    opacity: 1;
+  }
+}

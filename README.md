@@ -1,59 +1,50 @@
 # Trellis
 
-A production-ready documentation framework built on [Docusaurus 3](https://docusaurus.io/). Trellis provides an opinionated baseline with theme enhancements, a design token system, bundled plugins, and reusable components — so you can focus on writing content, not configuring tooling.
-
-**[Live Site](https://trellis.pixlngrid.com)**
+A production-ready documentation framework built on [Next.js 15](https://nextjs.org/), [Tailwind CSS v4](https://tailwindcss.com/), and [shadcn/ui](https://ui.shadcn.com/). Trellis provides an opinionated baseline with custom theme components, a design token system, built-in search, and reusable components — so you can focus on writing content, not configuring tooling.
 
 ## Features
 
-| Feature | Vanilla Docusaurus | Trellis |
-|---|---|---|
-| Last-updated display | Bottom of page | Top of page |
-| Heading anchors | Hash link | Copy-to-clipboard |
-| Tab sync | localStorage | URL query params (shareable) |
-| Tab style | Underline | Pill |
-| Admonition icons | Emoji | Custom SVG |
-| Default color mode | Light | Dark |
-| Search | External service (Algolia) | Built-in client-side (Fuse.js) |
-| Design tokens | Manual CSS | JSON-to-CSS pipeline |
-| Image lightbox | Not included | Built-in |
-| FAQ auto-indexer | Not included | Built-in |
-| URL redirects | Not included | JSON-based |
-| "Suggest an Edit" link | Not included | Pre-filled GitHub issue |
-
-### Bundled Plugins
-
-- **Smart Search** — Build-time indexing with Fuse.js, no external service required
-- **FAQ Index** — Auto-generates a searchable FAQ page from `###` headings
-- **Redirects** — JSON-based URL redirect management
-- **Image Lightbox** — Click-to-zoom on any markdown image
-- **Mermaid Pan/Zoom** — Pan and zoom for Mermaid diagrams
+| Feature | Description |
+|---|---|
+| Heading anchors | Copy-to-clipboard link |
+| Tab sync | URL query params (shareable) |
+| Tab style | Pill |
+| Admonition icons | Custom SVG |
+| Default color mode | Dark |
+| Search | Built-in client-side (Fuse.js, Cmd+K) |
+| Design tokens | JSON-to-CSS pipeline with Tailwind v4 `@theme` integration |
+| Image lightbox | Click-to-zoom on any image |
+| FAQ auto-indexer | Searchable FAQ page from `###` headings |
+| URL redirects | JSON-based static redirects |
+| Mermaid diagrams | Pan and zoom support |
+| Syntax highlighting | Shiki with dual light/dark themes |
+| Static export | Deployable anywhere |
 
 ### Reusable Components
 
 - **Glossary** — Searchable, alphabetically sorted glossary from a JSON data file
-- **FaqTableOfContents** — Searchable FAQ list integrated with the FAQ index plugin
+- **FaqTableOfContents** — Searchable FAQ list integrated with the FAQ index
 - **Feedback** — Embeddable page-level feedback widget
 - **FlippingCard** — Interactive flip cards for quizzes or feature showcases
-- **CustomSearch** — Modal search UI powered by Fuse.js
+- **Search** — Modal search UI powered by Fuse.js (Cmd+K)
 
 ### Design Token System
 
-Define your brand in `design-tokens.json` and the build step generates CSS custom properties automatically. Token categories include colors (neutral, brand, utility, accent), spacing, border radius, border width, and typography.
+Define your brand in `design-tokens.json` and the build step generates CSS custom properties that integrate directly with Tailwind v4's `@theme` directive. Token categories include colors (neutral, brand, utility, accent), spacing, border radius, border width, and typography.
 
 ## Quick Start
 
 ### Scaffold a New Project
 
 ```bash
-npm create trellis-docs@latest my-docs
+npx create-trellis-docs my-docs
 ```
 
 Options:
 
 ```
 --skip-install              Skip dependency installation
---package-manager <pm>      npm | yarn | pnpm (default: yarn)
+--package-manager <pm>      npm | yarn | pnpm (default: npm)
 ```
 
 ### Develop from this Repository
@@ -61,62 +52,81 @@ Options:
 ```bash
 git clone https://github.com/pixlngrid/trellis.git
 cd trellis
-yarn install
-yarn start
+npm install
+npm run dev
 ```
 
-The dev server runs on [http://localhost:3001](http://localhost:3001).
+The dev server runs on [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
 | Script | Description |
 |---|---|
-| `yarn start` | Start dev server on port 3001 |
-| `yarn build` | Build for production |
-| `yarn serve` | Serve the production build |
-| `yarn clear` | Clear Docusaurus cache |
-| `yarn build-tokens` | Regenerate CSS from `design-tokens.json` |
+| `npm run dev` | Start dev server |
+| `npm run build` | Build for production (static export to `out/`) |
+| `npm run start` | Serve the production build |
+| `npm run build-tokens` | Regenerate CSS from `design-tokens.json` |
 
-> `start` and `build` run `build-tokens` automatically before launching Docusaurus.
+> `dev` and `build` run `build-tokens` automatically before launching Next.js.
 
 ## Project Structure
 
 ```
 trellis/
-├── docs/                     # Documentation content (MDX)
-├── blog/                     # Release notes
-├── src/
-│   ├── components/           # Reusable React components
-│   ├── css/
-│   │   ├── tokens.css        # Generated — do not edit
-│   │   └── custom.css        # Theme overrides using token variables
-│   ├── data/                 # JSON data files (glossary, etc.)
-│   ├── pages/                # Custom pages (homepage)
-│   └── theme/                # Ejected Docusaurus theme components
-├── packages/
-│   ├── create-trellis-docs/  # CLI scaffolder
-│   ├── faq-index-plugin/     # FAQ indexing plugin
-│   └── redirects-plugin/     # Redirect management plugin
+├── app/
+│   ├── layout.tsx              # Root layout (ThemeProvider, fonts)
+│   ├── page.tsx                # Homepage
+│   ├── globals.css             # Tailwind imports + theme tokens
+│   ├── tokens.css              # Generated — do not edit
+│   ├── (docs)/
+│   │   ├── layout.tsx          # Docs layout (navbar, sidebar, footer)
+│   │   └── [...slug]/page.tsx  # Catch-all MDX renderer
+│   └── blog/
+│       ├── page.tsx            # Blog index
+│       └── [slug]/page.tsx     # Blog post
+├── components/
+│   ├── docs/                   # Layout: navbar, sidebar, footer, breadcrumbs, toc
+│   │   ├── mdx/                # MDX: callout, heading, tabs, code-block, mermaid, lightbox
+│   │   └── search/             # Search dialog
+│   └── custom/                 # Glossary, feedback, flipping-card, faq-toc
+├── config/
+│   ├── site.ts                 # Site configuration
+│   ├── sidebar.ts              # Sidebar navigation
+│   └── navigation.ts           # Navbar/footer links
+├── content/
+│   ├── docs/                   # Documentation content (MDX)
+│   └── blog/                   # Blog posts
+├── lib/                        # Utilities: MDX loading, TOC, sidebar, remark plugins
 ├── scripts/
-│   └── build-tokens.js       # Design token → CSS builder
-├── static/                   # Static assets
-├── design-tokens.json        # Design system definitions
-├── docusaurus.config.js      # Site configuration
-├── sidebars.js               # Sidebar navigation
-└── redirects.json            # URL redirect definitions
+│   ├── build-tokens.js         # design-tokens.json → app/tokens.css
+│   ├── build-search-index.js   # content/docs/ → public/searchIndex.json
+│   └── build-faq-index.js      # content/docs/faq/ → public/faqIndex.json
+├── data/
+│   └── glossary.json           # Glossary data
+├── public/img/                 # Static images
+├── packages/
+│   └── create-trellis-docs/    # CLI scaffolder (npx create-trellis-docs)
+├── design-tokens.json          # Design system definitions
+├── redirects.json              # URL redirect definitions
+├── next.config.mjs             # Next.js configuration
+├── postcss.config.mjs          # PostCSS (Tailwind v4)
+└── tsconfig.json               # TypeScript configuration
 ```
 
-## Who Is Trellis For
+## Tech Stack
 
-- **Technical writers** wanting polished docs without front-end configuration
-- **Platform teams** building internal developer portals
-- **Open-source projects** needing more than vanilla Docusaurus
-- **Anyone** who'd rather write content than tweak tooling
+- **Framework**: Next.js 15 (App Router, static export)
+- **Styling**: Tailwind CSS v4 with `@theme` directive
+- **Components**: Radix UI primitives (via shadcn/ui patterns)
+- **MDX**: next-mdx-remote v5 (RSC compatible)
+- **Syntax Highlighting**: Shiki (build-time, dual themes)
+- **Search**: Fuse.js (client-side fuzzy search)
+- **Icons**: Lucide React
+- **Theming**: next-themes (dark/light with system detection)
 
 ## Requirements
 
 - Node.js 18+
-- Yarn 1.22+ (or npm/pnpm via the CLI scaffolder)
 
 ## License
 

@@ -15,7 +15,7 @@ program
   .option(
     '-p, --package-manager <pm>',
     'Package manager to use (npm, yarn, pnpm)',
-    'yarn'
+    'npm'
   )
   .action(async (projectName, options) => {
     try {

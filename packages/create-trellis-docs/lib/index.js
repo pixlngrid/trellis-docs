@@ -80,7 +80,7 @@ function processTemplate(content, vars) {
 }
 
 async function copyTemplate(destDir, vars) {
-  const SKIP = new Set(['node_modules', '.docusaurus', 'build']);
+  const SKIP = new Set(['node_modules', '.next', 'out']);
 
   async function copyDir(src, dest) {
     await fs.ensureDir(dest);
@@ -148,7 +148,7 @@ async function init(projectName, options = {}) {
 
   console.log('Project files created.');
 
-  // Initialize git repo (required for showLastUpdateTime)
+  // Initialize git repo
   console.log('Initializing git repository...');
   spawn.sync('git', ['init'], { cwd: destDir, stdio: 'ignore' });
   spawn.sync('git', ['add', '-A'], { cwd: destDir, stdio: 'ignore' });
@@ -159,9 +159,12 @@ async function init(projectName, options = {}) {
   console.log('Git repository initialized.');
 
   if (!options.skipInstall) {
-    const pm = options.packageManager || 'yarn';
+    const pm = options.packageManager || 'npm';
     installDeps(destDir, pm);
   }
+
+  const pm = options.packageManager || 'npm';
+  const runCmd = pm === 'npm' ? 'npm run' : pm;
 
   console.log(`
   Done! Your Trellis docs site is ready.
@@ -169,9 +172,9 @@ async function init(projectName, options = {}) {
   Next steps:
 
     cd ${vars.projectName}
-    ${options.skipInstall ? (options.packageManager || 'yarn') + ' install\n    ' : ''}${options.packageManager || 'yarn'} start
+    ${options.skipInstall ? pm + ' install\n    ' : ''}${runCmd} dev
 
-  Your site will be available at http://localhost:3001
+  Your site will be available at http://localhost:3000
 `);
 }
 

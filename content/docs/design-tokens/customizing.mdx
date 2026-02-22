@@ -1,0 +1,173 @@
+---
+title: Customizing Tokens
+description: How to change brand colors, add new tokens, and rebrand your Trellis documentation site.
+keywords: [customizing, tokens, colors, branding, rebranding, logo]
+last_update:
+  date: 02/22/2026
+  author: Trellis
+---
+
+This guide walks through customizing design tokens to match your brand.
+
+## Changing Brand Colors
+
+Open `design-tokens.json` and update the `brand` section. The default uses a navy blue scale:
+
+```json title="design-tokens.json"
+{
+  "brand": {
+    "primary-50":  { "value": "#f0f5fa", "type": "color" },
+    "primary-100": { "value": "#dce8f2", "type": "color" },
+    "primary-200": { "value": "#b3cde0", "type": "color" },
+    "primary-300": { "value": "#8bb3cf", "type": "color" },
+    "primary-400": { "value": "#7ba4c4", "type": "color" },
+    "primary-500": { "value": "#4a7da8", "type": "color" },
+    "primary-600": { "value": "#2a5a82", "type": "color" },
+    "primary-700": { "value": "#1a3b5c", "type": "color" },
+    "primary-800": { "value": "#122a43", "type": "color" },
+    "primary-900": { "value": "#0b1c2e", "type": "color" }
+  }
+}
+```
+
+Replace the hex values with your brand's color scale. Use a tool like [Tailwind CSS Colors](https://tailwindcss.com/docs/colors) or [Coolors](https://coolors.co/) to generate a consistent scale.
+
+After editing, regenerate the CSS:
+
+```bash
+npm run build-tokens
+```
+
+Or simply restart the dev server — it runs `build-tokens` automatically:
+
+```bash
+npm run dev
+```
+
+## Changing Accent Colors
+
+The `accent` section controls secondary colors used for interactive elements like links and highlights in dark mode:
+
+```json
+{
+  "accent": {
+    "olive-200": { "value": "#dde896", "type": "color" },
+    "olive-300": { "value": "#c8d96e", "type": "color" },
+    "olive-400": { "value": "#b4ca4a", "type": "color" },
+    "olive-500": { "value": "#a2b53a", "type": "color" },
+    "olive-600": { "value": "#8a9a2f", "type": "color" }
+  }
+}
+```
+
+:::tip
+When choosing accent colors, ensure sufficient contrast against both light and dark backgrounds. The `400` shade is used most often.
+:::
+
+## Adding New Tokens
+
+Add new categories or tokens by extending the JSON structure:
+
+```json title="Adding a secondary brand color"
+{
+  "brand": {
+    "primary-600": { "value": "#2a5a82", "type": "color" },
+    "secondary-600": { "value": "#2563eb", "type": "color" }
+  }
+}
+```
+
+This generates:
+
+```css
+--color-brand-secondary-600: #2563eb;
+```
+
+You can then use it in `app/globals.css` or any component:
+
+```css
+.my-element {
+  color: var(--color-brand-secondary-600);
+}
+```
+
+## Changing Typography
+
+Update the font family in the `typography` section:
+
+```json
+{
+  "typography": {
+    "fontFamily": {
+      "name": "font-family",
+      "value": "'Inter', 'Segoe UI', system-ui, sans-serif"
+    }
+  }
+}
+```
+
+If using a web font, add the import in `app/globals.css`:
+
+```css title="app/globals.css"
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+```
+
+## Replacing the Logo
+
+Trellis ships with built-in SVG logo components. To use your own logo:
+
+### Option A: Image files (simplest)
+
+1. Place your logo images in `public/img/`:
+   - **Navbar logo** — small mark, ~32px tall (e.g. `my-logo-small.svg`)
+   - **Hero logo** — larger version for the landing page (e.g. `my-logo-hero.svg`)
+
+2. Update `config/site.ts`:
+
+```ts title="config/site.ts"
+logo: {
+  navbar: '/img/my-logo-small.svg',
+  hero: '/img/my-logo-hero.svg',
+  alt: 'My Company Logo',
+  useBuiltIn: false,  // Use image files instead of built-in SVG components
+},
+```
+
+### Option B: React components (advanced)
+
+For full control, replace the built-in components in `components/brand/trellis-logo.tsx` with your own SVG React components. The built-in components are:
+
+| Component | Used in | Description |
+|-----------|---------|-------------|
+| `TrellisIcon` | Navbar | Small circular mark |
+| `TrellisStacked` | Landing page hero | Icon + text stacked vertically |
+| `TrellisHorizontal` | — | Icon + text side by side |
+| `TrellisWordmark` | — | Text only, no icon |
+| `TrellisFavicon` | — | Simplified 32x32 mark |
+
+Keep `useBuiltIn: true` in `config/site.ts` to use these components.
+
+:::tip
+Logo text elements use `fill="currentColor"` so they automatically adapt to light and dark mode. Follow this pattern for your own SVG components.
+:::
+
+## Full Rebranding Checklist
+
+1. **Colors** — Update `brand` and `accent` sections in `design-tokens.json`
+2. **Typography** — Update `typography.fontFamily` (add web font import if needed)
+3. **Logo** — Replace images in `public/img/` or update components in `components/brand/`
+4. **Config** — Update `title`, `tagline`, `url`, `repoUrl`, and `logo` in `config/site.ts`
+5. **Navigation** — Update links in `config/navigation.ts` and copyright in `footerConfig`
+6. **Regenerate** — Run `npm run build-tokens`
+7. **Verify** — Run `npm run build` and check for errors, then `npm run dev` for visual review
+
+## Token Naming Conventions
+
+Follow these conventions for consistency:
+
+- **Colors**: `{category}-{shade}` → `primary-600`, `olive-400`
+- **Spacing**: `spacing-{pixels}` → `spacing-16`, `spacing-24`
+- **Border radius**: `border-radius-{pixels}` → `border-radius-8`
+- **Border width**: `border-width-{pixels}` → `border-width-1`
+
+The build script converts these to CSS variables by joining the full path with hyphens: `--color-brand-primary-600`, `--spacing-spacing-16`.

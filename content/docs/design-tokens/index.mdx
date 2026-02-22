@@ -1,0 +1,107 @@
+---
+title: Design Tokens
+description: How the Trellis design token system converts JSON definitions into CSS custom properties.
+keywords: [design tokens, css variables, json, build]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+Trellis uses a design token system that converts a single JSON file into CSS custom properties. This gives you a centralized place to define your brand colors, spacing, typography, and other design values.
+
+## How It Works
+
+```
+design-tokens.json  →  build-tokens.js  →  app/tokens.css  →  globals.css
+```
+
+1. **`design-tokens.json`** defines tokens as nested objects with `value` and `type` properties
+2. **`scripts/build-tokens.js`** reads the JSON and generates a `:root {}` CSS block
+3. **`app/tokens.css`** is the generated output (do not edit manually)
+4. **`app/globals.css`** maps token variables to CSS variables
+
+The script runs automatically before `npm run dev` and `npm run build` (via the `prebuild` and `predev` npm scripts).
+
+## Token File Structure
+
+```json title="design-tokens.json"
+{
+  "brand": {
+    "primary-600": {
+      "value": "#7c3aed",
+      "type": "color"
+    }
+  },
+  "accent": {
+    "teal-400": {
+      "value": "#2dd4bf",
+      "type": "color"
+    }
+  },
+  "spacing": {
+    "spacing-16": {
+      "value": "16px",
+      "type": "spacing"
+    }
+  }
+}
+```
+
+Each token has:
+- **`value`** — the actual CSS value
+- **`type`** — a descriptor (used for documentation; not consumed by the build script)
+
+## Generated CSS
+
+The build script converts nested keys into CSS custom property names using `--` prefix and `-` separators:
+
+```css title="app/tokens.css (generated)"
+:root {
+  --brand-primary-600-value: #7c3aed;
+  --accent-teal-400-value: #2dd4bf;
+  --spacing-spacing-16-value: 16px;
+}
+```
+
+## Token Categories
+
+The default `design-tokens.json` includes these categories:
+
+| Category | Tokens | Description |
+|----------|--------|-------------|
+| `neutral` | `white`, `slate-50` through `slate-900` | Background and text colors |
+| `brand` | `primary-50` through `primary-900` | Primary brand color scale (violet) |
+| `accent` | `teal-200` through `teal-600` | Accent color scale (teal) |
+| `utility` | `green-20/100`, `red-20/100`, `yellow-20/100` | Status/feedback colors |
+| `spacing` | `spacing-8` through `spacing-120` | Spacing values in pixels |
+| `border-radius` | `border-radius-4/8/30/900` | Border radius values |
+| `border-width` | `border-width-1/2/none` | Border width values |
+| `typography` | `fontFamily` | Font family stack |
+
+## Using Tokens in CSS
+
+Reference generated tokens in `globals.css` or any CSS module:
+
+```css
+.my-component {
+  color: var(--brand-primary-600-value);
+  background: var(--neutral-slate-50-value);
+  padding: var(--spacing-spacing-16-value);
+  border-radius: var(--border-radius-border-radius-8-value);
+}
+```
+
+## Mapping to Theme Variables
+
+`globals.css` maps tokens to theme CSS variables so the entire theme responds to token changes:
+
+```css title="app/globals.css (excerpt)"
+:root {
+  --ifm-color-primary: var(--brand-primary-600-value);
+  --ifm-color-primary-dark: var(--brand-primary-700-value);
+  --ifm-color-primary-light: var(--brand-primary-500-value);
+  --ifm-font-family-base: var(--typography-font-family-value);
+}
+```
+
+See [Customizing Tokens](/design-tokens/customizing/) for a step-by-step rebranding guide.

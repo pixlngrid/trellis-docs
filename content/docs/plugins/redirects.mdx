@@ -1,0 +1,104 @@
+---
+title: Redirects
+description: How the redirects plugin manages URL redirects via a JSON file.
+keywords: [redirects, url, plugin, meta refresh]
+last_update:
+  date: 02/20/2026
+  author: Trellis
+---
+
+The redirects plugin reads a JSON file of redirect rules and generates HTML pages with meta-refresh redirects at build time.
+
+## How It Works
+
+1. **Reads** redirect definitions from `redirects.json` (or a file specified in config)
+2. **Generates** an HTML file for each redirect source at build time
+3. Each HTML file contains a `<meta http-equiv="refresh">` tag and a JavaScript fallback
+4. Both `path.html` and `path/index.html` are created to handle trailing slash variations
+
+## Configuration
+
+```ts title="config/site.ts"
+['redirects-plugin', {
+  redirectsFile: 'redirects.json',  // Path to the redirects file
+}]
+```
+
+The plugin also supports inline redirects in the config:
+
+```ts
+['redirects-plugin', {
+  redirectsFile: 'redirects.json',
+  redirects: [
+    { from: '/old-page/', to: '/new-page/' },
+  ],
+}]
+```
+
+## Redirect File Format
+
+Create a `redirects.json` file at the project root:
+
+```json title="redirects.json"
+[
+  {
+    "from": "/old-getting-started/",
+    "to": "/getting-started/"
+  },
+  {
+    "from": "/docs/setup/",
+    "to": "/getting-started/",
+    "type": 301
+  },
+  {
+    "from": "/external-redirect/",
+    "to": "https://example.com/new-location"
+  }
+]
+```
+
+### Fields
+
+| Field | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `from` | Yes | — | The old URL path to redirect from |
+| `to` | Yes | — | The destination URL (relative path or absolute URL) |
+| `type` | No | `301` | HTTP redirect type (used for documentation; the actual redirect uses meta-refresh) |
+
+## Trailing Slash Handling
+
+The plugin respects the `trailingSlash` setting in `config/site.ts`:
+
+- **`trailingSlash: true`** — ensures `to` URLs end with `/`
+- **`trailingSlash: false`** — strips trailing slashes from `to` URLs
+- **`trailingSlash: undefined`** — uses `to` URLs as-is
+
+## Auto-Detection
+
+If `redirectsFile` is not specified, the plugin automatically checks these locations:
+
+1. `redirects.json` (project root)
+2. `config/redirects.json`
+3. `src/redirects.json`
+
+The first valid file found is used.
+
+## Generated Output
+
+For a redirect `{ "from": "/old-page/", "to": "/new-page/" }`, the plugin creates:
+
+```html title="build/old-page.html"
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=/new-page/">
+    <link rel="canonical" href="/new-page/" />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href="/new-page/">/new-page/</a>...</p>
+    <script>window.location.href = '/new-page/';</script>
+  </body>
+</html>
+```

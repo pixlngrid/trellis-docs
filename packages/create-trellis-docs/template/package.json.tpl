@@ -1,60 +1,48 @@
 {
   "name": "{{projectSlug}}",
+  "version": "0.1.0",
   "license": "MIT",
-  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build-tokens": "node scripts/build-tokens.js",
-    "docusaurus": "npm run build-tokens && docusaurus",
-    "start": "npm run build-tokens && docusaurus start --port 3001",
-    "build": "npm run build-tokens && docusaurus build",
-    "serve": "docusaurus serve",
-    "clear": "docusaurus clear"
+    "dev": "node scripts/build-tokens.js && next dev",
+    "build": "node scripts/build-tokens.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "build-tokens": "node scripts/build-tokens.js"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.3.7",
-    "@docusaurus/core": "^3.9.2",
-    "@docusaurus/mdx-loader": "^3.9.2",
-    "@docusaurus/preset-classic": "^3.9.2",
-    "@docusaurus/theme-live-codeblock": "^3.9.2",
-    "@docusaurus/theme-mermaid": "3.9.2",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@mdx-js/react": "^3.1.1",
-    "@mermaid-js/layout-elk": "^0.1.9",
-    "@mui/icons-material": "^5.10.6",
-    "@mui/material": "^5.16.4",
-    "@r74tech/docusaurus-plugin-panzoom": "^2.4.0",
-    "antd": "^5.27.3",
+    "@radix-ui/react-collapsible": "^1.1.3",
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-navigation-menu": "^1.2.5",
+    "@radix-ui/react-scroll-area": "^1.2.3",
+    "@radix-ui/react-separator": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-tabs": "^1.1.3",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "@tailwindcss/postcss": "^4.2.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.0.0",
+    "cmdk": "^1.0.4",
     "fuse.js": "^7.1.0",
     "gray-matter": "^4.0.3",
-    "lightbox-image-plugin": "^1.0.1",
+    "lucide-react": "^0.474.0",
     "mermaid": "^11.11.0",
-    "prism-react-renderer": "^2.4.1",
+    "next": "^15.2.0",
+    "next-mdx-remote": "^5.0.0",
+    "next-themes": "^0.4.4",
+    "panzoom": "^9.4.3",
+    "postcss": "^8.5.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^5.3.4",
-    "redirects-plugin": "file:./packages/redirects-plugin",
-    "docusaurus-plugin-faq-index": "file:./packages/faq-index-plugin",
-    "smart-search-plugin": "^3.1.1",
-    "webpack": "^5.104.1",
-    "yaml": "^2.8.1"
-  },
-  "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.9.2",
-    "@docusaurus/types": "3.9.2"
-  },
-  "browserslist": {
-    "production": [
-      ">0.5%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 3 chrome version",
-      "last 3 firefox version",
-      "last 5 safari version"
-    ]
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-directive": "^4.0.0",
+    "remark-gfm": "^4.0.0",
+    "shiki": "^3.0.0",
+    "tailwind-merge": "^3.0.0",
+    "tailwindcss": "^4.2.0",
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0"
   }
 }

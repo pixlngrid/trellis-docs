@@ -2,11 +2,13 @@
 node_modules/
 
 # Build
-build/
-.docusaurus/
+.next/
+out/
 
 # Generated
-src/css/tokens.css
+app/tokens.css
+public/searchIndex.json
+public/faqIndex.json
 
 # System
 .DS_Store
@@ -21,3 +23,7 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
