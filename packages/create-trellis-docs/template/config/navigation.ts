@@ -4,7 +4,8 @@ export const navItems = [
   {
     label: 'Resources',
     items: [
-      { label: 'Release Notes', href: '/blog/' },
+      { label: 'Release Notes', href: '/release-notes/' },
+      { label: 'Blog', href: '/blog/' },
       { label: 'FAQs', href: '/faq/' },
       { label: 'Glossary', href: '/components/glossary/' },
     ],

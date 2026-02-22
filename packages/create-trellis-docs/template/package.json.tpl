@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "node scripts/build-tokens.js && next dev",
+    "dev": "node scripts/build-tokens.js && cross-env NODE_ENV=development next dev",
     "build": "node scripts/build-tokens.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && next build",
     "start": "next start",
     "lint": "next lint",
@@ -19,9 +19,11 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tabs": "^1.1.3",
     "@radix-ui/react-tooltip": "^1.1.8",
+    "@shikijs/transformers": "^3.22.0",
     "@tailwindcss/postcss": "^4.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.0.0",
+    "cross-env": "^10.1.0",
     "cmdk": "^1.0.4",
     "fuse.js": "^7.1.0",
     "gray-matter": "^4.0.3",
@@ -44,5 +46,9 @@
     "typescript": "^5.7.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.0",
+    "lightningcss-win32-x64-msvc": "^1.31.1"
   }
 }

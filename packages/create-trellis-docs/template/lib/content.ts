@@ -4,6 +4,7 @@ import matter from 'gray-matter'
 
 const DOCS_DIR = path.join(process.cwd(), 'content/docs')
 const BLOG_DIR = path.join(process.cwd(), 'content/blog')
+const RELEASE_NOTES_DIR = path.join(process.cwd(), 'content/release-notes')
 
 export interface DocMeta {
   title: string
@@ -170,4 +171,64 @@ export async function getAllBlogPosts(): Promise<BlogEntry[]> {
 export async function getBlogPostBySlug(slug: string): Promise<BlogEntry | null> {
   const posts = await getAllBlogPosts()
   return posts.find((p) => p.meta.slug === slug) || null
+}
+
+// Release notes content loading
+
+export interface ReleaseNoteMeta {
+  title: string
+  version: string
+  date: string
+  description?: string
+  slug: string
+}
+
+export interface ReleaseNoteEntry {
+  meta: ReleaseNoteMeta
+  content: string
+}
+
+function compareSemver(a: string, b: string): number {
+  const pa = a.split('.').map(Number)
+  const pb = b.split('.').map(Number)
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i] || 0) !== (pb[i] || 0)) return (pb[i] || 0) - (pa[i] || 0)
+  }
+  return 0
+}
+
+export async function getAllReleaseNotes(): Promise<ReleaseNoteEntry[]> {
+  let files: string[]
+  try {
+    files = (await fs.readdir(RELEASE_NOTES_DIR)).filter((f) => /\.mdx?$/.test(f))
+  } catch {
+    return []
+  }
+
+  const notes: ReleaseNoteEntry[] = []
+
+  for (const file of files) {
+    const raw = await fs.readFile(path.join(RELEASE_NOTES_DIR, file), 'utf-8')
+    const { data, content } = matter(raw)
+
+    const fileSlug = file.replace(/\.mdx?$/, '')
+
+    notes.push({
+      meta: {
+        title: data.title || fileSlug,
+        version: data.version || fileSlug.replace(/^v/, ''),
+        date: data.date instanceof Date ? data.date.toISOString().split('T')[0] : data.date ? String(data.date).split('T')[0] : '',
+        description: data.description,
+        slug: fileSlug,
+      },
+      content,
+    })
+  }
+
+  return notes.sort((a, b) => compareSemver(a.meta.version, b.meta.version))
+}
+
+export async function getReleaseNoteBySlug(slug: string): Promise<ReleaseNoteEntry | null> {
+  const notes = await getAllReleaseNotes()
+  return notes.find((n) => n.meta.slug === slug) || null
 }

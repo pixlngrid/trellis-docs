@@ -19,7 +19,11 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
     // Extract code element props
     const codeEl = children?.props
     if (codeEl) {
-      return <CodeBlock className={codeEl.className}>{codeEl.children}</CodeBlock>
+      return (
+        <CodeBlock className={codeEl.className} meta={codeEl.meta}>
+          {codeEl.children}
+        </CodeBlock>
+      )
     }
     return <pre>{children}</pre>
   },

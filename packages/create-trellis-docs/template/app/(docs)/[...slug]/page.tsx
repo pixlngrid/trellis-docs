@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
+import remarkDirective from 'remark-directive'
 import rehypeSlug from 'rehype-slug'
 import { getAllDocSlugs, getDocBySlug } from '@/lib/content'
 import { extractToc } from '@/lib/toc'
@@ -8,6 +9,7 @@ import { mdxComponents } from '@/components/docs/mdx'
 import { TableOfContents } from '@/components/docs/toc'
 import { Breadcrumbs } from '@/components/docs/breadcrumbs'
 import { remarkCallout } from '@/lib/remark-callout'
+import { siteConfig } from '@/config/site'
 
 export async function generateStaticParams() {
   const slugs = await getAllDocSlugs()
@@ -44,10 +46,12 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
       <article className="flex-1 min-w-0 px-6 py-8 lg:px-12 max-w-[900px]">
         <Breadcrumbs slug={slug} title={doc.meta.title} />
 
+        <h1 className="text-3xl font-bold tracking-tight mb-2">{doc.meta.title}</h1>
+
         {doc.meta.last_update && (
           <div className="text-sm text-[var(--muted-foreground)] mb-4">
             Last updated: {doc.meta.last_update.date}
-            {doc.meta.last_update.author && ` by ${doc.meta.last_update.author}`}
+            {siteConfig.lastUpdated.showAuthor && doc.meta.last_update.author && ` by ${doc.meta.last_update.author}`}
           </div>
         )}
 
@@ -57,7 +61,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
             components={mdxComponents}
             options={{
               mdxOptions: {
-                remarkPlugins: [remarkGfm, remarkCallout],
+                remarkPlugins: [remarkGfm, remarkDirective, remarkCallout],
                 rehypePlugins: [rehypeSlug],
               },
             }}

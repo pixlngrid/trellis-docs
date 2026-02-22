@@ -8,6 +8,15 @@ export const siteConfig = {
   projectName: '{{projectSlug}}',
   repoUrl: '{{repoUrl}}',
   editBaseUrl: '{{repoUrl}}/edit/main',
+  logo: {
+    navbar: '/img/favicon.svg',
+    hero: null,
+    alt: '{{projectName}} Logo',
+    useBuiltIn: false,
+  },
+  lastUpdated: {
+    showAuthor: false,
+  },
   colorMode: {
     defaultMode: 'dark' as const,
     respectPrefersColorScheme: true,

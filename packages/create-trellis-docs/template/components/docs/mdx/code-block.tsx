@@ -1,11 +1,20 @@
 import { codeToHtml } from 'shiki'
+import {
+  transformerMetaHighlight,
+  transformerNotationHighlight,
+  transformerNotationDiff,
+  transformerNotationFocus,
+} from '@shikijs/transformers'
+import { CodeBlockClient } from './code-block-client'
+import { MermaidRenderer } from './mermaid'
 
 interface CodeBlockProps {
   children?: string
   className?: string
+  meta?: string
 }
 
-export async function CodeBlock({ children, className }: CodeBlockProps) {
+export async function CodeBlock({ children, className, meta }: CodeBlockProps) {
   if (!children) return null
 
   const lang = className?.replace('language-', '') || 'text'
@@ -15,26 +24,26 @@ export async function CodeBlock({ children, className }: CodeBlockProps) {
     return <MermaidBlock code={children.trim()} />
   }
 
-  const html = await codeToHtml(children.trim(), {
+  const code = children.trim()
+
+  const html = await codeToHtml(code, {
     lang,
+    meta: { __raw: meta },
     themes: {
       light: 'github-light',
       dark: 'dracula',
     },
+    transformers: [
+      transformerMetaHighlight(),
+      transformerNotationHighlight(),
+      transformerNotationDiff(),
+      transformerNotationFocus(),
+    ],
   })
 
-  return (
-    <div
-      className="[&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&>pre]:text-sm"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  )
+  return <CodeBlockClient html={html} code={code} />
 }
 
 function MermaidBlock({ code }: { code: string }) {
-  // Mermaid is rendered client-side, pass the code as a data attribute
   return <MermaidRenderer chart={code} />
 }
-
-// Client component for mermaid, imported dynamically
-import { MermaidRenderer } from './mermaid'
