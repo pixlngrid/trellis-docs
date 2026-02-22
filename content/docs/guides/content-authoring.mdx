@@ -1,0 +1,246 @@
+---
+title: Content Authoring
+description: Create new pages, blog posts, and release notes in the Trellis docs framework.
+keywords: [content, authoring, pages, blog, release-notes, frontmatter, images, sidebar]
+last_update:
+  date: 02/22/2026
+  author: Trellis
+---
+
+This guide covers how to create and organize content in Trellis. For markdown syntax and features (code blocks, admonitions, tabs), see [Writing Docs](/guides/writing-docs/).
+
+## Creating a New Page
+
+Add an `.mdx` file under `content/docs/`. The file path determines its URL:
+
+| File Path | URL |
+|-----------|-----|
+| `content/docs/getting-started.mdx` | `/getting-started/` |
+| `content/docs/guides/deployment.mdx` | `/guides/deployment/` |
+| `content/docs/theme/index.mdx` | `/theme/` |
+
+Use `index.mdx` for the landing page of a section (e.g. `theme/index.mdx` → `/theme/`).
+
+### Frontmatter
+
+Every page starts with YAML frontmatter:
+
+```yaml
+---
+title: My Page Title
+description: A short description for search results and SEO.
+keywords: [keyword-one, keyword-two]
+last_update:
+  date: 02/22/2026
+  author: Your Name
+---
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `title` | Yes | Page title, displayed as the h1 heading |
+| `description` | No | Used in search results and meta tags |
+| `keywords` | No | Array of keywords to boost search relevance |
+| `last_update.date` | No | Displayed at the top of the page (MM/DD/YYYY) |
+| `last_update.author` | No | Subject matter expert for the page (visible when `lastUpdated.showAuthor` is `true` in `config/site.ts`) |
+| `hide_table_of_contents` | No | Set to `true` to hide the right-side TOC |
+
+## Configuring the Sidebar
+
+The sidebar is defined in `config/sidebar.ts`. If you've used Docusaurus, this plays the same role as `sidebars.js` — but it's a typed TypeScript array instead of a plain object.
+
+### Item Types
+
+There are two item types: **doc** (a link to a page) and **category** (a collapsible group).
+
+```ts
+export const mainSidebar: SidebarItem[] = [
+  // A standalone doc at the top level
+  { type: 'doc', id: 'getting-started' },
+
+  // A category with child docs
+  {
+    type: 'category',
+    label: 'Guides',
+    items: [
+      { type: 'doc', id: 'guides/content-authoring' },
+      { type: 'doc', id: 'guides/deployment' },
+    ],
+  },
+]
+```
+
+### Doc Items
+
+A `doc` item links to a page. The `id` is the file path under `content/docs/` without the extension:
+
+| File | `id` |
+|------|------|
+| `content/docs/getting-started.mdx` | `'getting-started'` |
+| `content/docs/guides/deployment.mdx` | `'guides/deployment'` |
+| `content/docs/theme/index.mdx` | `'theme/index'` |
+
+The sidebar label defaults to a title derived from the filename. Override it with the `label` property:
+
+```ts
+{ type: 'doc', id: 'overview/index', label: 'What is Trellis?' }
+```
+
+### Categories
+
+A `category` is a collapsible group with a label and child items:
+
+```ts
+{
+  type: 'category',
+  label: 'Guides',
+  collapsed: true,
+  items: [
+    { type: 'doc', id: 'guides/content-authoring' },
+    { type: 'doc', id: 'guides/writing-docs' },
+  ],
+}
+```
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| `label` | Yes | Display text in the sidebar |
+| `items` | Yes | Array of child `doc` or `category` items |
+| `collapsed` | No | Start collapsed (`true`) or expanded (`false`, default) |
+| `link` | No | Doc id to make the category label itself a clickable link |
+
+### Linking a Category to a Page
+
+By default, clicking a category label just toggles it open/closed. Use the `link` property to make the label navigate to a page — the chevron still toggles expand/collapse independently:
+
+```ts
+{
+  type: 'category',
+  label: 'Theme',
+  link: 'theme/index',    // clicking "Theme" navigates to /theme/
+  collapsed: true,
+  items: [
+    { type: 'doc', id: 'theme/last-updated' },
+    { type: 'doc', id: 'theme/tabs' },
+  ],
+}
+```
+
+This avoids the need for a redundant child like "Theme Overview" under a "Theme" category. Categories without `link` (like "Guides") remain plain collapsible headers.
+
+### Nesting Categories
+
+Categories can be nested for deeper hierarchies:
+
+```ts
+{
+  type: 'category',
+  label: 'API',
+  items: [
+    {
+      type: 'category',
+      label: 'REST',
+      items: [
+        { type: 'doc', id: 'api/rest/authentication' },
+        { type: 'doc', id: 'api/rest/endpoints' },
+      ],
+    },
+    { type: 'doc', id: 'api/graphql' },
+  ],
+}
+```
+
+## Images
+
+Place images in `public/img/` and reference them with an absolute path:
+
+```md
+![Architecture diagram](/img/architecture.png)
+```
+
+All images automatically support **click-to-zoom** via the built-in lightbox — no extra markup needed. Click any image to open it in a modal overlay.
+
+## Blog Posts
+
+Blog posts live in `content/blog/`. Name files with a date prefix:
+
+```
+content/blog/2026-02-20-welcome.md
+```
+
+### Blog Frontmatter
+
+```yaml
+---
+title: Welcome to Trellis
+description: Introducing the Trellis docs framework.
+slug: welcome
+authors:
+  - name: Trellis Team
+---
+```
+
+| Field | Description |
+|-------|-------------|
+| `title` | Post title |
+| `description` | Short description |
+| `slug` | URL slug (defaults to the filename slug) |
+| `authors` | Array of `{ name }` objects |
+
+The date is parsed from the filename. Posts are listed at `/blog/`, newest first.
+
+### Excerpt Truncation
+
+Use an MDX comment to mark where the excerpt ends on the blog index page:
+
+```mdx
+This intro paragraph appears on the index page.
+
+{/* truncate */}
+
+This content only appears on the full post page.
+```
+
+## Release Notes
+
+Release notes live in `content/release-notes/`. Name files after the version:
+
+```
+content/release-notes/v1.0.0.md
+```
+
+### Release Notes Frontmatter
+
+```yaml
+---
+title: v1.0.0
+version: 1.0.0
+date: 2026-02-20
+description: Initial release of Trellis on Next.js.
+---
+
+## Added
+- Smart search with configurable weights
+- Design token pipeline
+
+## Changed
+- Migrated from Docusaurus to Next.js
+
+## Removed
+- Legacy search plugin
+```
+
+| Field | Description |
+|-------|-------------|
+| `title` | Display title |
+| `version` | Semantic version for sorting |
+| `date` | Release date (YYYY-MM-DD) |
+| `description` | Short summary |
+
+Release notes are listed at `/release-notes/`, sorted by version (newest first).
+
+## MDX Tips
+
+- **Comments** must use `{/* comment */}` — HTML comments (`<!-- -->`) cause build errors in MDX.
+- **Components** are available globally in MDX without importing. See [Using Components](/guides/using-components/) for the full list.
+- **Blank lines** are required before and after fenced code blocks and JSX components for correct parsing.

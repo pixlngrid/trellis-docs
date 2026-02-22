@@ -95,7 +95,8 @@ trellis/
 │   └── navigation.ts           # Navbar/footer links
 ├── content/
 │   ├── docs/                   # Documentation content (MDX)
-│   └── blog/                   # Blog posts
+│   ├── blog/                   # Blog posts
+│   └── release-notes/          # Version release notes
 ├── lib/                        # Utilities: MDX loading, TOC, sidebar, remark plugins
 ├── scripts/
 │   ├── build-tokens.js         # design-tokens.json → app/tokens.css
@@ -112,6 +113,16 @@ trellis/
 ├── postcss.config.mjs          # PostCSS (Tailwind v4)
 └── tsconfig.json               # TypeScript configuration
 ```
+
+## Documentation
+
+Once the dev server is running, the built-in docs cover everything you need to get productive:
+
+- [Content Authoring](/guides/content-authoring/) — create pages, configure the sidebar, add blog posts and release notes
+- [Writing Docs](/guides/writing-docs/) — markdown features (code blocks, admonitions, tabs, Mermaid)
+- [Using Components](/guides/using-components/) — interactive React components available in MDX
+- [Design Tokens](/design-tokens/customizing/) — customize colors and branding
+- [Deployment](/guides/deployment/) — build pipeline and hosting options
 
 ## Tech Stack
 

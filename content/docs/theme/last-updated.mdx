@@ -41,16 +41,7 @@ export default function DocItemContent({children}) {
 
 ## Configuration
 
-The last-updated date requires `showLastUpdateTime: true` in your `config/site.ts`:
-
-```ts title="config/site.ts"
-docs: {
-  showLastUpdateTime: true,  // Required for the date to appear
-  editUrl: 'https://github.com/your-org/your-repo/edit/main',
-},
-```
-
-Individual pages can also set the date via frontmatter:
+The date and author are set per-page via frontmatter:
 
 ```yaml title="Any .mdx file"
 ---
@@ -59,6 +50,16 @@ last_update:
   author: Your Name
 ---
 ```
+
+The `author` field is useful as a subject matter expert reference for contributors. To control whether the author name is displayed on the page, toggle `showAuthor` in `config/site.ts`:
+
+```ts title="config/site.ts"
+lastUpdated: {
+  showAuthor: false,  // true to display the author next to the date
+},
+```
+
+When `showAuthor` is `false` (the default), only the date renders. The author remains in the frontmatter for contributor reference.
 
 ## The "Suggest an Edit" Link
 

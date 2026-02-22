@@ -26,12 +26,17 @@ export function resolveSidebar(docTitles?: Record<string, string>): ResolvedSide
       }
     }
 
-    return {
+    const resolved: ResolvedSidebarItem = {
       type: 'category',
       label: item.label,
       collapsed: item.collapsed,
       items: item.items.map(resolve),
     }
+    if (item.link) {
+      const slug = item.link.replace(/\/index$/, '')
+      resolved.href = `/${slug}/`
+    }
+    return resolved
   }
 
   return mainSidebar.map(resolve)

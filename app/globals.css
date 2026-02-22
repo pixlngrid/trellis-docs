@@ -24,7 +24,7 @@
     --popover: var(--color-neutral-white);
     --popover-foreground: var(--color-neutral-slate-900);
     --input: var(--color-neutral-slate-200);
-    --sidebar-width: 320px;
+    --sidebar-width: 240px;
     --navbar-height: 56px;
   }
 
@@ -243,5 +243,17 @@
   }
   .shiki-wrapper .has-focused:hover .line:not(.focused) {
     opacity: 1;
+  }
+
+  /* Shiki dark theme activation */
+  .dark .shiki {
+    background-color: var(--muted) !important;
+  }
+
+  .dark .shiki span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
   }
 }

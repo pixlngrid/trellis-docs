@@ -1,15 +1,15 @@
 export type SidebarItem =
   | { type: 'doc'; id: string; label?: string }
-  | { type: 'category'; label: string; collapsed?: boolean; items: SidebarItem[] }
+  | { type: 'category'; label: string; link?: string; collapsed?: boolean; items: SidebarItem[] }
 
 export const mainSidebar: SidebarItem[] = [
   { type: 'doc', id: 'getting-started' },
   {
     type: 'category',
     label: 'Overview',
+    link: 'overview/index',
     collapsed: false,
     items: [
-      { type: 'doc', id: 'overview/index', label: 'What is Trellis?' },
       { type: 'doc', id: 'overview/trellis-vs-nextjs' },
       { type: 'doc', id: 'overview/architecture' },
     ],
@@ -17,9 +17,9 @@ export const mainSidebar: SidebarItem[] = [
   {
     type: 'category',
     label: 'Theme',
+    link: 'theme/index',
     collapsed: true,
     items: [
-      { type: 'doc', id: 'theme/index', label: 'Theme Overview' },
       { type: 'doc', id: 'theme/last-updated' },
       { type: 'doc', id: 'theme/heading-anchors' },
       { type: 'doc', id: 'theme/tabs' },
@@ -29,9 +29,9 @@ export const mainSidebar: SidebarItem[] = [
   {
     type: 'category',
     label: 'Plugins',
+    link: 'plugins/index',
     collapsed: true,
     items: [
-      { type: 'doc', id: 'plugins/index', label: 'Plugins Overview' },
       { type: 'doc', id: 'plugins/smart-search' },
       { type: 'doc', id: 'plugins/faq-index' },
       { type: 'doc', id: 'plugins/redirects' },
@@ -40,18 +40,18 @@ export const mainSidebar: SidebarItem[] = [
   {
     type: 'category',
     label: 'Design Tokens',
+    link: 'design-tokens/index',
     collapsed: true,
     items: [
-      { type: 'doc', id: 'design-tokens/index', label: 'Design Tokens' },
       { type: 'doc', id: 'design-tokens/customizing' },
     ],
   },
   {
     type: 'category',
     label: 'Components',
+    link: 'components/index',
     collapsed: true,
     items: [
-      { type: 'doc', id: 'components/index', label: 'Components Overview' },
       { type: 'doc', id: 'components/glossary' },
       { type: 'doc', id: 'components/feedback' },
     ],

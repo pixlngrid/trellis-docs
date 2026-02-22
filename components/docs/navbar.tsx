@@ -51,21 +51,45 @@ function MobileSidebarItems({ items, onNavigate, depth = 0 }: { items: ResolvedS
 
 function MobileSidebarCategory({ item, onNavigate, depth }: { item: ResolvedSidebarItem; onNavigate: () => void; depth: number }) {
   const pathname = usePathname()
+  const isSelfActive = item.href && pathname === item.href
   const isChildActive = item.items?.some((child) => child.href && pathname === child.href)
-  const [open, setOpen] = useState(!item.collapsed || !!isChildActive)
+  const [open, setOpen] = useState(!item.collapsed || !!isChildActive || !!isSelfActive)
 
   return (
     <div className="mb-0.5">
-      <button
-        onClick={() => setOpen(!open)}
-        className={cn(
-          'flex items-center justify-between w-full px-3 py-1.5 text-sm font-semibold rounded-md',
-          'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+      <div className="flex items-center">
+        {item.href ? (
+          <Link
+            href={item.href}
+            className={cn(
+              'flex-1 px-3 py-1.5 text-sm font-semibold rounded-md no-underline',
+              isSelfActive
+                ? 'text-[var(--primary)]'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+            )}
+            onClick={onNavigate}
+          >
+            {item.label}
+          </Link>
+        ) : (
+          <button
+            onClick={() => setOpen(!open)}
+            className={cn(
+              'flex-1 text-left px-3 py-1.5 text-sm font-semibold rounded-md',
+              'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+            )}
+          >
+            {item.label}
+          </button>
         )}
-      >
-        {item.label}
-        <ChevronDown size={14} className={cn('transition-transform', open ? '' : '-rotate-90')} />
-      </button>
+        <button
+          onClick={() => setOpen(!open)}
+          className="p-1.5 rounded-md text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          aria-label={open ? 'Collapse' : 'Expand'}
+        >
+          <ChevronDown size={14} className={cn('transition-transform', open ? '' : '-rotate-90')} />
+        </button>
+      </div>
       {open && item.items && (
         <MobileSidebarItems items={item.items} onNavigate={onNavigate} depth={depth + 1} />
       )}

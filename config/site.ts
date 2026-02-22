@@ -23,6 +23,9 @@ export const siteConfig = {
   projectName: 'trellis',
   repoUrl: 'https://github.com/pixlngrid/trellis',
   editBaseUrl: 'https://github.com/pixlngrid/trellis/edit/main',
+  lastUpdated: {
+    showAuthor: false,
+  },
   colorMode: {
     defaultMode: 'dark' as const,
     respectPrefersColorScheme: true,

@@ -5,7 +5,7 @@ import {
   transformerNotationDiff,
   transformerNotationFocus,
 } from '@shikijs/transformers'
-import { CopyButton } from './copy-button'
+import { CodeBlockClient } from './code-block-client'
 import { MermaidRenderer } from './mermaid'
 
 interface CodeBlockProps {
@@ -41,15 +41,7 @@ export async function CodeBlock({ children, className, meta }: CodeBlockProps) {
     ],
   })
 
-  return (
-    <div className="group relative">
-      <div
-        className="shiki-wrapper [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&>pre]:text-sm [&>pre]:border [&>pre]:border-[var(--border)]"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-      <CopyButton code={code} />
-    </div>
-  )
+  return <CodeBlockClient html={html} code={code} />
 }
 
 function MermaidBlock({ code }: { code: string }) {

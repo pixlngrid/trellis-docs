@@ -9,6 +9,7 @@ import { mdxComponents } from '@/components/docs/mdx'
 import { TableOfContents } from '@/components/docs/toc'
 import { Breadcrumbs } from '@/components/docs/breadcrumbs'
 import { remarkCallout } from '@/lib/remark-callout'
+import { siteConfig } from '@/config/site'
 
 export async function generateStaticParams() {
   const slugs = await getAllDocSlugs()
@@ -50,7 +51,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
         {doc.meta.last_update && (
           <div className="text-sm text-[var(--muted-foreground)] mb-4">
             Last updated: {doc.meta.last_update.date}
-            {doc.meta.last_update.author && ` by ${doc.meta.last_update.author}`}
+            {siteConfig.lastUpdated.showAuthor && doc.meta.last_update.author && ` by ${doc.meta.last_update.author}`}
           </div>
         )}
 
