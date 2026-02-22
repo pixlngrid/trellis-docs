@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.title}`,
   },
   description: siteConfig.tagline,
-  icons: { icon: siteConfig.favicon },
+  icons: { icon: { url: siteConfig.favicon, type: 'image/svg+xml' } },
   openGraph: {
     description: `${siteConfig.title} — an opinionated docs framework by PixlnGrid.`,
   },
