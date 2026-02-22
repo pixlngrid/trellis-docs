@@ -66,6 +66,7 @@ export function Navbar() {
                           key={sub.label}
                           href={sub.href}
                           className="block px-4 py-2 text-sm text-[var(--popover-foreground)] hover:bg-[var(--muted)] no-underline"
+                          onMouseDown={(e) => e.preventDefault()}
                           onClick={() => setOpenDropdown(null)}
                         >
                           {sub.label}

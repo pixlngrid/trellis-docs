@@ -1,6 +1,5 @@
 ---
 title: Getting Started
-sidebar_position: 1
 ---
 
 Welcome to your documentation site powered by **Trellis**.

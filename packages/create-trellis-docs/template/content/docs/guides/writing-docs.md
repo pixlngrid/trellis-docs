@@ -1,6 +1,5 @@
 ---
 title: Writing Documentation
-sidebar_position: 1
 ---
 
 Learn how to write and organize your documentation content.
