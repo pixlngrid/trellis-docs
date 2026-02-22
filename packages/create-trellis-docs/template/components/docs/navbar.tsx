@@ -36,7 +36,7 @@ export function Navbar() {
           {/* Logo + title */}
           <Link href="/" className="flex items-center gap-2 mr-6 text-[var(--foreground)] no-underline">
             <img
-              src="/img/trellis-mark.svg"
+              src="/img/favicon.svg"
               alt="Trellis Logo"
               className="h-[39px] w-auto"
             />

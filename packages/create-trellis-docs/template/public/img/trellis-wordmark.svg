@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 52" width="400" height="104" fill="none">
+  <text x="0" y="36"
+    font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif"
+    font-size="34" font-weight="700" fill="#1a3b5c">Trellis</text>
+  <text x="1" y="50"
+    font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif"
+    font-size="12" font-weight="400" letter-spacing="1.5" fill="#5a7a96" opacity="0.9">docs-as-code</text>
+</svg>
