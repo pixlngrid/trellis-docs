@@ -26,6 +26,8 @@ async function getFilesRecursive(dir: string, base = ''): Promise<string[]> {
   const files: string[] = []
 
   for (const entry of entries) {
+    // Skip _prefixed files/dirs (partials/includes, like Docusaurus)
+    if (entry.name.startsWith('_')) continue
     const rel = base ? `${base}/${entry.name}` : entry.name
     if (entry.isDirectory()) {
       files.push(...await getFilesRecursive(path.join(dir, entry.name), rel))

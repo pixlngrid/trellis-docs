@@ -21,6 +21,38 @@ Add an `.mdx` file under `content/docs/`. The file path determines its URL:
 
 Use `index.mdx` for the landing page of a section (e.g. `theme/index.mdx` → `/theme/`).
 
+### Partial Files
+
+Files and folders that start with an underscore (`_`) are treated as **partials** — they are excluded from routing, search indexing, and the sidebar. This convention matches [Docusaurus behavior](https://docusaurus.io/docs/creating-pages#routing), so content that worked in Docusaurus carries over.
+
+```
+content/docs/
+├── guides/
+│   ├── deployment.mdx            → /guides/deployment/
+│   └── _internal-notes.mdx       ✗ no route, not indexed
+├── _shared/
+│   └── common-setup.mdx          ✗ entire folder skipped
+└── getting-started.mdx           → /getting-started/
+```
+
+Use partials for:
+
+- **Internal reference notes** that shouldn't be published
+- **Draft content** that isn't ready for readers yet
+- **Reusable snippets** you plan to incorporate into other pages
+
+To hide a file, simply prefix its name with `_`:
+
+```bash
+# Hide a page
+mv content/docs/guides/draft.mdx content/docs/guides/_draft.mdx
+
+# Hide an entire folder
+mv content/docs/internal content/docs/_internal
+```
+
+Partial files are also excluded from the [Smart Search](/plugins/smart-search/) index via the `excludedPrefixes` option.
+
 ### Frontmatter
 
 Every page starts with YAML frontmatter:
