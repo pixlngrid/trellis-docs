@@ -13,6 +13,6 @@ export const navItems = [
 ]
 
 export const footerConfig = {
-  copyright: `© ${new Date().getFullYear()} Trellis by PixlnGrid`,
+  copyright: `© ${new Date().getFullYear()} Trellis by Pixl'n Grid`,
   poweredBy: 'Powered by Next.js',
 }

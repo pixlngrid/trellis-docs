@@ -36,7 +36,7 @@ export function Navbar() {
           {/* Logo + title */}
           <Link href="/" className="flex items-center gap-2 mr-6 text-[var(--foreground)] no-underline">
             <img
-              src="/img/trellis-mark.svg"
+              src="/img/favicon.svg"
               alt="Trellis Logo"
               className="h-[39px] w-auto"
             />
@@ -66,6 +66,7 @@ export function Navbar() {
                           key={sub.label}
                           href={sub.href}
                           className="block px-4 py-2 text-sm text-[var(--popover-foreground)] hover:bg-[var(--muted)] no-underline"
+                          onMouseDown={(e) => e.preventDefault()}
                           onClick={() => setOpenDropdown(null)}
                         >
                           {sub.label}

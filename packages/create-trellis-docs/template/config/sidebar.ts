@@ -4,13 +4,21 @@ export type SidebarItem =
   | { type: 'link'; label: string; href: string }
 
 export const mainSidebar: SidebarItem[] = [
-  { type: 'doc', id: 'index', label: 'Getting Started' },
+  {
+    type: 'doc',
+    id: 'getting-started',
+    label: 'Getting Started',
+  },
   {
     type: 'category',
     label: 'Guides',
     collapsed: false,
     items: [
-      { type: 'doc', id: 'guides/writing-docs', label: 'Writing Documentation' },
+      {
+        type: 'doc',
+        id: 'guides/writing-docs',
+        label: 'Writing Documentation',
+      },
     ],
   },
 ]
