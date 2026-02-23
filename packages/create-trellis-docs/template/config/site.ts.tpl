@@ -12,7 +12,7 @@ export const siteConfig = {
     navbar: '/img/favicon.svg',
     hero: null,
     alt: '{{projectName}} Logo',
-    useBuiltIn: false,
+    useBuiltIn: true,
   },
   lastUpdated: {
     showAuthor: false,

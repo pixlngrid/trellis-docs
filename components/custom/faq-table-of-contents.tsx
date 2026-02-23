@@ -82,7 +82,7 @@ export function FaqTableOfContents({
 
   return (
     <div className="not-prose">
-      {title && <h2 className="text-xl font-bold mb-4">{title}</h2>}
+      {title && <h2 className="text-xl font-bold mb-2">{title}</h2>}
 
       <div className="relative mb-4">
         <svg
