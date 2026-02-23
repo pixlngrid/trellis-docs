@@ -27,7 +27,7 @@ export function FaqTableOfContents({
   const [topics, setTopics] = useState<FaqTopic[]>([])
 
   useEffect(() => {
-    fetch('/faqIndex.json')
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/faqIndex.json`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) {

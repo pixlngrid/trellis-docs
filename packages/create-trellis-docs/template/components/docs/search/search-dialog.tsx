@@ -42,7 +42,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
 
   // Load search index — supports both legacy array and keyed object format
   useEffect(() => {
-    fetch('/searchIndex.json')
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/searchIndex.json`)
       .then((r) => r.json())
       .then((data) => {
         let items: SearchResult[]
