@@ -47,6 +47,14 @@ export const siteConfig = {
     basePermalink: '/faq',
   },
 
+  // OpenAPI / API documentation — set enabled: true and place specs in content/api/
+  apiDocs: {
+    enabled: true,
+    specDir: 'content/api',
+    routeBasePath: 'api',
+    redocOptions: {} as Record<string, unknown>,
+  },
+
   // Internationalization — set enabled: true and add locales to activate
   i18n: {
     enabled: false,

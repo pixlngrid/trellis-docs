@@ -1,0 +1,123 @@
+---
+title: API Documentation
+description: Render OpenAPI/Swagger specs as full-featured API reference pages using the built-in Redoc integration.
+keywords: [api, openapi, swagger, redoc, api-docs]
+last_update:
+  date: 02/23/2026
+  author: Trellis
+---
+
+Trellis includes native support for rendering OpenAPI (Swagger) specifications as interactive API reference pages. It uses [Redoc](https://github.com/Redocly/redoc) under the hood — providing a three-panel layout with schema explorer, code samples, and endpoint navigation.
+
+## Quick Start
+
+### 1. Enable the Feature
+
+```ts title="config/site.ts"
+apiDocs: {
+  enabled: true,
+  specDir: 'content/api',
+  routeBasePath: 'api',
+  redocOptions: {},
+},
+```
+
+### 2. Add a Spec File
+
+Place your OpenAPI spec (YAML or JSON) in the `content/api/` directory:
+
+```
+content/
+  api/
+    petstore.yaml      # → /api/petstore/
+    payments.json       # → /api/payments/
+```
+
+The filename (without extension) becomes the URL slug.
+
+### 3. Add a Sidebar Entry
+
+```ts title="config/sidebar.ts"
+{
+  type: 'category',
+  label: 'API Reference',
+  collapsed: false,
+  items: [
+    { type: 'api', id: 'petstore', label: 'Petstore API' },
+    { type: 'api', id: 'payments', label: 'Payments API' },
+  ],
+},
+```
+
+The `type: 'api'` sidebar item links to `/api/{id}/`. The `label` is optional — if omitted, it defaults to a title-cased version of the slug.
+
+### 4. Build
+
+```bash
+npm run build
+```
+
+The build script automatically:
+- Scans `content/api/` for `.yaml`, `.yml`, and `.json` files
+- Validates each spec has an `openapi` or `swagger` top-level key
+- Converts YAML specs to JSON
+- Outputs processed specs to `public/api-specs/`
+- Generates a manifest at `public/api-specs/_index.json`
+
+## Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | `boolean` | `false` | Enable/disable API docs feature |
+| `specDir` | `string` | `'content/api'` | Directory containing OpenAPI spec files |
+| `routeBasePath` | `string` | `'api'` | URL prefix for API doc pages |
+| `redocOptions` | `object` | `{}` | Options passed directly to Redoc |
+
+### Redoc Options
+
+The `redocOptions` object is passed directly to the [Redoc configuration](https://redocly.com/docs/redoc/config). Common options:
+
+```ts title="config/site.ts"
+apiDocs: {
+  enabled: true,
+  specDir: 'content/api',
+  routeBasePath: 'api',
+  redocOptions: {
+    hideDownloadButton: true,
+    expandResponses: '200,201',
+    requiredPropsFirst: true,
+    sortPropsAlphabetically: true,
+  },
+},
+```
+
+## Supported Formats
+
+- **OpenAPI 3.x** (`.yaml`, `.yml`, or `.json`)
+- **Swagger 2.x** (`.yaml`, `.yml`, or `.json`)
+
+Files prefixed with `_` (e.g., `_shared-schemas.yaml`) are skipped. This is useful for partial specs or shared schema files that shouldn't generate their own page.
+
+## Theme Integration
+
+The Redoc viewer automatically adapts to Trellis's light and dark mode. When a user toggles the theme, the API docs re-render with matching colors. No additional configuration is needed.
+
+## Versioning Support
+
+If [versioning](/guides/versioning/) is enabled, you can place version-specific specs in `versioned_docs/{version}/api/`:
+
+```
+versioned_docs/
+  v1.0/
+    api/
+      petstore.yaml    # → /v1.0/api/petstore/
+content/
+  api/
+    petstore.yaml      # → /api/petstore/ (current version)
+```
+
+## Limitations
+
+- **Bundled specs only** — external `$ref` references to other files are not resolved. Use a tool like `swagger-cli bundle` to produce a single-file spec before adding it.
+- **No try-it-out** — Redoc provides read-only documentation. For interactive API testing, consider pairing with Swagger UI or a tool like [Hoppscotch](https://hoppscotch.io/).
+- **Client-side rendering** — the spec is loaded and rendered in the browser, so very large specs may have a brief loading delay.

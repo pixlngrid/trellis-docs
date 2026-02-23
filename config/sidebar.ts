@@ -1,6 +1,7 @@
 export type SidebarItem =
   | { type: 'doc'; id: string; label?: string }
   | { type: 'category'; label: string; link?: string; collapsed?: boolean; items: SidebarItem[] }
+  | { type: 'api'; id: string; label?: string }
 
 export const mainSidebar: SidebarItem[] = [
   { type: 'doc', id: 'getting-started' },
@@ -34,6 +35,7 @@ export const mainSidebar: SidebarItem[] = [
     items: [
       { type: 'doc', id: 'plugins/smart-search' },
       { type: 'doc', id: 'plugins/faq-index' },
+      { type: 'doc', id: 'plugins/api-docs', label: 'API Documentation' },
       { type: 'doc', id: 'plugins/redirects' },
     ],
   },
@@ -67,6 +69,14 @@ export const mainSidebar: SidebarItem[] = [
       { type: 'doc', id: 'guides/i18n' },
       { type: 'doc', id: 'guides/versioning' },
       { type: 'doc', id: 'guides/deployment' },
+    ],
+  },
+  {
+    type: 'category',
+    label: 'API Reference',
+    collapsed: false,
+    items: [
+      { type: 'api', id: 'petstore', label: 'Petstore API' },
     ],
   },
 ]

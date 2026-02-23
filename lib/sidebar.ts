@@ -34,6 +34,14 @@ export function resolveSidebar(
       }
     }
 
+    if (item.type === 'api') {
+      return {
+        type: 'doc',
+        label: item.label || titleFromId(item.id),
+        href: `${urlPrefix}/api/${item.id}/`,
+      }
+    }
+
     const resolved: ResolvedSidebarItem = {
       type: 'category',
       label: item.label,

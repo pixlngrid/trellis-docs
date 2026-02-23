@@ -9,6 +9,7 @@ out/
 app/tokens.css
 public/searchIndex.json
 public/faqIndex.json
+public/api-specs/
 
 # System
 .DS_Store
