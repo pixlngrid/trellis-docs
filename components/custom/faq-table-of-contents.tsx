@@ -29,7 +29,15 @@ export function FaqTableOfContents({
   useEffect(() => {
     fetch('/faqIndex.json')
       .then((r) => r.json())
-      .then(setTopics)
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTopics(data)
+        } else {
+          // faqIndex.json is keyed by version (e.g. "en:current")
+          const first = Object.values(data)[0]
+          setTopics(Array.isArray(first) ? first : [])
+        }
+      })
       .catch(() => setTopics([]))
   }, [])
 
