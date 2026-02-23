@@ -8,37 +8,31 @@ const features = [
     title: 'Theme Enhancements',
     icon: '✨',
     description: 'Last-updated at top, heading copy-to-clipboard, pill-style tabs, and custom admonition icons.',
-    link: '/theme/',
   },
   {
     title: 'Smart Search',
     icon: '🔍',
     description: 'Build-time indexing with Fuse.js for fast, client-side fuzzy search. No external service needed.',
-    link: '/plugins/smart-search/',
   },
   {
     title: 'Design Tokens',
     icon: '🎨',
     description: 'JSON-to-CSS pipeline. Define your brand in one file, regenerate all variables automatically.',
-    link: '/design-tokens/',
   },
   {
     title: 'Bundled Plugins',
     icon: '🔌',
     description: 'FAQ indexer, redirects, image lightbox, and Mermaid pan/zoom — configured and ready to go.',
-    link: '/plugins/',
   },
   {
     title: 'Reusable Components',
     icon: '🧩',
     description: 'Glossary, feedback widget, flipping cards, and custom search UI for your MDX pages.',
-    link: '/components/',
   },
   {
     title: 'Mermaid Diagrams',
     icon: '📈',
     description: 'Built-in Mermaid rendering with pan and zoom. Just write fenced code blocks.',
-    link: '/guides/writing-docs/',
   },
 ]
 
@@ -63,7 +57,7 @@ export default function Home() {
               Get Started
             </Link>
             <Link
-              href="/overview/"
+              href="https://trellis.pixlngrid.com"
               className="px-6 py-3 rounded-lg border font-medium hover:bg-[var(--muted)] no-underline text-[var(--foreground)]"
             >
               Learn More
