@@ -1,0 +1,150 @@
+---
+title: Documentation Versioning
+description: Maintain multiple versions of your documentation with snapshot-based versioning.
+keywords: [versioning, versions, snapshot, documentation versions, version switcher]
+last_update:
+  date: 02/23/2026
+  author: Trellis
+---
+
+{vars.productName} supports documentation versioning, letting you maintain separate copies of your docs for each release. The system uses **folder-based snapshots** — similar to Docusaurus — so each version is a complete, independent copy of your content.
+
+## How It Works
+
+- `content/docs/` is always the **current** (latest) version
+- When you cut a release, a snapshot script copies `content/docs/` into `versioned_docs/<version>/`
+- A `versions.json` file at the project root tracks all archived versions
+- A dropdown in the navbar lets readers switch between versions
+- The current version's URLs have **no prefix**; archived versions are prefixed: `/v1/getting-started/`
+
+## Enable Versioning
+
+Open `config/site.ts` and update the `versioning` block:
+
+```ts
+versioning: {
+  enabled: true,
+  currentLabel: 'Latest',
+},
+```
+
+| Field | Description |
+|-------|-------------|
+| `enabled` | Set to `true` to activate version routing and the version switcher |
+| `currentLabel` | The label shown in the version dropdown for the current version (e.g., `'Latest'`, `'Next'`, `'2.x'`) |
+
+:::note
+Versioning requires at least one archived version to be useful. After enabling the config, create your first snapshot (see below).
+:::
+
+## Creating a Version Snapshot
+
+When you're ready to freeze the current docs for a release, run:
+
+```bash
+npm run version:snapshot v1
+```
+
+Replace `v1` with your version label (e.g., `v1`, `v2.0`, `1.x`). The script does the following:
+
+1. Copies `content/docs/` to `versioned_docs/v1/`
+2. Copies `config/sidebar.ts` to `versioned_sidebars/v1.ts`
+3. Creates or updates `versions.json` at the project root
+4. If [i18n](/guides/i18n/) is enabled, copies each locale's `content/i18n/<code>/docs/` to `content/i18n/<code>/versioned_docs/v1/`
+
+After running the script, your project will look like:
+
+```
+my-docs/
+├── content/docs/              # Current version (keep editing here)
+├── versioned_docs/
+│   └── v1/                    # Frozen snapshot of docs at v1
+├── versioned_sidebars/
+│   └── v1.ts                  # Sidebar config frozen at v1
+└── versions.json              # ["v1"]
+```
+
+:::caution
+The snapshot script will refuse to overwrite an existing version. If `versioned_docs/v1/` already exists, you'll get an error. To re-snapshot, delete the old directory first.
+:::
+
+## URL Routing
+
+The current version has **no prefix** in URLs. Archived versions are prefixed with their label:
+
+| Version | URL |
+|---------|-----|
+| Current (latest) | `/getting-started/` |
+| v1 | `/v1/getting-started/` |
+| v2 | `/v2/getting-started/` |
+
+When [i18n](/guides/i18n/) is also enabled, the locale prefix comes first:
+
+| Locale + Version | URL |
+|------------------|-----|
+| English, current | `/getting-started/` |
+| English, v1 | `/v1/getting-started/` |
+| Spanish, current | `/es/getting-started/` |
+| Spanish, v1 | `/es/v1/getting-started/` |
+
+## Version Switcher
+
+When versioning is enabled and at least one archived version exists, a dropdown appears in the navbar showing the current version label and all archived versions. Switching versions preserves the current page — switching from `/getting-started/` to v1 navigates to `/v1/getting-started/`.
+
+## Editing Versioned Content
+
+- **Current version**: Edit files in `content/docs/` as usual
+- **Archived versions**: Edit files directly in `versioned_docs/<version>/`. These are regular MDX files, not read-only
+
+:::tip
+Archived versions are independent snapshots. Changes to `content/docs/` do not affect `versioned_docs/v1/`, and vice versa.
+:::
+
+## Search
+
+The search index is automatically partitioned by version. When a reader is browsing the v1 docs, search results come only from v1 content.
+
+## Sidebar Per Version
+
+Each version snapshot includes a copy of `config/sidebar.ts` saved to `versioned_sidebars/<version>.ts`. This means the sidebar navigation can differ between versions — pages added or removed in newer versions won't affect the sidebar of older versions.
+
+## Workflow Example
+
+Here's a typical versioning workflow:
+
+```bash
+# 1. You've been writing docs in content/docs/ for your v1 release
+# 2. v1 is ready to ship — freeze the docs
+npm run version:snapshot v1
+
+# 3. Continue working on docs for v2 in content/docs/
+#    Add new pages, update existing ones, etc.
+
+# 4. When v2 is ready, freeze again
+npm run version:snapshot v2
+
+# 5. Now you have:
+#    - content/docs/         → current (v3-in-progress)
+#    - versioned_docs/v2/    → frozen v2
+#    - versioned_docs/v1/    → frozen v1
+```
+
+## Multiple Versions
+
+Each time you run the snapshot script, the new version is prepended to `versions.json`. The version dropdown lists them in order, newest first:
+
+```json
+["v2", "v1"]
+```
+
+The "current" version is always shown at the top of the dropdown with the `currentLabel` from your config.
+
+## Removing a Version
+
+To remove an archived version:
+
+1. Delete the `versioned_docs/<version>/` directory
+2. Delete `versioned_sidebars/<version>.ts`
+3. Remove the version string from `versions.json`
+4. If i18n is enabled, delete `content/i18n/<code>/versioned_docs/<version>/` for each locale
+5. Rebuild the site

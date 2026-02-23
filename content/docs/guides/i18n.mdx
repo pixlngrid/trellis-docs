@@ -1,0 +1,128 @@
+---
+title: Internationalization (i18n)
+description: Translate your documentation into multiple languages with locale-based routing and automatic fallback.
+keywords: [i18n, localization, translation, locale, language, multilingual]
+last_update:
+  date: 02/23/2026
+  author: Trellis
+---
+
+{vars.productName} supports publishing your documentation in multiple languages. The i18n system is **opt-in** — when disabled (the default), your site works exactly as a single-language project with zero overhead.
+
+## How It Works
+
+- Each locale gets its own content directory under `content/i18n/<code>/docs/`
+- The default locale's content lives in `content/docs/` as usual
+- Non-default locales are prefixed in the URL: `/es/getting-started/`, `/ja/overview/`
+- If a translation is missing, {vars.productName} falls back to the default locale's content and shows a banner
+- A globe dropdown in the navbar lets readers switch languages
+
+## Enable i18n
+
+Open `config/site.ts` and update the `i18n` block:
+
+```ts
+i18n: {
+  enabled: true,
+  defaultLocale: 'en',
+  locales: [
+    { code: 'en', name: 'English', dir: 'ltr' },
+    { code: 'es', name: 'Español', dir: 'ltr' },
+    { code: 'ja', name: '日本語', dir: 'ltr' },
+  ],
+},
+```
+
+| Field | Description |
+|-------|-------------|
+| `enabled` | Set to `true` to activate i18n routing and the locale switcher |
+| `defaultLocale` | The locale code for your primary language. Content in `content/docs/` is this locale. Its URLs have **no prefix**. |
+| `locales` | Array of all locales including the default. Each entry has a `code`, display `name`, and text direction (`ltr` or `rtl`). |
+
+:::tip
+RTL languages like Arabic and Hebrew are supported. Set `dir: 'rtl'` and {vars.productName} will automatically set the `dir` attribute on `<html>` for those pages.
+:::
+
+## Content Structure
+
+After enabling i18n, create translation directories under `content/i18n/`:
+
+```
+content/
+├── docs/                      # Default locale (English)
+│   ├── getting-started.mdx
+│   └── guides/
+│       └── deployment.mdx
+└── i18n/
+    ├── es/
+    │   └── docs/              # Spanish translations
+    │       ├── getting-started.mdx
+    │       └── guides/
+    │           └── deployment.mdx
+    └── ja/
+        └── docs/              # Japanese translations
+            └── getting-started.mdx
+```
+
+The file paths inside each locale's `docs/` directory must mirror the default locale's structure. For example, if `content/docs/guides/deployment.mdx` exists, the Spanish translation goes at `content/i18n/es/docs/guides/deployment.mdx`.
+
+## Translation Fallback
+
+You don't need to translate every page at once. When a page hasn't been translated to the requested locale, {vars.productName} automatically:
+
+1. Loads the default locale's content instead
+2. Displays a banner at the top of the page:
+
+> This page has not been translated to Español yet. You are viewing the English version.
+
+This means all routes work for every locale — even before you've written a single translation.
+
+## URL Routing
+
+The default locale has **no prefix** in URLs. Non-default locales are prefixed with their code:
+
+| Locale | URL |
+|--------|-----|
+| English (default) | `/getting-started/` |
+| Spanish | `/es/getting-started/` |
+| Japanese | `/ja/getting-started/` |
+
+When [versioning](/guides/versioning/) is also enabled, the locale prefix comes first:
+
+| Locale + Version | URL |
+|------------------|-----|
+| English, current | `/getting-started/` |
+| English, v1 | `/v1/getting-started/` |
+| Spanish, current | `/es/getting-started/` |
+| Spanish, v1 | `/es/v1/getting-started/` |
+
+## Locale Switcher
+
+When i18n is enabled, a globe icon dropdown appears in the navbar. Readers can click it to switch to any configured locale. The switcher preserves the current page — switching from `/es/guides/deployment/` to Japanese navigates to `/ja/guides/deployment/`.
+
+## Search
+
+The search index is automatically partitioned by locale. When a reader searches on the Spanish version of the site, results come only from Spanish content (falling back to English for untranslated pages).
+
+## SEO
+
+{vars.productName} automatically adds `hreflang` alternate links in the page metadata when i18n is enabled. This tells search engines about the relationship between translations of the same page.
+
+## Frontmatter
+
+Translation files use the same frontmatter fields as the default locale. You should translate the `title` and `description` fields:
+
+```yaml
+---
+title: Primeros Pasos
+description: Instala y configura tu sitio de documentación con Trellis.
+keywords: [inicio, configuración, instalación]
+---
+```
+
+## Adding a New Locale
+
+1. Add the locale to the `locales` array in `config/site.ts`
+2. Create the directory `content/i18n/<code>/docs/`
+3. Start translating pages — untranslated pages fall back automatically
+4. Run `npm run build` to verify all routes generate correctly

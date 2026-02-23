@@ -5,11 +5,24 @@ export interface TocItem {
 }
 
 export function extractToc(content: string): TocItem[] {
+  // Strip fenced code blocks so headings inside them aren't picked up
+  const lines = content.split('\n')
+  const filtered: string[] = []
+  let inFence = false
+  for (const line of lines) {
+    if (/^(`{3,}|~{3,})/.test(line)) {
+      inFence = !inFence
+      continue
+    }
+    if (!inFence) filtered.push(line)
+  }
+  const stripped = filtered.join('\n')
+
   const headingRegex = /^(#{2,4})\s+(.+)$/gm
   const items: TocItem[] = []
   let match
 
-  while ((match = headingRegex.exec(content)) !== null) {
+  while ((match = headingRegex.exec(stripped)) !== null) {
     const level = match[1].length
     const text = match[2]
       .trim()
