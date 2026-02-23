@@ -50,21 +50,3 @@ export function resolveSidebar(
   return items.map(resolve)
 }
 
-// Versioned sidebar map — populated at build time via dynamic imports
-const versionedSidebarCache = new Map<string, SidebarItem[]>()
-
-export async function getSidebarForVersion(version: string): Promise<SidebarItem[]> {
-  if (version === 'current') return mainSidebar
-  if (versionedSidebarCache.has(version)) return versionedSidebarCache.get(version)!
-
-  try {
-    // Dynamic import of versioned sidebar
-    const mod = await import(`@/versioned_sidebars/${version}`)
-    const items = mod.mainSidebar || mod.default
-    versionedSidebarCache.set(version, items)
-    return items
-  } catch {
-    // Fall back to current sidebar if versioned one doesn't exist
-    return mainSidebar
-  }
-}

@@ -7,6 +7,7 @@ import { mdxComponents } from '@/components/docs/mdx'
 import { Navbar } from '@/components/docs/navbar'
 import { Footer } from '@/components/docs/footer'
 import { BlogSidebar } from '@/components/blog/blog-sidebar'
+import { docVariables } from '@/config/variables'
 
 export async function generateStaticParams() {
   const posts = await getAllBlogPosts()
@@ -49,6 +50,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               source={post.content}
               components={mdxComponents}
               options={{
+                scope: { vars: docVariables },
                 mdxOptions: {
                   remarkPlugins: [remarkGfm],
                   rehypePlugins: [rehypeSlug],
