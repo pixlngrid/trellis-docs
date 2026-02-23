@@ -6,7 +6,7 @@ import rehypeSlug from 'rehype-slug'
 import { getAllDocSlugs, getDocBySlug } from '@/lib/content'
 import { extractToc } from '@/lib/toc'
 import { mdxComponents } from '@/components/docs/mdx'
-import { TableOfContents } from '@/components/docs/toc'
+import { TableOfContents, MobileTableOfContents } from '@/components/docs/toc'
 import { Breadcrumbs } from '@/components/docs/breadcrumbs'
 import { remarkCallout } from '@/lib/remark-callout'
 import { siteConfig } from '@/config/site'
@@ -53,6 +53,10 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
             Last updated: {doc.meta.last_update.date}
             {siteConfig.lastUpdated.showAuthor && doc.meta.last_update.author && ` by ${doc.meta.last_update.author}`}
           </div>
+        )}
+
+        {!doc.meta.hide_table_of_contents && toc.length > 0 && (
+          <MobileTableOfContents items={toc} />
         )}
 
         <div className="prose">

@@ -111,22 +111,22 @@
     margin-bottom: 0.5rem;
   }
 
-  .prose p {
+  .prose p:not(.not-prose p) {
     margin: 0.5rem 0;
   }
 
-  .prose li {
+  .prose li:not(.not-prose li) {
     font-size: 16px;
     margin: 12px 0;
   }
 
-  .prose a {
+  .prose a:not(.not-prose a) {
     color: var(--primary);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
 
-  .prose a:hover {
+  .prose a:not(.not-prose a):hover {
     opacity: 0.8;
   }
 

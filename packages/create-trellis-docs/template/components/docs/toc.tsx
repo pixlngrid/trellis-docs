@@ -1,8 +1,58 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { TocItem } from '@/lib/toc'
+
+export function MobileTableOfContents({ items }: { items: TocItem[] }) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [open])
+
+  return (
+    <div ref={containerRef} className="xl:hidden mb-6 border rounded-lg">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full px-4 py-2.5 text-sm font-medium text-[var(--foreground)]"
+      >
+        On this page
+        <ChevronDown
+          size={16}
+          className={cn('transition-transform text-[var(--muted-foreground)]', open && 'rotate-180')}
+        />
+      </button>
+      {open && (
+        <ul className="px-4 pb-3 space-y-1 border-t">
+          {items.map((item) => (
+            <li key={item.id}>
+              <a
+                href={`#${item.id}`}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'block text-sm no-underline py-1 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors',
+                  item.level === 2 ? 'pl-0' : item.level === 3 ? 'pl-3' : 'pl-6'
+                )}
+              >
+                {item.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 export function TableOfContents({ items }: { items: TocItem[] }) {
   const [activeId, setActiveId] = useState<string>('')
