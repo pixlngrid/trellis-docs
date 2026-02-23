@@ -6,6 +6,8 @@ import { parseSlug, buildUrlPrefix } from '@/lib/route-context'
 import { DocContextWrapper } from '../../[...slug]/doc-context-wrapper'
 import { RedocViewer } from '@/components/docs/redoc-viewer'
 
+export const dynamicParams = false
+
 export async function generateStaticParams() {
   if (!siteConfig.apiDocs?.enabled) return []
 

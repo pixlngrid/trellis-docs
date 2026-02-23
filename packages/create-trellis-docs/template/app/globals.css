@@ -11,7 +11,7 @@
     --primary-foreground: var(--color-neutral-white);
     --secondary: var(--color-brand-primary-700);
     --secondary-foreground: var(--color-neutral-white);
-    --accent: var(--color-accent-olive-500);
+    --accent: var(--color-accent-teal-500);
     --accent-foreground: var(--color-neutral-white);
     --muted: var(--color-neutral-slate-100);
     --muted-foreground: var(--color-neutral-slate-500);
@@ -31,7 +31,7 @@
   .dark {
     --background: var(--color-neutral-slate-900);
     --foreground: var(--color-neutral-slate-100);
-    --primary: var(--color-accent-olive-400);
+    --primary: var(--color-accent-teal-400);
     --primary-foreground: var(--color-neutral-slate-900);
     --secondary: var(--color-brand-primary-400);
     --secondary-foreground: var(--color-neutral-slate-900);
@@ -40,7 +40,7 @@
     --muted: var(--color-neutral-slate-800);
     --muted-foreground: var(--color-neutral-slate-400);
     --border: rgba(241, 245, 249, 0.12);
-    --ring: var(--color-accent-olive-400);
+    --ring: var(--color-accent-teal-400);
     --destructive: var(--color-utility-red-100);
     --destructive-foreground: var(--color-neutral-white);
     --card: var(--color-neutral-slate-800);

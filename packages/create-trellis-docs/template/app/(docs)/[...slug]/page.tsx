@@ -136,9 +136,6 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
               }}
             />
           </div>
-          <hr className="my-8 border-t border-(--border)" />
-
-          <Feedback />
         </article>
 
         {!doc.meta.hide_table_of_contents && toc.length > 0 && (
