@@ -1,6 +1,6 @@
 {
   "name": "create-trellis-docs",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Create a new Trellis documentation site",
   "license": "MIT",
   "bin": {
