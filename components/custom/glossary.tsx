@@ -34,7 +34,7 @@ export function Glossary() {
     <div>
       <dl>
         {glossary.map(({ term, definition }) => (
-          <div key={term}>
+          <div key={term} className="mt-6 first:mt-0">
             <dt><strong>{term}</strong></dt>
             {Array.isArray(definition) ? (
               <dd>
