@@ -42,6 +42,14 @@ export function resolveSidebar(
       }
     }
 
+    if (item.type === 'link') {
+      return {
+        type: 'doc',
+        label: item.label,
+        href: item.href,
+      }
+    }
+
     const resolved: ResolvedSidebarItem = {
       type: 'category',
       label: item.label,
