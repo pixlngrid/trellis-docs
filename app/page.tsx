@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { siteConfig } from '@/config/site'
 import { Navbar } from '@/components/docs/navbar'
 import { Footer } from '@/components/docs/footer'
@@ -11,14 +12,16 @@ export default function Home() {
       <Navbar />
       <main className="flex-1" style={{ marginTop: 'var(--navbar-height)' }}>
         {/* Hero */}
-        <div className="max-w-3xl mx-auto text-center py-20 px-4">
-          <div className="flex justify-center mb-6">
+        <div className="max-w-3xl mx-auto text-center py-16 px-4">
+          <div className="flex justify-center">
             {siteConfig.logo.useBuiltIn ? (
-              <TrellisStacked size={180} />
+              <TrellisStacked size={300} />
             ) : siteConfig.logo.hero ? (
-              <img
+              <Image
                 src={siteConfig.logo.hero}
                 alt={siteConfig.logo.alt}
+                width={300}
+                height={300}
                 className="h-44 w-auto"
               />
             ) : null}
