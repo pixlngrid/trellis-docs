@@ -8,7 +8,7 @@
  *   node scripts/export-sidebar.js > sidebar.csv    # saves to file
  *
  * Output columns:
- *   Doc ID, Title, URL, Category, Doc Type, Role, Last Updated, Author, Description, Keywords, File Path
+ *   Doc ID, Title, URL, Category, Draft, Doc Type, Role, Last Updated, Author, Description, Keywords, File Path
  */
 
 const fs = require('fs')
@@ -83,6 +83,7 @@ function flattenSidebar(items, category = '') {
           title: item.label || fm.title || slug,
           url,
           category,
+          draft: fm.draft === true ? 'Yes' : '',
           docType: fm.doc_type || '',
           role: Array.isArray(fm.role) ? fm.role.join('; ') : (fm.role || ''),
           lastUpdated: fm.last_update?.date || '',
@@ -97,6 +98,7 @@ function flattenSidebar(items, category = '') {
           title: item.label || slug,
           url,
           category,
+          draft: '',
           docType: '',
           role: '',
           lastUpdated: '',
@@ -121,6 +123,7 @@ function flattenSidebar(items, category = '') {
             title: item.label,
             url,
             category: category || '(top-level)',
+            draft: fm.draft === true ? 'Yes' : '',
             docType: fm.doc_type || '',
             role: Array.isArray(fm.role) ? fm.role.join('; ') : (fm.role || ''),
             lastUpdated: fm.last_update?.date || '',
@@ -145,11 +148,11 @@ function flattenSidebar(items, category = '') {
 const sidebar = loadSidebar()
 const rows = flattenSidebar(sidebar)
 
-const headers = ['Doc ID', 'Title', 'URL', 'Category', 'Doc Type', 'Role', 'Last Updated', 'Author', 'Description', 'Keywords', 'File Path']
+const headers = ['Doc ID', 'Title', 'URL', 'Category', 'Draft', 'Doc Type', 'Role', 'Last Updated', 'Author', 'Description', 'Keywords', 'File Path']
 const csvLines = [
   headers.join(','),
   ...rows.map((r) =>
-    [r.id, r.title, r.url, r.category, r.docType, r.role, r.lastUpdated, r.author, r.description, r.keywords, r.filePath]
+    [r.id, r.title, r.url, r.category, r.draft, r.docType, r.role, r.lastUpdated, r.author, r.description, r.keywords, r.filePath]
       .map(csvField)
       .join(',')
   ),

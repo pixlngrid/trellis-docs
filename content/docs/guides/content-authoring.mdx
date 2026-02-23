@@ -67,6 +67,7 @@ last_update:
   author: Your Name
 doc_type: how-to
 role: [Developer, Admin]
+draft: false
 ---
 ```
 
@@ -80,6 +81,7 @@ role: [Developer, Admin]
 | `hide_table_of_contents` | No | Set to `true` to hide the right-side TOC |
 | `doc_type` | No | Content type for auditing (e.g. `how-to`, `concept`, `reference`, `tutorial`). Not rendered on the page — used in sidebar exports |
 | `role` | No | Array of audience roles (e.g. `[Developer, Admin]`). Rendered as colored chips below the page title |
+| `draft` | No | Set to `true` to exclude the page from the production build, search index, and FAQ index |
 
 ### Role Chips
 
@@ -106,6 +108,28 @@ The `doc_type` field is metadata-only — it is not rendered on the page. Use it
 | `tutorial` | End-to-end guided walkthrough |
 
 Both `doc_type` and `role` are included in the [sidebar export](#sidebar-export) for spreadsheet-based auditing.
+
+### Draft Pages
+
+Set `draft: true` in a page's frontmatter to exclude it from the production build:
+
+```yaml
+---
+title: Upcoming API Changes
+draft: true
+---
+```
+
+Draft pages are:
+
+- **Excluded from the build** — no static page is generated, so the URL returns a 404 in production
+- **Excluded from search** — not indexed by the [Smart Search](/plugins/smart-search/) plugin
+- **Excluded from FAQ index** — not indexed by the [FAQ Index](/plugins/faq-index/) plugin
+- **Visible in sidebar exports** — the [sidebar export](#sidebar-export) includes a Draft column so you can track which pages are still in progress
+
+:::tip
+Use `draft: true` for pages that are actively being written. Unlike the `_` prefix convention (which hides files from the filesystem level), drafts stay in the sidebar config and appear in content audits — making them easier to track.
+:::
 
 ## Configuring the Sidebar
 
@@ -387,6 +411,7 @@ The CSV includes one row per sidebar entry with these columns:
 | Title | Sidebar label or frontmatter `title` |
 | URL | The page URL |
 | Category | Sidebar category path (e.g. `Guides > Content Authoring`) |
+| Draft | `Yes` if `draft: true`, blank otherwise |
 | Doc Type | Frontmatter `doc_type` |
 | Role | Frontmatter `role` (semicolon-separated) |
 | Last Updated | Frontmatter `last_update.date` |

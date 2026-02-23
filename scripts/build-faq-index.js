@@ -73,6 +73,9 @@ function indexFaqDir(faqDir, urlPrefix) {
     const raw = fs.readFileSync(filePath, 'utf-8');
     const { data: frontmatter, content } = matter(raw);
 
+    // Skip draft pages
+    if (frontmatter.draft === true) continue;
+
     const slug = file.replace(/\.mdx?$/, '');
     const title =
       frontmatter.title ||
