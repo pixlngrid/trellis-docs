@@ -85,7 +85,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
     >
       <LocaleHtmlAttrs />
       <div className="flex">
-        <article className="flex-1 min-w-0 px-6 py-8 lg:px-12 max-w-[900px]">
+        <article className="flex-1 min-w-0 px-6 py-8 lg:px-12">
           <Breadcrumbs slug={ctx.slug} title={doc.meta.title} />
 
           {doc.isFallback && <FallbackBanner locale={ctx.locale} />}
@@ -93,21 +93,19 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
           <h1 className="text-3xl font-bold tracking-tight mb-2">{doc.meta.title}</h1>
 
           {(doc.meta.last_update || siteConfig.editBaseUrl) && (
-            <div className="flex items-center justify-between text-sm text-[var(--muted-foreground)] mb-4">
-              <span>
-                {doc.meta.last_update && (
-                  <>
-                    Last updated: {doc.meta.last_update.date}
-                    {siteConfig.lastUpdated.showAuthor && doc.meta.last_update.author && ` by ${doc.meta.last_update.author}`}
-                  </>
-                )}
-              </span>
+            <div className="flex items-center flex-wrap gap-x-4 text-sm text-[var(--muted-foreground)] mb-4">
+              {doc.meta.last_update && (
+                <span>
+                  Last updated: {doc.meta.last_update.date}
+                  {siteConfig.lastUpdated.showAuthor && doc.meta.last_update.author && ` by ${doc.meta.last_update.author}`}
+                </span>
+              )}
               {siteConfig.editBaseUrl && (
                 <a
                   href={`${siteConfig.editBaseUrl}/${doc.filePath.replace(/\\/g, '/').replace(/^.*?content\//, 'content/')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[var(--primary)] hover:underline no-underline shrink-0"
+                  className="inline-flex items-center gap-1 text-[var(--primary)] hover:underline no-underline shrink-0 ml-auto"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                   Edit this page
@@ -124,7 +122,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
             <MobileTableOfContents items={toc} />
           )}
 
-          <div className="prose">
+          <div className="prose max-w-none">
             <MDXRemote
               source={doc.content}
               components={mdxComponents}
@@ -140,7 +138,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
         </article>
 
         {!doc.meta.hide_table_of_contents && toc.length > 0 && (
-          <aside className="hidden xl:block w-64 shrink-0">
+          <aside className="hidden lg:block w-64 shrink-0">
             <TableOfContents items={toc} />
           </aside>
         )}

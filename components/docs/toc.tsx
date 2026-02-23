@@ -21,7 +21,7 @@ export function MobileTableOfContents({ items }: { items: TocItem[] }) {
   }, [open])
 
   return (
-    <div ref={containerRef} className="xl:hidden mb-6 border rounded-lg">
+    <div ref={containerRef} className="lg:hidden mb-6 border rounded-lg">
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center justify-between w-full px-4 py-2.5 text-sm font-medium text-[var(--foreground)]"
