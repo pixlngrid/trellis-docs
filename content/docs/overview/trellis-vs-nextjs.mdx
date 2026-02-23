@@ -7,11 +7,11 @@ last_update:
   author: Trellis
 ---
 
-Trellis is built **on top of** Next.js — it doesn't replace it. Everything Next.js provides still works. Trellis adds a layer of theme customizations, bundled plugins, and developer experience improvements.
+{vars.productName} is built **on top of** {vars.frameworkName} — it doesn't replace it. Everything {vars.frameworkName} provides still works. {vars.productName} adds a layer of theme customizations, bundled plugins, and developer experience improvements.
 
 ## Feature Comparison
 
-| Feature | Vanilla Next.js | Trellis |
+| Feature | Vanilla {vars.frameworkName} | {vars.productName} |
 |---------|-------------------|---------|
 | **Last-updated date** | Shown at the bottom of the page | Moved to the **top**, below the title — gives readers immediate context about freshness |
 | **Heading anchors** | Hover shows a `#` link | Hover shows a link icon with **copy-to-clipboard** functionality |
@@ -31,26 +31,26 @@ Trellis is built **on top of** Next.js — it doesn't replace it. Everything Nex
 
 ## What Stays the Same
 
-Trellis doesn't modify these Next.js fundamentals:
+{vars.productName} doesn't modify these {vars.frameworkName} fundamentals:
 
 - **MDX content authoring** — same markdown syntax, same component imports
 - **Routing** — file-based routing in `content/docs/`, `blog/`, `app/`
 - **Configuration** — `config/site.ts` with the same API
-- **Plugin system** — all Next.js plugins are compatible
+- **Plugin system** — all {vars.frameworkName} plugins are compatible
 - **Deployment** — same static output, deploy anywhere
 - **Versioning** — docs versioning works as expected
 - **i18n** — internationalization support is unchanged
 - **Syntax highlighting** — Shiki-powered code blocks with dual light/dark themes
 
-## When to Use Trellis
+## When to Use {vars.productName}
 
-**Use Trellis when:**
+**Use {vars.productName} when:**
 - You want a polished docs site without spending time on theme customization
 - You need built-in search that doesn't require Algolia
 - Your team wants a design token system for consistent branding
 - You're building internal developer documentation
 
-**Stick with vanilla Next.js when:**
+**Stick with vanilla {vars.frameworkName} when:**
 - You need complete control over every theme component from scratch
 - You prefer to pick and choose individual plugins
-- Your project has specific theme requirements that conflict with Trellis defaults
+- Your project has specific theme requirements that conflict with {vars.productName} defaults

@@ -6,9 +6,9 @@ last_update:
   author: Trellis
 ---
 
-### What is Trellis?
+### What is {vars.productName}?
 
-Trellis is an opinionated documentation framework built on top of Next.js. It includes a custom theme with UX improvements, a design token system, smart search, and several plugins that enhance the documentation experience.
+{vars.productName} is an opinionated documentation framework built on top of {vars.frameworkName}. It includes a custom theme with UX improvements, a design token system, smart search, and several plugins that enhance the documentation experience.
 
 ### How do I customize the colors?
 
@@ -16,7 +16,7 @@ Edit `design-tokens.json` at the project root. The build process converts this J
 
 ### Can I use this with an existing Docusaurus project?
 
-Not yet directly. Currently, Trellis is a standalone project. In the future, we plan to publish it as `@pixlngrid/trellis` that you can install into any Next.js project.
+Not yet directly. Currently, {vars.productName} is a standalone project. In the future, we plan to publish it as `@pixlngrid/trellis` that you can install into any {vars.frameworkName} project.
 
 ### How does the search work?
 
@@ -36,12 +36,12 @@ Create a new `.mdx` file in the `content/docs/faq/` directory. Use `###` heading
 
 ### How many theme components are ejected?
 
-Trellis includes custom theme components. The major customizations are in `DocItem/Content` (last-updated placement), `Tabs` (URL sync), and `Admonition/Icon` (custom SVGs). See [Theme Overview](/theme/).
+{vars.productName} includes custom theme components. The major customizations are in `DocItem/Content` (last-updated placement), `Tabs` (URL sync), and `Admonition/Icon` (custom SVGs). See [Theme Overview](/theme/).
 
 ### How do I deploy the site?
 
-Trellis produces a standard static site via `npm run build`. The output goes to the `out/` directory. Deploy it anywhere that serves static files: Vercel, Netlify, GitHub Pages, Cloudflare Pages, S3 + CloudFront, or your own server.
+{vars.productName} produces a standard static site via `npm run build`. The output goes to the `out/` directory. Deploy it anywhere that serves static files: Vercel, Netlify, GitHub Pages, Cloudflare Pages, S3 + CloudFront, or your own server.
 
-### Does Trellis support dark mode?
+### Does {vars.productName} support dark mode?
 
-Yes. Trellis ships with dark mode as the default and `respectPrefersColorScheme` enabled. Users can toggle between light and dark mode using the switch in the navbar. The design tokens include separate color mappings for both modes in `app/globals.css`.
+Yes. {vars.productName} ships with dark mode as the default and `respectPrefersColorScheme` enabled. Users can toggle between light and dark mode using the switch in the navbar. The design tokens include separate color mappings for both modes in `app/globals.css`.

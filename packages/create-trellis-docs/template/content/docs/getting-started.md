@@ -2,7 +2,7 @@
 title: Getting Started
 ---
 
-Welcome to your documentation site powered by **Trellis**.
+Welcome to your documentation site powered by **{vars.productName}**.
 
 ## Quick Start
 

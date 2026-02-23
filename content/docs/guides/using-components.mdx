@@ -84,3 +84,91 @@ Manage URL redirects via `redirects.json`:
 ### Image Lightbox
 
 All images in markdown content automatically support click-to-zoom via the lightbox plugin. No additional markup needed.
+
+## Creating Custom Components
+
+You can add your own React components and make them available in MDX — either via explicit `import` or as **global components** that are available on every page without importing.
+
+### 1. Create the Component
+
+Add a new file under `components/custom/`:
+
+```tsx title="components/custom/status-badge.tsx"
+'use client'
+
+interface StatusBadgeProps {
+  status: 'stable' | 'beta' | 'deprecated'
+}
+
+const colors = {
+  stable: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  beta: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  deprecated: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+}
+
+export function StatusBadge({ status }: StatusBadgeProps) {
+  return (
+    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${colors[status]}`}>
+      {status}
+    </span>
+  )
+}
+```
+
+:::tip
+Add `'use client'` at the top if the component uses hooks, event handlers, or browser APIs. Pure display components that only accept props can remain server components.
+:::
+
+### 2. Use via Import (Per-Page)
+
+Import it directly in any MDX file:
+
+```mdx
+import { StatusBadge } from '@/components/custom/status-badge';
+
+This feature is <StatusBadge status="beta" />.
+```
+
+This works immediately — no registration needed.
+
+### 3. Register as a Global Component (Optional)
+
+To make a component available on **every page** without importing, add it to `components/docs/mdx/index.tsx`:
+
+```ts title="components/docs/mdx/index.tsx"
+import { StatusBadge } from '@/components/custom/status-badge'
+
+export const mdxComponents: Record<string, React.ComponentType<any>> = {
+  // ... existing components
+  StatusBadge,
+}
+```
+
+Now you can use it in any MDX file without an import:
+
+```mdx
+This feature is <StatusBadge status="stable" />.
+```
+
+### Server vs Client Components
+
+| Component Type | When to Use | Directive |
+|----------------|-------------|-----------|
+| **Server** (default) | Static display, no interactivity | None needed |
+| **Client** | Hooks, state, event handlers, browser APIs | `'use client'` at top of file |
+
+All globally registered components in `mdxComponents` are rendered inside a server component (`MDXRemote`), but client components work fine — React handles the boundary automatically.
+
+### File Organization
+
+```
+components/
+├── custom/              ← Your custom components
+│   ├── glossary.tsx
+│   ├── feedback.tsx
+│   ├── status-badge.tsx ← New component
+│   └── ...
+└── docs/
+    └── mdx/
+        └── index.tsx    ← Global registration
+```

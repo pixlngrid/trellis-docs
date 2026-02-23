@@ -7,7 +7,7 @@ last_update:
   author: Trellis
 ---
 
-This guide covers how to create and organize content in Trellis. For markdown syntax and features (code blocks, admonitions, tabs), see [Writing Docs](/guides/writing-docs/).
+This guide covers how to create and organize content in {vars.productName}. For markdown syntax and features (code blocks, admonitions, tabs), see [Writing Docs](/guides/writing-docs/).
 
 ## Creating a New Page
 
@@ -300,6 +300,46 @@ description: Initial release of Trellis on Next.js.
 | `description` | Short summary |
 
 Release notes are listed at `/release-notes/`, sorted by version (newest first).
+
+## Variables
+
+{vars.productName} supports **reusable variables** in MDX files — a feature Docusaurus doesn't offer. Define variables once, use them across every page.
+
+### Defining Variables
+
+Edit `config/variables.ts` to add or change variables:
+
+```ts title="config/variables.ts"
+export const docVariables: Record<string, string> = {
+  productName: 'Trellis',
+  companyName: "Pixl'n Grid",
+  version: '1.0.0',
+  frameworkName: 'Next.js',
+}
+```
+
+### Using Variables in MDX
+
+Reference any variable in your content with `{vars.variableName}`:
+
+```mdx
+Welcome to {vars.productName} by {vars.companyName}.
+
+{vars.productName} is built on {vars.frameworkName} and is currently
+at version {vars.version}.
+```
+
+This renders as:
+
+> Welcome to {vars.productName} by {vars.companyName}.
+>
+> {vars.productName} is built on {vars.frameworkName} and is currently at version {vars.version}.
+
+Variables work anywhere in MDX — paragraphs, headings, tables, admonitions, and JSX component props.
+
+:::tip
+When you rename a product or bump a version, update `config/variables.ts` once and every page reflects the change on the next build.
+:::
 
 ## MDX Tips
 

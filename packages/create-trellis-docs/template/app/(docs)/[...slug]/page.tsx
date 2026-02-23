@@ -10,6 +10,7 @@ import { TableOfContents, MobileTableOfContents } from '@/components/docs/toc'
 import { Breadcrumbs } from '@/components/docs/breadcrumbs'
 import { remarkCallout } from '@/lib/remark-callout'
 import { siteConfig } from '@/config/site'
+import { docVariables } from '@/config/variables'
 
 export async function generateStaticParams() {
   const slugs = await getAllDocSlugs()
@@ -64,6 +65,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
             source={doc.content}
             components={mdxComponents}
             options={{
+              scope: { vars: docVariables },
               mdxOptions: {
                 remarkPlugins: [remarkGfm, remarkDirective, remarkCallout],
                 rehypePlugins: [rehypeSlug],

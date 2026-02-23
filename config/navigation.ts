@@ -10,6 +10,7 @@ export const navItems = [
       { label: 'Glossary', href: '/components/glossary/' },
     ],
   },
+  { label: 'About', href: '/about/' },
 ]
 
 export const footerConfig = {

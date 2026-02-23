@@ -3,45 +3,7 @@ import { siteConfig } from '@/config/site'
 import { Navbar } from '@/components/docs/navbar'
 import { Footer } from '@/components/docs/footer'
 import { TrellisStacked } from '@/components/brand/trellis-logo'
-
-const features = [
-  {
-    title: 'Theme Enhancements',
-    icon: '✨',
-    description: 'Last-updated at top, heading copy-to-clipboard, pill-style tabs, and custom admonition icons.',
-    link: '/theme/',
-  },
-  {
-    title: 'Smart Search',
-    icon: '🔍',
-    description: 'Build-time indexing with Fuse.js for fast, client-side fuzzy search. No external service needed.',
-    link: '/plugins/smart-search/',
-  },
-  {
-    title: 'Design Tokens',
-    icon: '🎨',
-    description: 'JSON-to-CSS pipeline. Define your brand in one file, regenerate all variables automatically.',
-    link: '/design-tokens/',
-  },
-  {
-    title: 'Bundled Plugins',
-    icon: '🔌',
-    description: 'FAQ indexer, redirects, image lightbox, and Mermaid pan/zoom — configured and ready to go.',
-    link: '/plugins/',
-  },
-  {
-    title: 'Reusable Components',
-    icon: '🧩',
-    description: 'Glossary, feedback widget, flipping cards, and custom search UI for your MDX pages.',
-    link: '/components/',
-  },
-  {
-    title: 'Mermaid Diagrams',
-    icon: '📈',
-    description: 'Built-in Mermaid rendering with pan and zoom. Just write fenced code blocks.',
-    link: '/guides/writing-docs/',
-  },
-]
+import { FeatureCards } from '@/components/landing/feature-cards'
 
 export default function Home() {
   return (
@@ -61,10 +23,11 @@ export default function Home() {
               />
             ) : null}
           </div>
-          <p className="text-xl text-[var(--muted-foreground)] mb-8">
-            An opinionated docs framework built on Next.js.
-            <br />
-            Structure for your content to grow on.
+          <p className="text-xl text-[var(--muted-foreground)] mb-3">
+            The docs framework that scales with your product.
+          </p>
+          <p className="text-base text-[var(--muted-foreground)] mb-8">
+            Built on Next.js. Variables, custom components, smart search, and static export — everything Docusaurus doesn&apos;t give you.
           </p>
           <div className="flex gap-4 justify-center">
             <Link
@@ -84,21 +47,7 @@ export default function Home() {
 
         {/* Feature Cards */}
         <div className="max-w-5xl mx-auto px-4 pb-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature) => (
-              <Link
-                key={feature.title}
-                href={feature.link}
-                className="block p-6 rounded-lg border hover:border-[var(--primary)] hover:shadow-[0_2px_12px_rgba(42,90,130,0.2)] transition-all no-underline text-[var(--foreground)]"
-              >
-                <div className="text-3xl mb-2">{feature.icon}</div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-[var(--muted-foreground)]">
-                  {feature.description}
-                </p>
-              </Link>
-            ))}
-          </div>
+          <FeatureCards />
         </div>
       </main>
       <Footer />
