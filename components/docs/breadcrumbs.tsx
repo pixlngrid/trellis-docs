@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ChevronRight, Home } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 interface BreadcrumbsProps {
   slug: string[]
@@ -20,7 +20,7 @@ export function Breadcrumbs({ slug, title }: BreadcrumbsProps) {
   return (
     <nav className="flex items-center gap-1 text-sm text-[var(--muted-foreground)] mb-6">
       <Link href="/" className="hover:text-[var(--foreground)] no-underline">
-        <Home size={14} />
+        Home
       </Link>
       {crumbs.map((crumb) => (
         <span key={crumb.href} className="flex items-center gap-1">

@@ -182,6 +182,36 @@ Categories can be nested for deeper hierarchies:
 }
 ```
 
+## Landing Page
+
+By default, the root URL (`/`) renders a landing page with a hero section and feature cards. This is defined in `app/page.tsx`.
+
+### Skipping the Landing Page
+
+Most documentation sites don't need a marketing-style landing page — visitors should go straight to the docs. To bypass the landing page and redirect `/` to your first doc, replace the contents of `app/page.tsx`:
+
+```tsx title="app/page.tsx"
+import { redirect } from 'next/navigation'
+
+export default function Home() {
+  redirect('/getting-started/')
+}
+```
+
+Change `'/getting-started/'` to whichever page you want as your entry point. The redirect works with static export — Next.js generates an HTML page with a `<meta http-equiv="refresh">` tag, so no server is required.
+
+:::tip
+After switching to a redirect you can also remove imports and assets that were only used by the landing page, such as the hero logo in `config/site.ts` (`logo.hero`) and any feature card data.
+:::
+
+### Customizing the Landing Page
+
+If you want to keep the landing page but tailor it, edit `app/page.tsx` directly. It's a regular React component — not MDX — so you have full control over layout. The key pieces to update are:
+
+- **Hero text** — the tagline and call-to-action buttons
+- **Feature cards** — the `features` array at the top of the file
+- **Hero logo** — controlled by `logo.hero` and `logo.useBuiltIn` in `config/site.ts`
+
 ## Images
 
 Place images in `public/img/` and reference them with an absolute path:
