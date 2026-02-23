@@ -1,7 +1,14 @@
+import { docVariables } from '@/config/variables'
+
 export interface TocItem {
   id: string
   text: string
   level: number
+}
+
+/** Replace {vars.xxx} expressions with their resolved values. */
+export function resolveVars(text: string, vars: Record<string, string> = docVariables): string {
+  return text.replace(/\{vars\.(\w+)\}/g, (_, key) => vars[key] ?? '')
 }
 
 export function extractToc(content: string): TocItem[] {
@@ -24,11 +31,13 @@ export function extractToc(content: string): TocItem[] {
 
   while ((match = headingRegex.exec(stripped)) !== null) {
     const level = match[1].length
-    const text = match[2]
-      .trim()
-      .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
-      .replace(/`([^`]+)`/g, '$1')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    const text = resolveVars(
+      match[2]
+        .trim()
+        .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    )
 
     const id = text
       .toLowerCase()

@@ -9,6 +9,18 @@ const OUT_FILE = path.join(ROOT, 'public/searchIndex.json');
 const EXCLUDED_PREFIXES = ['_'];
 const EXCLUDED_FOLDERS = ['includes', '_includes'];
 
+// Load doc variables for resolving {vars.xxx} in headings
+let docVars = {};
+try {
+  const varsRaw = fs.readFileSync(path.join(ROOT, 'config/variables.ts'), 'utf-8');
+  const varMatches = [...varsRaw.matchAll(/(\w+):\s*['"]([^'"]*)['"]/g)];
+  for (const m of varMatches) docVars[m[1]] = m[2];
+} catch { /* variables file is optional */ }
+
+function resolveVars(text) {
+  return text.replace(/\{vars\.(\w+)\}/g, (_, key) => docVars[key] ?? '');
+}
+
 // Load site config to check i18n/versioning settings
 let siteConfig = {};
 try {
@@ -105,10 +117,12 @@ function extractSections(content) {
       });
     }
 
-    const text = match[2].trim()
-      .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
-      .replace(/`([^`]+)`/g, '$1')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+    const text = resolveVars(
+      match[2].trim()
+        .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    );
 
     const id = text.toLowerCase()
       .replace(/[^\w\s-]/g, '')

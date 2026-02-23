@@ -8,6 +8,18 @@ const FAQ_DIR = path.join(ROOT, 'content/docs/faq');
 const OUT_FILE = path.join(ROOT, 'public/faqIndex.json');
 const BASE_PERMALINK = '/faq';
 
+// Load doc variables for resolving {vars.xxx} in headings
+let docVars = {};
+try {
+  const varsRaw = fs.readFileSync(path.join(ROOT, 'config/variables.ts'), 'utf-8');
+  const varMatches = [...varsRaw.matchAll(/(\w+):\s*['"]([^'"]*)['"]/g)];
+  for (const m of varMatches) docVars[m[1]] = m[2];
+} catch { /* variables file is optional */ }
+
+function resolveVars(text) {
+  return text.replace(/\{vars\.(\w+)\}/g, (_, key) => docVars[key] ?? '');
+}
+
 // Load site config for i18n/versioning awareness
 let siteConfig = {};
 try {
@@ -87,12 +99,14 @@ function indexFaqDir(faqDir, urlPrefix) {
     let match;
 
     while ((match = h3Regex.exec(content)) !== null) {
-      let questionText = match[1]
-        .trim()
-        .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
-        .replace(/`([^`]+)`/g, '$1')
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        .trim();
+      let questionText = resolveVars(
+        match[1]
+          .trim()
+          .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+          .replace(/`([^`]+)`/g, '$1')
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+          .trim()
+      );
 
       if (questionText) {
         const anchor = questionText
