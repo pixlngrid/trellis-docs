@@ -34,6 +34,7 @@ export interface DocMeta {
   hide_table_of_contents?: boolean
   doc_type?: string
   role?: string[]
+  draft?: boolean
   slug: string
 }
 
@@ -76,7 +77,14 @@ export async function getAllDocSlugs(
   const dir = getContentDir(locale, version)
   try {
     const files = await getFilesRecursive(dir)
-    return files.map(fileToSlug)
+    const slugs: string[][] = []
+    for (const file of files) {
+      const raw = await fs.readFile(path.join(dir, file), 'utf-8')
+      const { data } = matter(raw)
+      if (data.draft === true) continue
+      slugs.push(fileToSlug(file))
+    }
+    return slugs
   } catch {
     // Directory doesn't exist (e.g. no translations for this locale/version)
     return []
@@ -125,6 +133,7 @@ async function loadDoc(
       hide_table_of_contents: data.hide_table_of_contents,
       doc_type: data.doc_type,
       role: data.role,
+      draft: data.draft === true,
       slug: '/' + slugPath,
     },
     content,
@@ -175,6 +184,7 @@ export async function getAllDocsMeta(
   for (const file of files) {
     const raw = await fs.readFile(path.join(dir, file), 'utf-8')
     const { data } = matter(raw)
+    if (data.draft === true) continue
     const slugArr = fileToSlug(file)
     metas.push({
       title: data.title || slugArr[slugArr.length - 1],
@@ -183,6 +193,7 @@ export async function getAllDocsMeta(
       last_update: data.last_update,
       doc_type: data.doc_type,
       role: data.role,
+      draft: false,
       slug: '/' + slugArr.join('/'),
     })
   }

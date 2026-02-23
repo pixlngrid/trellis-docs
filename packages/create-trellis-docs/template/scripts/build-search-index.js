@@ -140,6 +140,9 @@ function indexDir(dir, urlPrefix) {
     const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
     const { data, content } = matter(raw);
 
+    // Skip draft pages
+    if (data.draft === true) continue;
+
     const slug = file.replace(/\.mdx?$/, '').replace(/\/index$/, '');
     const url = `${urlPrefix}/${slug}/`;
 
