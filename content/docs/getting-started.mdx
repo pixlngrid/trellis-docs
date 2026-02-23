@@ -38,9 +38,7 @@ New to {vars.productName}? Read [What is {vars.productName}?](/overview/) for th
 
 ## Quick Start
 
-### Option A: Scaffold a new project
-
-The fastest way to start a new docs site:
+Scaffold a new project with a single command:
 
 ```bash
 npx create-trellis-docs my-docs
@@ -50,16 +48,6 @@ npm run dev
 
 You'll be prompted for a site title, tagline, URL, and optional GitHub repo URL.
 
-### Option B: Clone the repo
-
-```bash
-git clone https://github.com/pixlngrid/trellis.git
-cd trellis
-
-npm install
-npm run dev
-```
-
 :::tip
 The dev server runs on port 3000 by default. Visit `http://localhost:3000` to see your docs.
 :::
@@ -67,29 +55,35 @@ The dev server runs on port 3000 by default. Visit `http://localhost:3000` to se
 ## Project Structure
 
 ```
-trellis/
-├── content/
-│   ├── docs/              # Documentation content (MDX files)
-│   ├── blog/              # Blog posts
-│   └── release-notes/     # Version release notes
+my-docs/
 ├── app/
 │   ├── (docs)/            # Docs layout (navbar, sidebar, footer)
 │   ├── blog/              # Blog pages
 │   ├── release-notes/     # Release notes pages
+│   ├── layout.tsx         # Root layout (providers, fonts)
+│   ├── page.tsx           # Landing page
 │   ├── globals.css        # Global CSS + dark/light mode tokens
 │   └── tokens.css         # Generated design token CSS
 ├── components/
-│   ├── docs/              # Layout & MDX components
+│   ├── blog/              # Blog sidebar
+│   ├── brand/             # Logo components (replace with your own)
 │   ├── custom/            # Reusable components (glossary, feedback, etc.)
-│   └── brand/             # Logo components
+│   └── docs/              # Layout & MDX components
 ├── config/
-│   ├── site.ts            # Site title, logo, search, FAQ settings
+│   ├── navigation.ts      # Navbar and footer links
 │   ├── sidebar.ts         # Sidebar navigation structure
-│   └── navigation.ts      # Navbar and footer links
-├── lib/                   # Content loading, utilities
+│   ├── site.ts            # Site title, logo, search, i18n, versioning
+│   └── variables.ts       # Reusable content variables
+├── content/
+│   ├── docs/              # Documentation content (MDX files)
+│   ├── blog/              # Blog posts
+│   └── release-notes/     # Version release notes
+├── data/                  # Static data files (glossary, etc.)
+├── lib/                   # Content loading, routing, utilities
 ├── public/img/            # Static assets (images, logos, favicon)
-├── scripts/               # Build scripts (tokens, search index, FAQ index)
+├── scripts/               # Build scripts (tokens, search, FAQ, versioning)
 ├── design-tokens.json     # Design token definitions
+├── redirects.json         # URL redirect mappings
 └── package.json
 ```
 

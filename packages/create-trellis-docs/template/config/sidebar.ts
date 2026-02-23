@@ -1,6 +1,6 @@
 export type SidebarItem =
   | { type: 'doc'; id: string; label?: string }
-  | { type: 'category'; label: string; collapsed?: boolean; items: SidebarItem[] }
+  | { type: 'category'; label: string; link?: string; collapsed?: boolean; items: SidebarItem[] }
   | { type: 'link'; label: string; href: string }
 
 export const mainSidebar: SidebarItem[] = [

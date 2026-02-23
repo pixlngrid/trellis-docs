@@ -22,7 +22,8 @@ const comparisonRows = [
   { feature: 'CLI scaffolding', trellis: checkmark, docusaurus: checkmark, nextra: partial, starlight: checkmark, gitbook: cross },
   { feature: 'TypeScript config', trellis: checkmark, docusaurus: checkmark, nextra: checkmark, starlight: checkmark, gitbook: cross },
   { feature: 'Blog support', trellis: checkmark, docusaurus: checkmark, nextra: checkmark, starlight: partial, gitbook: cross },
-  { feature: 'i18n / localization', trellis: cross, docusaurus: checkmark, nextra: partial, starlight: checkmark, gitbook: partial },
+  { feature: 'i18n / localization', trellis: checkmark, docusaurus: checkmark, nextra: partial, starlight: checkmark, gitbook: partial },
+  { feature: 'Documentation versioning', trellis: checkmark, docusaurus: checkmark, nextra: cross, starlight: partial, gitbook: partial },
   { feature: 'Free & open source', trellis: checkmark, docusaurus: checkmark, nextra: checkmark, starlight: checkmark, gitbook: cross },
 ]
 
