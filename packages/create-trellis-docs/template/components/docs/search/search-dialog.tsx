@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 import Fuse from 'fuse.js'
+import { useDocContext } from '@/lib/doc-context'
 
 interface SearchResult {
   id: string
@@ -37,14 +38,26 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
   const [fuse, setFuse] = useState<Fuse<SearchResult> | null>(null)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const router = useRouter()
+  const { locale, version } = useDocContext()
 
-  // Load search index
+  // Load search index — supports both legacy array and keyed object format
   useEffect(() => {
     fetch('/searchIndex.json')
       .then((r) => r.json())
-      .then((data) => setFuse(new Fuse(data, fuseOptions)))
+      .then((data) => {
+        let items: SearchResult[]
+        if (Array.isArray(data)) {
+          // Legacy flat array format (i18n/versioning disabled)
+          items = data
+        } else {
+          // Keyed format: { "en:current": [...], "es:v1": [...] }
+          const key = `${locale}:${version}`
+          items = data[key] || data[`${locale}:current`] || Object.values(data)[0] || []
+        }
+        setFuse(new Fuse(items, fuseOptions))
+      })
       .catch(console.error)
-  }, [])
+  }, [locale, version])
 
   // Keyboard shortcut: Cmd+K
   useEffect(() => {

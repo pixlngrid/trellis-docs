@@ -1,10 +1,30 @@
 import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
+import { siteConfig } from '@/config/site'
 
 const DOCS_DIR = path.join(process.cwd(), 'content/docs')
 const BLOG_DIR = path.join(process.cwd(), 'content/blog')
 const RELEASE_NOTES_DIR = path.join(process.cwd(), 'content/release-notes')
+
+function getContentDir(locale: string, version: string): string {
+  const { i18n, versioning } = siteConfig
+  const defaultLocale = i18n?.defaultLocale || 'en'
+  const isDefaultLocale = !i18n?.enabled || locale === defaultLocale
+  const isCurrentVersion = !versioning?.enabled || version === 'current'
+
+  if (isDefaultLocale && isCurrentVersion) {
+    return DOCS_DIR
+  }
+  if (isDefaultLocale && !isCurrentVersion) {
+    return path.join(process.cwd(), 'versioned_docs', version)
+  }
+  if (!isDefaultLocale && isCurrentVersion) {
+    return path.join(process.cwd(), 'content/i18n', locale, 'docs')
+  }
+  // Non-default locale + old version
+  return path.join(process.cwd(), 'content/i18n', locale, 'versioned_docs', version)
+}
 
 export interface DocMeta {
   title: string
@@ -47,20 +67,33 @@ function fileToSlug(file: string): string[] {
     .filter(Boolean)
 }
 
-export async function getAllDocSlugs(): Promise<string[][]> {
-  const files = await getFilesRecursive(DOCS_DIR)
-  return files.map(fileToSlug)
+export async function getAllDocSlugs(
+  locale = 'en',
+  version = 'current'
+): Promise<string[][]> {
+  const dir = getContentDir(locale, version)
+  try {
+    const files = await getFilesRecursive(dir)
+    return files.map(fileToSlug)
+  } catch {
+    // Directory doesn't exist (e.g. no translations for this locale/version)
+    return []
+  }
 }
 
-export async function getDocBySlug(slug: string[]): Promise<DocEntry> {
+async function loadDoc(
+  slug: string[],
+  locale: string,
+  version: string
+): Promise<DocEntry> {
+  const dir = getContentDir(locale, version)
   const slugPath = slug.join('/')
 
-  // Try exact file match, then index file
   const candidates = [
-    path.join(DOCS_DIR, `${slugPath}.mdx`),
-    path.join(DOCS_DIR, `${slugPath}.md`),
-    path.join(DOCS_DIR, `${slugPath}/index.mdx`),
-    path.join(DOCS_DIR, `${slugPath}/index.md`),
+    path.join(dir, `${slugPath}.mdx`),
+    path.join(dir, `${slugPath}.md`),
+    path.join(dir, `${slugPath}/index.mdx`),
+    path.join(dir, `${slugPath}/index.md`),
   ]
 
   let filePath: string | null = null
@@ -75,7 +108,7 @@ export async function getDocBySlug(slug: string[]): Promise<DocEntry> {
   }
 
   if (!filePath) {
-    throw new Error(`Doc not found: ${slugPath}`)
+    throw new Error(`Doc not found: ${slugPath} (locale=${locale}, version=${version})`)
   }
 
   const raw = await fs.readFile(filePath, 'utf-8')
@@ -95,12 +128,48 @@ export async function getDocBySlug(slug: string[]): Promise<DocEntry> {
   }
 }
 
-export async function getAllDocsMeta(): Promise<DocMeta[]> {
-  const files = await getFilesRecursive(DOCS_DIR)
+export async function getDocBySlug(
+  slug: string[],
+  locale = 'en',
+  version = 'current'
+): Promise<DocEntry & { isFallback: boolean }> {
+  const defaultLocale = siteConfig.i18n?.defaultLocale || 'en'
+
+  // Try requested locale first
+  try {
+    const entry = await loadDoc(slug, locale, version)
+    return { ...entry, isFallback: false }
+  } catch {
+    // If non-default locale, fall back to default locale
+    if (locale !== defaultLocale) {
+      try {
+        const entry = await loadDoc(slug, defaultLocale, version)
+        return { ...entry, isFallback: true }
+      } catch {
+        throw new Error(
+          `Doc not found: ${slug.join('/')} (locale=${locale}, version=${version})`
+        )
+      }
+    }
+    throw new Error(`Doc not found: ${slug.join('/')} (version=${version})`)
+  }
+}
+
+export async function getAllDocsMeta(
+  locale = 'en',
+  version = 'current'
+): Promise<DocMeta[]> {
+  const dir = getContentDir(locale, version)
+  let files: string[]
+  try {
+    files = await getFilesRecursive(dir)
+  } catch {
+    return []
+  }
   const metas: DocMeta[] = []
 
   for (const file of files) {
-    const raw = await fs.readFile(path.join(DOCS_DIR, file), 'utf-8')
+    const raw = await fs.readFile(path.join(dir, file), 'utf-8')
     const { data } = matter(raw)
     const slugArr = fileToSlug(file)
     metas.push({

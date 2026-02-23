@@ -37,4 +37,19 @@ export const siteConfig = {
     faqDir: 'content/docs/faq',
     basePermalink: '/faq',
   },
+
+  // Internationalization — set enabled: true and add locales to activate
+  i18n: {
+    enabled: false,
+    defaultLocale: 'en',
+    locales: [
+      { code: 'en', name: 'English', dir: 'ltr' as const },
+    ],
+  },
+
+  // Documentation versioning — set enabled: true to activate
+  versioning: {
+    enabled: false,
+    currentLabel: 'Latest',
+  },
 }

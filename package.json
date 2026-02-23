@@ -8,7 +8,8 @@
     "build": "node scripts/build-tokens.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && next build",
     "start": "next start",
     "lint": "next lint",
-    "build-tokens": "node scripts/build-tokens.js"
+    "build-tokens": "node scripts/build-tokens.js",
+    "version:snapshot": "node scripts/version-snapshot.js"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.3",

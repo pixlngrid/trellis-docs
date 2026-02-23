@@ -3,68 +3,141 @@ const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
 
-const FAQ_DIR = path.join(__dirname, '../content/docs/faq');
-const OUT_FILE = path.join(__dirname, '../public/faqIndex.json');
+const ROOT = path.join(__dirname, '..');
+const FAQ_DIR = path.join(ROOT, 'content/docs/faq');
+const OUT_FILE = path.join(ROOT, 'public/faqIndex.json');
 const BASE_PERMALINK = '/faq';
 
-if (!fs.existsSync(FAQ_DIR)) {
-  console.log('FAQ directory not found, creating empty index');
-  fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
-  fs.writeFileSync(OUT_FILE, '[]');
-  process.exit(0);
+// Load site config for i18n/versioning awareness
+let siteConfig = {};
+try {
+  const configPath = path.join(ROOT, 'config/site.ts');
+  const configRaw = fs.readFileSync(configPath, 'utf-8');
+  siteConfig.i18nEnabled = /i18n:\s*\{[^}]*enabled:\s*true/s.test(configRaw);
+  siteConfig.versioningEnabled = /versioning:\s*\{[^}]*enabled:\s*true/s.test(configRaw);
+  const localeMatch = configRaw.match(/defaultLocale:\s*['"]([^'"]+)['"]/);
+  siteConfig.defaultLocale = localeMatch ? localeMatch[1] : 'en';
+
+  if (siteConfig.i18nEnabled) {
+    const codeMatches = [...configRaw.matchAll(/code:\s*['"]([^'"]+)['"]/g)];
+    siteConfig.locales = codeMatches.map((m) => m[1]);
+  } else {
+    siteConfig.locales = [siteConfig.defaultLocale];
+  }
+} catch {
+  siteConfig = {
+    i18nEnabled: false,
+    versioningEnabled: false,
+    defaultLocale: 'en',
+    locales: ['en'],
+  };
 }
 
-const files = fs
-  .readdirSync(FAQ_DIR)
-  .filter((f) => /\.mdx?$/.test(f) && f !== 'index.mdx' && f !== 'index.md');
+let versions = [];
+try {
+  if (siteConfig.versioningEnabled) {
+    versions = JSON.parse(fs.readFileSync(path.join(ROOT, 'versions.json'), 'utf-8'));
+  }
+} catch {
+  // No versions file
+}
 
-const topics = [];
+function getFaqDir(locale, version) {
+  const isDefault = locale === siteConfig.defaultLocale;
+  const isCurrent = version === 'current';
 
-for (const file of files) {
-  const filePath = path.join(FAQ_DIR, file);
-  const raw = fs.readFileSync(filePath, 'utf-8');
-  const { data: frontmatter, content } = matter(raw);
+  if (isDefault && isCurrent) return FAQ_DIR;
+  if (isDefault && !isCurrent) return path.join(ROOT, 'versioned_docs', version, 'faq');
+  if (!isDefault && isCurrent) return path.join(ROOT, 'content/i18n', locale, 'docs/faq');
+  return path.join(ROOT, 'content/i18n', locale, 'versioned_docs', version, 'faq');
+}
 
-  const slug = file.replace(/\.mdx?$/, '');
-  const title =
-    frontmatter.title ||
-    slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+function buildUrlPrefix(locale, version) {
+  const parts = [];
+  if (locale !== siteConfig.defaultLocale) parts.push(locale);
+  if (version !== 'current') parts.push(version);
+  return parts.length > 0 ? '/' + parts.join('/') : '';
+}
 
-  // Extract ### headings as questions
-  const h3Regex = /^###\s+(.+)$/gm;
-  const questions = [];
-  let match;
+function indexFaqDir(faqDir, urlPrefix) {
+  if (!fs.existsSync(faqDir)) return [];
 
-  while ((match = h3Regex.exec(content)) !== null) {
-    let questionText = match[1]
-      .trim()
-      .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
-      .replace(/`([^`]+)`/g, '$1')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      .trim();
+  const files = fs
+    .readdirSync(faqDir)
+    .filter((f) => /\.mdx?$/.test(f) && f !== 'index.mdx' && f !== 'index.md');
 
-    if (questionText) {
-      const anchor = questionText
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+  const topics = [];
 
-      questions.push({ text: questionText, anchor });
+  for (const file of files) {
+    const filePath = path.join(faqDir, file);
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    const { data: frontmatter, content } = matter(raw);
+
+    const slug = file.replace(/\.mdx?$/, '');
+    const title =
+      frontmatter.title ||
+      slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+    // Extract ### headings as questions
+    const h3Regex = /^###\s+(.+)$/gm;
+    const questions = [];
+    let match;
+
+    while ((match = h3Regex.exec(content)) !== null) {
+      let questionText = match[1]
+        .trim()
+        .replace(/\*{1,3}(.*?)\*{1,3}/g, '$1')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .trim();
+
+      if (questionText) {
+        const anchor = questionText
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-');
+
+        questions.push({ text: questionText, anchor });
+      }
     }
+
+    topics.push({
+      slug,
+      title,
+      description: frontmatter.description || '',
+      permalink: `${urlPrefix}${BASE_PERMALINK}/${slug}`,
+      questions,
+    });
   }
 
-  topics.push({
-    slug,
-    title,
-    description: frontmatter.description || '',
-    permalink: `${BASE_PERMALINK}/${slug}`,
-    questions,
-  });
+  topics.sort((a, b) => a.title.localeCompare(b.title));
+  return topics;
 }
 
-topics.sort((a, b) => a.title.localeCompare(b.title));
+// Build the index
+const allVersions = ['current', ...versions];
+const allLocales = siteConfig.locales;
+const fullIndex = {};
+let totalTopics = 0;
+
+for (const locale of allLocales) {
+  for (const version of allVersions) {
+    const faqDir = getFaqDir(locale, version);
+    const urlPrefix = buildUrlPrefix(locale, version);
+    const key = `${locale}:${version}`;
+    const topics = indexFaqDir(faqDir, urlPrefix);
+
+    if (topics.length > 0) {
+      fullIndex[key] = topics;
+      totalTopics += topics.length;
+    }
+  }
+}
 
 fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
-fs.writeFileSync(OUT_FILE, JSON.stringify(topics, null, 2));
-console.log(`FAQ index built: ${topics.length} topics, ${topics.reduce((s, t) => s + t.questions.length, 0)} questions`);
+fs.writeFileSync(OUT_FILE, JSON.stringify(fullIndex, null, 2));
+
+const keys = Object.keys(fullIndex);
+const totalQuestions = Object.values(fullIndex).flat().reduce((s, t) => s + t.questions.length, 0);
+console.log(`FAQ index built: ${totalTopics} topics, ${totalQuestions} questions across ${keys.length} index(es)`);

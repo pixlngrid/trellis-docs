@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState, ReactElement } from 'react'
 import Link from 'next/link'
 import { motion } from 'motion/react'
 
@@ -10,7 +10,7 @@ interface Feature {
   description: string
   link: string
   imageGradient: string
-  visualElement: JSX.Element
+  visualElement: ReactElement
 }
 
 const features: Feature[] = [

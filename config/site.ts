@@ -3,7 +3,7 @@ export const siteConfig = {
   tagline: 'Docs Framework',
   url: 'https://trellis.pixlngrid.com',
   baseUrl: '/',
-  favicon: '/img/trellis-favicon.svg',
+  favicon: '/img/favicon.svg',
 
   // Logo configuration
   // To use your own logo, replace these paths with your image files in public/img/
@@ -45,5 +45,20 @@ export const siteConfig = {
   faq: {
     faqDir: 'content/docs/faq',
     basePermalink: '/faq',
+  },
+
+  // Internationalization — set enabled: true and add locales to activate
+  i18n: {
+    enabled: false,
+    defaultLocale: 'en',
+    locales: [
+      { code: 'en', name: 'English', dir: 'ltr' as const },
+    ],
+  },
+
+  // Documentation versioning — set enabled: true to activate
+  versioning: {
+    enabled: false,
+    currentLabel: 'Latest',
   },
 }

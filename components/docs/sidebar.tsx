@@ -6,8 +6,9 @@ import { useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { resolveSidebar, type ResolvedSidebarItem } from '@/lib/sidebar'
+import { useDocContext } from '@/lib/doc-context'
 
-const sidebarItems = resolveSidebar()
+const defaultSidebarItems = resolveSidebar()
 
 function SidebarCategory({ item }: { item: ResolvedSidebarItem }) {
   const pathname = usePathname()
@@ -102,6 +103,11 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+  const { urlPrefix } = useDocContext()
+  const sidebarItems = urlPrefix
+    ? resolveSidebar(undefined, urlPrefix)
+    : defaultSidebarItems
+
   return (
     <div className="hidden lg:flex relative shrink-0">
       {/* Sidebar content */}

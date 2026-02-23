@@ -3,10 +3,68 @@ const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
 
-const DOCS_DIR = path.join(__dirname, '../content/docs');
-const OUT_FILE = path.join(__dirname, '../public/searchIndex.json');
+const ROOT = path.join(__dirname, '..');
+const DOCS_DIR = path.join(ROOT, 'content/docs');
+const OUT_FILE = path.join(ROOT, 'public/searchIndex.json');
 const EXCLUDED_PREFIXES = ['_'];
 const EXCLUDED_FOLDERS = ['includes', '_includes'];
+
+// Load site config to check i18n/versioning settings
+let siteConfig = {};
+try {
+  // Try to read the compiled config, fall back to defaults
+  const configPath = path.join(ROOT, 'config/site.ts');
+  const configRaw = fs.readFileSync(configPath, 'utf-8');
+  // Simple extraction of i18n and versioning enabled flags
+  siteConfig.i18nEnabled = /i18n:\s*\{[^}]*enabled:\s*true/s.test(configRaw);
+  siteConfig.versioningEnabled = /versioning:\s*\{[^}]*enabled:\s*true/s.test(configRaw);
+
+  // Extract default locale
+  const localeMatch = configRaw.match(/defaultLocale:\s*['"]([^'"]+)['"]/);
+  siteConfig.defaultLocale = localeMatch ? localeMatch[1] : 'en';
+
+  // Extract locale codes
+  if (siteConfig.i18nEnabled) {
+    const codeMatches = [...configRaw.matchAll(/code:\s*['"]([^'"]+)['"]/g)];
+    siteConfig.locales = codeMatches.map((m) => m[1]);
+  } else {
+    siteConfig.locales = [siteConfig.defaultLocale];
+  }
+} catch {
+  siteConfig = {
+    i18nEnabled: false,
+    versioningEnabled: false,
+    defaultLocale: 'en',
+    locales: ['en'],
+  };
+}
+
+// Load versions
+let versions = [];
+try {
+  if (siteConfig.versioningEnabled) {
+    versions = JSON.parse(fs.readFileSync(path.join(ROOT, 'versions.json'), 'utf-8'));
+  }
+} catch {
+  // No versions file
+}
+
+function getContentDir(locale, version) {
+  const isDefault = locale === siteConfig.defaultLocale;
+  const isCurrent = version === 'current';
+
+  if (isDefault && isCurrent) return DOCS_DIR;
+  if (isDefault && !isCurrent) return path.join(ROOT, 'versioned_docs', version);
+  if (!isDefault && isCurrent) return path.join(ROOT, 'content/i18n', locale, 'docs');
+  return path.join(ROOT, 'content/i18n', locale, 'versioned_docs', version);
+}
+
+function buildUrlPrefix(locale, version) {
+  const parts = [];
+  if (locale !== siteConfig.defaultLocale) parts.push(locale);
+  if (version !== 'current') parts.push(version);
+  return parts.length > 0 ? '/' + parts.join('/') : '';
+}
 
 function getFiles(dir, base = '') {
   if (!fs.existsSync(dir)) return [];
@@ -74,37 +132,65 @@ function extractSections(content) {
   return sections;
 }
 
-const files = getFiles(DOCS_DIR);
-const index = [];
+function indexDir(dir, urlPrefix) {
+  const files = getFiles(dir);
+  const entries = [];
 
-for (const file of files) {
-  const raw = fs.readFileSync(path.join(DOCS_DIR, file), 'utf-8');
-  const { data, content } = matter(raw);
+  for (const file of files) {
+    const raw = fs.readFileSync(path.join(dir, file), 'utf-8');
+    const { data, content } = matter(raw);
 
-  const slug = file.replace(/\.mdx?$/, '').replace(/\/index$/, '');
-  const url = `/${slug}/`;
+    const slug = file.replace(/\.mdx?$/, '').replace(/\/index$/, '');
+    const url = `${urlPrefix}/${slug}/`;
 
-  const sections = extractSections(content);
-  const plainContent = content
-    .replace(/^---[\s\S]*?---/, '')
-    .replace(/[#*`\[\]()]/g, '')
-    .slice(0, 1000);
+    const sections = extractSections(content);
+    const plainContent = content
+      .replace(/^---[\s\S]*?---/, '')
+      .replace(/[#*`\[\]()]/g, '')
+      .slice(0, 1000);
 
-  index.push({
-    id: slug.replace(/\//g, '-'),
-    title: data.title || slug.split('/').pop(),
-    description: data.description || '',
-    keywords: data.keywords || [],
-    last_update: data.last_update || null,
-    url,
-    content: plainContent,
-    sections: sections.map((s) => ({
-      ...s,
-      url: `${url}#${s.id}`,
-    })),
-  });
+    entries.push({
+      id: slug.replace(/\//g, '-'),
+      title: data.title || slug.split('/').pop(),
+      description: data.description || '',
+      keywords: data.keywords || [],
+      last_update: data.last_update || null,
+      url,
+      content: plainContent,
+      sections: sections.map((s) => ({
+        ...s,
+        url: `${url}#${s.id}`,
+      })),
+    });
+  }
+
+  return entries;
+}
+
+// Build the index
+const allVersions = ['current', ...versions];
+const allLocales = siteConfig.locales;
+const fullIndex = {};
+let totalDocs = 0;
+
+for (const locale of allLocales) {
+  for (const version of allVersions) {
+    const dir = getContentDir(locale, version);
+    if (!fs.existsSync(dir)) continue;
+
+    const urlPrefix = buildUrlPrefix(locale, version);
+    const key = `${locale}:${version}`;
+    const entries = indexDir(dir, urlPrefix);
+
+    if (entries.length > 0) {
+      fullIndex[key] = entries;
+      totalDocs += entries.length;
+    }
+  }
 }
 
 fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
-fs.writeFileSync(OUT_FILE, JSON.stringify(index, null, 2));
-console.log(`Search index built: ${index.length} documents`);
+fs.writeFileSync(OUT_FILE, JSON.stringify(fullIndex, null, 2));
+
+const keys = Object.keys(fullIndex);
+console.log(`Search index built: ${totalDocs} documents across ${keys.length} index(es) [${keys.join(', ')}]`);

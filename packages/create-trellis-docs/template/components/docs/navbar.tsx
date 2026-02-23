@@ -9,6 +9,96 @@ import { siteConfig } from '@/config/site'
 import { navItems } from '@/config/navigation'
 import { cn } from '@/lib/utils'
 import { SearchDialog } from '@/components/docs/search/search-dialog'
+import { TrellisIcon } from '@/components/brand/trellis-logo'
+import { resolveSidebar, type ResolvedSidebarItem } from '@/lib/sidebar'
+import { useDocContext } from '@/lib/doc-context'
+import { VersionSwitcher } from '@/components/docs/version-switcher'
+import { LocaleSwitcher } from '@/components/docs/locale-switcher'
+
+const defaultSidebarItems = resolveSidebar()
+
+function MobileSidebarItems({ items, onNavigate, depth = 0 }: { items: ResolvedSidebarItem[]; onNavigate: () => void; depth?: number }) {
+  const pathname = usePathname()
+
+  return (
+    <ul className={cn(depth > 0 && 'ml-3 pl-3 border-l border-[var(--border)]')}>
+      {items.map((item) => {
+        if (item.type === 'category') {
+          return (
+            <li key={item.label}>
+              <MobileSidebarCategory item={item} onNavigate={onNavigate} depth={depth} />
+            </li>
+          )
+        }
+        const isActive = item.href && pathname === item.href
+        return (
+          <li key={item.href || item.label}>
+            <Link
+              href={item.href || '#'}
+              className={cn(
+                'block px-3 py-1.5 text-sm rounded-md no-underline transition-colors',
+                isActive
+                  ? 'text-[var(--primary)] font-semibold'
+                  : 'text-[var(--foreground)] hover:bg-[var(--muted)]'
+              )}
+              onClick={onNavigate}
+            >
+              {item.label}
+            </Link>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function MobileSidebarCategory({ item, onNavigate, depth }: { item: ResolvedSidebarItem; onNavigate: () => void; depth: number }) {
+  const pathname = usePathname()
+  const isSelfActive = item.href && pathname === item.href
+  const isChildActive = item.items?.some((child) => child.href && pathname === child.href)
+  const [open, setOpen] = useState(!item.collapsed || !!isChildActive || !!isSelfActive)
+
+  return (
+    <div className="mb-0.5">
+      <div className="flex items-center">
+        {item.href ? (
+          <Link
+            href={item.href}
+            className={cn(
+              'flex-1 px-3 py-1.5 text-sm font-semibold rounded-md no-underline',
+              isSelfActive
+                ? 'text-[var(--primary)]'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+            )}
+            onClick={onNavigate}
+          >
+            {item.label}
+          </Link>
+        ) : (
+          <button
+            onClick={() => setOpen(!open)}
+            className={cn(
+              'flex-1 text-left px-3 py-1.5 text-sm font-semibold rounded-md',
+              'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+            )}
+          >
+            {item.label}
+          </button>
+        )}
+        <button
+          onClick={() => setOpen(!open)}
+          className="p-1.5 rounded-md text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          aria-label={open ? 'Collapse' : 'Expand'}
+        >
+          <ChevronDown size={14} className={cn('transition-transform', open ? '' : '-rotate-90')} />
+        </button>
+      </div>
+      {open && item.items && (
+        <MobileSidebarItems items={item.items} onNavigate={onNavigate} depth={depth + 1} />
+      )}
+    </div>
+  )
+}
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -16,6 +106,12 @@ export function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
+  const { urlPrefix } = useDocContext()
+
+  // Use context-aware sidebar when locale/version prefix is active
+  const sidebarItems = urlPrefix
+    ? resolveSidebar(undefined, urlPrefix)
+    : defaultSidebarItems
 
   return (
     <>
@@ -35,11 +131,15 @@ export function Navbar() {
 
           {/* Logo + title */}
           <Link href="/" className="flex items-center gap-2 mr-6 text-[var(--foreground)] no-underline">
-            <img
-              src="/img/favicon.svg"
-              alt="Trellis Logo"
-              className="h-[39px] w-auto"
-            />
+            {siteConfig.logo.useBuiltIn ? (
+              <TrellisIcon size={32} />
+            ) : siteConfig.logo.navbar ? (
+              <img
+                src={siteConfig.logo.navbar}
+                alt={siteConfig.logo.alt}
+                className="h-8 w-auto"
+              />
+            ) : null}
             <span className="text-lg font-semibold">{siteConfig.title}</span>
           </Link>
 
@@ -109,6 +209,9 @@ export function Navbar() {
               <Sun size={18} className="hidden dark:block" />
               <Moon size={18} className="block dark:hidden" />
             </button>
+
+            <VersionSwitcher />
+            <LocaleSwitcher />
           </nav>
         </div>
       </header>
@@ -121,6 +224,7 @@ export function Navbar() {
         >
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
           <nav className="relative w-72 h-full bg-[var(--background)] border-r overflow-y-auto p-4">
+            {/* Top-level nav */}
             {navItems.map((item) =>
               'items' in item ? (
                 <div key={item.label} className="mb-2">
@@ -149,6 +253,14 @@ export function Navbar() {
                 </Link>
               )
             )}
+
+            {/* Docs sidebar */}
+            <div className="mt-4 pt-4 border-t">
+              <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                Documentation
+              </div>
+              <MobileSidebarItems items={sidebarItems} onNavigate={() => setMobileOpen(false)} />
+            </div>
 
             <div className="flex items-center gap-2 mt-4 px-3">
               <button
