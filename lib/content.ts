@@ -32,6 +32,8 @@ export interface DocMeta {
   keywords?: string[]
   last_update?: { date: string; author: string }
   hide_table_of_contents?: boolean
+  doc_type?: string
+  role?: string[]
   slug: string
 }
 
@@ -121,6 +123,8 @@ async function loadDoc(
       keywords: data.keywords,
       last_update: data.last_update,
       hide_table_of_contents: data.hide_table_of_contents,
+      doc_type: data.doc_type,
+      role: data.role,
       slug: '/' + slugPath,
     },
     content,
@@ -177,6 +181,8 @@ export async function getAllDocsMeta(
       description: data.description,
       keywords: data.keywords,
       last_update: data.last_update,
+      doc_type: data.doc_type,
+      role: data.role,
       slug: '/' + slugArr.join('/'),
     })
   }

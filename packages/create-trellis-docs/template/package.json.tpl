@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "build-tokens": "node scripts/build-tokens.js",
-    "version:snapshot": "node scripts/version-snapshot.js"
+    "version:snapshot": "node scripts/version-snapshot.js",
+    "export:sidebar": "node scripts/export-sidebar.js"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.3",

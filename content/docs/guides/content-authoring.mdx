@@ -65,6 +65,8 @@ keywords: [keyword-one, keyword-two]
 last_update:
   date: 02/22/2026
   author: Your Name
+doc_type: how-to
+role: [Developer, Admin]
 ---
 ```
 
@@ -76,6 +78,34 @@ last_update:
 | `last_update.date` | No | Displayed at the top of the page (MM/DD/YYYY) |
 | `last_update.author` | No | Subject matter expert for the page (visible when `lastUpdated.showAuthor` is `true` in `config/site.ts`) |
 | `hide_table_of_contents` | No | Set to `true` to hide the right-side TOC |
+| `doc_type` | No | Content type for auditing (e.g. `how-to`, `concept`, `reference`, `tutorial`). Not rendered on the page — used in sidebar exports |
+| `role` | No | Array of audience roles (e.g. `[Developer, Admin]`). Rendered as colored chips below the page title |
+
+### Role Chips
+
+When you add a `role` array to a page's frontmatter, Trellis renders each role as a colored chip below the title. This helps readers quickly identify whether a page is relevant to them.
+
+```yaml
+---
+title: API Authentication
+role: [Developer, Admin]
+---
+```
+
+Roles are purely informational — they don't restrict access. Use any labels that make sense for your audience (e.g. `Developer`, `Admin`, `Designer`, `Product Manager`).
+
+### Document Type
+
+The `doc_type` field is metadata-only — it is not rendered on the page. Use it to classify pages for content auditing:
+
+| `doc_type` | When to use |
+|------------|-------------|
+| `concept` | Explains what something is or why it matters |
+| `how-to` | Step-by-step instructions for a specific task |
+| `reference` | API docs, config options, parameter tables |
+| `tutorial` | End-to-end guided walkthrough |
+
+Both `doc_type` and `role` are included in the [sidebar export](#sidebar-export) for spreadsheet-based auditing.
 
 ## Configuring the Sidebar
 
@@ -339,6 +369,34 @@ Variables work anywhere in MDX — paragraphs, headings, tables, admonitions, an
 
 :::tip
 When you rename a product or bump a version, update `config/variables.ts` once and every page reflects the change on the next build.
+:::
+
+## Sidebar Export
+
+Trellis includes a script that exports your sidebar structure as a CSV file for content auditing in spreadsheets. Run it with:
+
+```bash
+npm run export:sidebar > sidebar.csv
+```
+
+The CSV includes one row per sidebar entry with these columns:
+
+| Column | Source |
+|--------|--------|
+| Doc ID | The sidebar `id` (e.g. `guides/content-authoring`) |
+| Title | Sidebar label or frontmatter `title` |
+| URL | The page URL |
+| Category | Sidebar category path (e.g. `Guides > Content Authoring`) |
+| Doc Type | Frontmatter `doc_type` |
+| Role | Frontmatter `role` (semicolon-separated) |
+| Last Updated | Frontmatter `last_update.date` |
+| Author | Frontmatter `last_update.author` |
+| Description | Frontmatter `description` |
+| Keywords | Frontmatter `keywords` (semicolon-separated) |
+| File Path | Relative file path from project root |
+
+:::tip
+Import the CSV into Google Sheets or Excel to audit coverage gaps, identify stale pages, and track which roles are documented.
 :::
 
 ## MDX Tips

@@ -17,6 +17,7 @@ import { getVersions } from '@/lib/versions'
 import { DocContextWrapper } from './doc-context-wrapper'
 import { FallbackBanner } from '@/components/docs/fallback-banner'
 import { LocaleHtmlAttrs } from '@/components/docs/locale-html-attrs'
+import { RoleChips } from '@/components/docs/role-chips'
 
 export async function generateStaticParams() {
   return generateAllParams()
@@ -113,6 +114,10 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
                 </a>
               )}
             </div>
+          )}
+
+          {doc.meta.role && doc.meta.role.length > 0 && (
+            <RoleChips roles={doc.meta.role} />
           )}
 
           {!doc.meta.hide_table_of_contents && toc.length > 0 && (
