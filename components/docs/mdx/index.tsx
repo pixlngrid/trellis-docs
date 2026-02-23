@@ -7,6 +7,7 @@ import { Glossary } from '@/components/custom/glossary'
 import { Feedback } from '@/components/custom/feedback'
 import { FlippingCard } from '@/components/custom/flipping-card'
 import { FaqTableOfContents } from '@/components/custom/faq-table-of-contents'
+import { Tooltip } from '@/components/docs/tooltip'
 
 export const mdxComponents: Record<string, React.ComponentType<any>> = {
   h1: H1,
@@ -35,4 +36,5 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   Feedback,
   FlippingCard,
   FaqTableOfContents,
+  Tooltip,
 }

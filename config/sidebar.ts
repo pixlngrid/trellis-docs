@@ -56,6 +56,7 @@ export const mainSidebar: SidebarItem[] = [
     items: [
       { type: 'doc', id: 'components/glossary' },
       { type: 'doc', id: 'components/feedback' },
+      { type: 'doc', id: 'components/flipping-card' },
     ],
   },
   {

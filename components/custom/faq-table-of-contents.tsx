@@ -96,7 +96,7 @@ export function FaqTableOfContents({
         </svg>
         <input
           type="text"
-          className="w-full pl-10 pr-10 py-2 text-sm border rounded-md bg-[var(--background)] text-[var(--foreground)]"
+          className="w-1/4 pl-10 pr-10 py-2 text-sm border rounded-md bg-[var(--background)] text-[var(--foreground)]"
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}

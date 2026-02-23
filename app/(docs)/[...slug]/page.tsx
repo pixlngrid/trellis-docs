@@ -18,6 +18,8 @@ import { DocContextWrapper } from './doc-context-wrapper'
 import { FallbackBanner } from '@/components/docs/fallback-banner'
 import { LocaleHtmlAttrs } from '@/components/docs/locale-html-attrs'
 import { RoleChips } from '@/components/docs/role-chips'
+import { Feedback } from '@/components/custom/feedback'
+
 
 export async function generateStaticParams() {
   return generateAllParams()
@@ -135,6 +137,9 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
               }}
             />
           </div>
+          <hr className="my-8 border-t border-(--border)" />
+
+          <Feedback /> 
         </article>
 
         {!doc.meta.hide_table_of_contents && toc.length > 0 && (

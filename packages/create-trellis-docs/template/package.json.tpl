@@ -10,7 +10,8 @@
     "lint": "next lint",
     "build-tokens": "node scripts/build-tokens.js",
     "version:snapshot": "node scripts/version-snapshot.js",
-    "export:sidebar": "node scripts/export-sidebar.js"
+    "export:sidebar": "node scripts/export-sidebar.js",
+    "setup:feedback-api": "node scripts/setup-feedback-api.js"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.3",
