@@ -39,14 +39,17 @@ interface HeadingProps {
 export function Heading({ level, id, children }: HeadingProps) {
   const [showMessage, setShowMessage] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [canCopy, setCanCopy] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const Tag = `h${level}` as const
 
-  const canCopy =
-    typeof window !== 'undefined' &&
-    window.navigator.clipboard &&
-    typeof window.navigator.clipboard.writeText === 'function'
+  useEffect(() => {
+    setCanCopy(
+      !!window.navigator.clipboard &&
+      typeof window.navigator.clipboard.writeText === 'function'
+    )
+  }, [])
 
   const copyToClipboard = async () => {
     if (canCopy && id) {
