@@ -25,6 +25,7 @@
     "@tailwindcss/postcss": "^4.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.0.0",
+    "core-js": "^3.48.0",
     "cross-env": "^10.1.0",
     "cmdk": "^1.0.4",
     "fuse.js": "^7.1.0",
