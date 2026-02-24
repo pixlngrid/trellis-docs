@@ -1,0 +1,255 @@
+---
+title: Site Configuration
+description: Customize your site identity, navigation, sidebar, and content variables.
+keywords: [configuration, site, settings, sidebar, navigation, variables]
+last_update:
+  date: 02/24/2026
+  author: Trellis
+---
+
+After scaffolding a project, the first thing you'll want to do is configure it for your brand. {vars.productName} keeps all configuration in four files under `config/`:
+
+| File | Purpose |
+|------|---------|
+| `config/site.ts` | Site identity, logo, color mode, search, and feature flags |
+| `config/navigation.ts` | Top navbar links and footer text |
+| `config/sidebar.ts` | Documentation sidebar structure |
+| `config/variables.ts` | Reusable content variables for MDX pages |
+
+## Site Settings
+
+`config/site.ts` is the main configuration file. It controls your site's identity, branding, and optional features.
+
+### Identity & GitHub
+
+| Setting | Description |
+|---------|-------------|
+| `title` | Site name shown in the navbar and browser tab |
+| `tagline` | Short description used on the landing page |
+| `url` | Production URL (e.g., `https://docs.example.com`) |
+| `baseUrl` | Base path — use `'/'` unless hosting under a subdirectory |
+| `favicon` | Path to favicon relative to `public/` |
+| `organizationName` | GitHub org or username |
+| `projectName` | Repository name |
+| `repoUrl` | Full GitHub repo URL — powers the navbar GitHub link |
+| `editBaseUrl` | Base URL for "Edit this page" links (e.g., `https://github.com/org/repo/edit/main`) |
+
+### Logo
+
+| Setting | Description |
+|---------|-------------|
+| `logo.navbar` | Image path for the navbar logo (relative to `public/`) |
+| `logo.hero` | Image path for the landing page hero — set to `null` to use `navbar` |
+| `logo.alt` | Alt text for the logo image |
+| `logo.useBuiltIn` | When `true`, renders the SVG component from `components/brand/` instead of an `<img>` tag |
+
+### Color Mode
+
+| Setting | Description |
+|---------|-------------|
+| `colorMode.defaultMode` | `'dark'` or `'light'` — the default theme |
+| `colorMode.respectPrefersColorScheme` | When `true`, follows the user's OS preference |
+
+### Search
+
+The built-in search indexes all documentation pages at build time. You can tune relevance with weights and exclude folders from indexing.
+
+| Setting | Description |
+|---------|-------------|
+| `search.weights.title` | Weight for page titles (default `1.0`) |
+| `search.weights['sections.heading']` | Weight for section headings (default `1.0`) |
+| `search.weights.keywords` | Weight for frontmatter keywords (default `0.8`) |
+| `search.weights.description` | Weight for frontmatter description (default `0.6`) |
+| `search.weights['sections.content']` | Weight for section body text (default `0.5`) |
+| `search.weights.content` | Weight for full page content (default `0.4`) |
+| `search.excludedFolders` | Folders to skip (default `['includes', '_includes']`) |
+| `search.excludedPrefixes` | File prefixes to skip (default `['_']`) |
+
+See [Smart Search](/plugins/smart-search/) for more details.
+
+### Feature Flags
+
+These features are disabled by default. To enable one, set its `enabled` property to `true` and configure the related settings. Each feature has a dedicated guide with full setup instructions.
+
+#### API Documentation
+
+Render OpenAPI/Swagger specs as interactive API reference pages. Place your spec files (YAML or JSON) in the `specDir` directory. See the [API Documentation](/plugins/api-docs/) guide.
+
+```ts title="config/site.ts"
+apiDocs: {
+  enabled: true,
+  specDir: 'content/api',
+  routeBasePath: 'api',
+  viewerOptions: {} as Record<string, unknown>,
+},
+```
+
+#### Internationalization (i18n)
+
+Serve your docs in multiple languages. Add locale entries and create translated content files. See the [i18n](/guides/i18n/) guide.
+
+```ts title="config/site.ts"
+i18n: {
+  enabled: true,
+  defaultLocale: 'en',
+  locales: [
+    { code: 'en', name: 'English', dir: 'ltr' as const },
+    { code: 'es', name: 'Español', dir: 'ltr' as const },
+    { code: 'ja', name: '日本語', dir: 'ltr' as const },
+  ],
+},
+```
+
+#### Versioning
+
+Snapshot your docs at a release so users can browse previous versions. See the [Versioning](/guides/versioning/) guide.
+
+```ts title="config/site.ts"
+versioning: {
+  enabled: true,
+  currentLabel: 'Latest',
+},
+```
+
+After enabling, run the snapshot script to create your first version:
+
+```bash
+npm run version:snapshot 1.0.0
+```
+
+### Full Example
+
+```ts title="config/site.ts"
+export const siteConfig = {
+  title: 'Acme Docs',
+  tagline: 'Developer documentation for Acme Platform',
+  url: 'https://docs.acme.com',
+  baseUrl: '/',
+  favicon: '/img/favicon.svg',
+  organizationName: 'acme',
+  projectName: 'acme-docs',
+  repoUrl: 'https://github.com/acme/acme-docs',
+  editBaseUrl: 'https://github.com/acme/acme-docs/edit/main',
+  logo: {
+    navbar: '/img/logo.svg',
+    hero: null,
+    alt: 'Acme Logo',
+    useBuiltIn: false,
+  },
+  colorMode: {
+    defaultMode: 'dark' as const,
+    respectPrefersColorScheme: true,
+  },
+  // ...
+}
+```
+
+## Navigation
+
+`config/navigation.ts` defines the top navbar and footer. The navbar supports flat links and dropdown groups.
+
+### Navbar
+
+```ts title="config/navigation.ts"
+export const navItems = [
+  // Flat link
+  { label: 'Overview', href: '/overview/' },
+
+  // Dropdown group
+  {
+    label: 'Resources',
+    items: [
+      { label: 'Release Notes', href: '/release-notes/' },
+      { label: 'Blog', href: '/blog/' },
+      { label: 'FAQs', href: '/faq/' },
+    ],
+  },
+
+  // External link
+  { label: 'GitHub', href: 'https://github.com/acme/acme-docs' },
+]
+```
+
+Each item has a `label` (display text) and either:
+- `href` — a direct link (internal route or external URL)
+- `items` — an array of child links rendered as a dropdown
+
+### Footer
+
+```ts title="config/navigation.ts"
+export const footerConfig = {
+  copyright: `© ${new Date().getFullYear()} Acme Inc.`,
+  poweredBy: 'Powered by Next.js',
+}
+```
+
+## Sidebar
+
+`config/sidebar.ts` defines the documentation sidebar. It exports a `mainSidebar` array of items that can be nested to any depth.
+
+### Item Types
+
+| Type | Fields | Description |
+|------|--------|-------------|
+| `doc` | `id`, `label?` | A documentation page. `id` is the file path under `content/docs/` without the extension. |
+| `category` | `label`, `items`, `link?`, `collapsed?` | A collapsible group of items. Set `link` to make the label clickable. |
+| `link` | `label`, `href` | An external or arbitrary link in the sidebar. |
+| `api` | `id`, `label?` | An OpenAPI spec page (requires [API Documentation](/plugins/api-docs/) enabled). |
+
+### Example
+
+```ts title="config/sidebar.ts"
+export const mainSidebar: SidebarItem[] = [
+  { type: 'doc', id: 'getting-started' },
+  {
+    type: 'category',
+    label: 'Guides',
+    collapsed: false,
+    items: [
+      { type: 'doc', id: 'guides/writing-docs' },
+      { type: 'doc', id: 'guides/deployment' },
+    ],
+  },
+  {
+    type: 'category',
+    label: 'API',
+    link: 'api/index',
+    collapsed: true,
+    items: [
+      { type: 'doc', id: 'api/authentication' },
+      { type: 'doc', id: 'api/endpoints' },
+    ],
+  },
+]
+```
+
+:::note
+The `id` field maps to a file path under `content/docs/`. For example, `id: 'guides/writing-docs'` resolves to `content/docs/guides/writing-docs.mdx` (or `.md`).
+:::
+
+## Content Variables
+
+`config/variables.ts` defines key-value pairs that you can reference in any MDX page using `{vars.key}`.
+
+```ts title="config/variables.ts"
+export const docVariables: Record<string, string> = {
+  productName: 'Acme Platform',
+  companyName: 'Acme Inc.',
+  version: '2.1.0',
+  frameworkName: 'Next.js',
+}
+```
+
+Then in any MDX file:
+
+```md
+Welcome to {vars.productName} version {vars.version}.
+```
+
+This renders as: "Welcome to Acme Platform version 2.1.0."
+
+Variables are injected at build time, so changes require restarting the dev server or rebuilding.
+
+:::tip
+After scaffolding, start by customizing `config/site.ts` (your site identity and logo) and `config/sidebar.ts` (your page structure). The other two files work well with their defaults.
+:::

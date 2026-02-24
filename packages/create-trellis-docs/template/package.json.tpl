@@ -51,9 +51,5 @@
     "typescript": "^5.7.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0"
-  },
-  "optionalDependencies": {
-    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.0",
-    "lightningcss-win32-x64-msvc": "^1.31.1"
   }
 }

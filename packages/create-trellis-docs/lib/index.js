@@ -112,9 +112,18 @@ async function copyTemplate(destDir, vars) {
 function installDeps(projectDir, packageManager) {
   console.log(`\nInstalling dependencies with ${packageManager}...\n`);
 
+  // Pass the real OS to npm so platform-specific optional deps (e.g.
+  // lightningcss native binaries) install correctly even when the user's
+  // .npmrc overrides `os` to a different value.
+  const env = { ...process.env };
+  if (packageManager === 'npm') {
+    env.npm_config_os = process.platform;
+  }
+
   const result = spawn.sync(packageManager, ['install'], {
     cwd: projectDir,
     stdio: 'inherit',
+    env,
   });
 
   if (result.status !== 0) {

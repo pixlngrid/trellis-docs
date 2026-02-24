@@ -52,6 +52,21 @@ You'll be prompted for a site title, tagline, URL, and optional GitHub repo URL.
 The dev server runs on port 3000 by default. Visit `http://localhost:3000` to see your docs.
 :::
 
+### Platform Note
+
+Tailwind CSS v4 relies on platform-specific native binaries (via `lightningcss`). The scaffolder detects your OS automatically, but if you run `npm install` manually and your `.npmrc` overrides the `os` setting, npm may skip the correct binaries. If you see an error like `Cannot find module '../lightningcss.<platform>.node'`, reinstall with your actual platform:
+
+```bash
+# macOS
+npm install --os=darwin
+
+# Windows
+npm install --os=win32
+
+# Linux
+npm install --os=linux
+```
+
 ## Project Structure
 
 ```
@@ -91,6 +106,7 @@ my-docs/
 
 - [What is {vars.productName}?](/overview/) — understand the framework and what it provides
 - [{vars.productName} vs {vars.frameworkName}](/overview/trellis-vs-nextjs/) — feature comparison
+- [Site Configuration](/guides/site-configuration/) — customize site identity, navigation, and sidebar
 - [Content Authoring](/guides/content-authoring/) — create pages, blog posts, and release notes
 - [Writing Docs](/guides/writing-docs/) — markdown features (code blocks, admonitions, tabs)
 - [Design Tokens](/design-tokens/customizing/) — customize colors and branding

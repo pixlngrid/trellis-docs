@@ -64,6 +64,7 @@ export const mainSidebar: SidebarItem[] = [
     label: 'Guides',
     collapsed: true,
     items: [
+      { type: 'doc', id: 'guides/site-configuration', label: 'Site Configuration' },
       { type: 'doc', id: 'guides/content-authoring' },
       { type: 'doc', id: 'guides/writing-docs' },
       { type: 'doc', id: 'guides/using-components' },
