@@ -3,9 +3,9 @@ import path from 'path'
 import matter from 'gray-matter'
 import { siteConfig } from '@/config/site'
 
-const DOCS_DIR = path.join(process.cwd(), 'docs')
-const BLOG_DIR = path.join(process.cwd(), 'blog')
-const RELEASE_NOTES_DIR = path.join(process.cwd(), 'release-notes')
+const DOCS_DIR = path.join(process.cwd(), 'content/docs')
+const BLOG_DIR = path.join(process.cwd(), 'content/blog')
+const RELEASE_NOTES_DIR = path.join(process.cwd(), 'content/release-notes')
 
 function getContentDir(locale: string, version: string): string {
   const { i18n, versioning } = siteConfig
@@ -20,10 +20,10 @@ function getContentDir(locale: string, version: string): string {
     return path.join(process.cwd(), 'versioned_docs', version)
   }
   if (!isDefaultLocale && isCurrentVersion) {
-    return path.join(process.cwd(), 'i18n', locale, 'docs')
+    return path.join(process.cwd(), 'content/i18n', locale, 'docs')
   }
   // Non-default locale + old version
-  return path.join(process.cwd(), 'i18n', locale, 'versioned_docs', version)
+  return path.join(process.cwd(), 'content/i18n', locale, 'versioned_docs', version)
 }
 
 export interface DocMeta {

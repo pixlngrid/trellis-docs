@@ -20,16 +20,16 @@ The FAQ index plugin scans your FAQ directory for `###` headings, treats each on
 
 ```ts title="config/site.ts"
 ['./packages/faq-index-plugin', {
-  faqDir: 'docs/faq',       // Directory containing FAQ files
+  faqDir: 'content/docs/faq',       // Directory containing FAQ files
   basePermalink: '/faq',    // Base URL for FAQ pages
 }]
 ```
 
 ## Writing FAQ Pages
 
-Each FAQ page is a standard MDX file in the `docs/faq/` directory. Use `###` headings for questions:
+Each FAQ page is a standard MDX file in the `content/docs/faq/` directory. Use `###` headings for questions:
 
-```mdx title="docs/faq/general.mdx"
+```mdx title="content/docs/faq/general.mdx"
 ---
 title: General
 description: General questions about the framework.
@@ -52,7 +52,7 @@ The plugin extracts each `###` heading as a question and generates an anchor fro
 
 The companion component renders the indexed questions as a searchable list. Import and use it on your FAQ index page:
 
-```mdx title="docs/faq/index.mdx"
+```mdx title="content/docs/faq/index.mdx"
 ---
 title: Frequently Asked Questions
 slug: /faq

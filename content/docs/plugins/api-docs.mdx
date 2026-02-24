@@ -16,7 +16,7 @@ Trellis includes native support for rendering OpenAPI (Swagger) specifications a
 ```ts title="config/site.ts"
 apiDocs: {
   enabled: true,
-  specDir: 'api',
+  specDir: 'content/api',
   routeBasePath: 'api',
   redocOptions: {},
 },
@@ -24,10 +24,10 @@ apiDocs: {
 
 ### 2. Add a Spec File
 
-Place your OpenAPI spec (YAML or JSON) in the `api/` directory:
+Place your OpenAPI spec (YAML or JSON) in the `content/api/` directory:
 
 ```
-api/
+content/api/
   petstore.yaml      # → /api/petstore/
   payments.json       # → /api/payments/
 ```
@@ -57,7 +57,7 @@ npm run build
 ```
 
 The build script automatically:
-- Scans `api/` for `.yaml`, `.yml`, and `.json` files
+- Scans `content/api/` for `.yaml`, `.yml`, and `.json` files
 - Validates each spec has an `openapi` or `swagger` top-level key
 - Converts YAML specs to JSON
 - Outputs processed specs to `public/api-specs/`
@@ -79,7 +79,7 @@ The `redocOptions` object is passed directly to the [Redoc configuration](https:
 ```ts title="config/site.ts"
 apiDocs: {
   enabled: true,
-  specDir: 'api',
+  specDir: 'content/api',
   routeBasePath: 'api',
   redocOptions: {
     hideDownloadButton: true,
@@ -110,7 +110,7 @@ versioned_docs/
   v1.0/
     api/
       petstore.yaml    # → /v1.0/api/petstore/
-api/
+content/api/
   petstore.yaml      # → /api/petstore/ (current version)
 ```
 

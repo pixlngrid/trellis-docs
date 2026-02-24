@@ -6,7 +6,7 @@ Welcome to your documentation site powered by **{vars.productName}**.
 
 ## Quick Start
 
-Edit files in `docs/` to update your documentation. The site will automatically rebuild when you save changes during development.
+Edit files in `content/docs/` to update your documentation. The site will automatically rebuild when you save changes during development.
 
 ## Features
 
@@ -19,7 +19,7 @@ Edit files in `docs/` to update your documentation. The site will automatically 
 
 ## Writing Content
 
-Create `.md` or `.mdx` files in the `docs/` directory. Each file needs frontmatter:
+Create `.md` or `.mdx` files in the `content/docs/` directory. Each file needs frontmatter:
 
 ```yaml
 ---

@@ -4,7 +4,7 @@ const path = require('path');
 const matter = require('gray-matter');
 
 const ROOT = path.join(__dirname, '..');
-const DOCS_DIR = path.join(ROOT, 'docs');
+const DOCS_DIR = path.join(ROOT, 'content/docs');
 const OUT_FILE = path.join(ROOT, 'public/searchIndex.json');
 const EXCLUDED_PREFIXES = ['_'];
 const EXCLUDED_FOLDERS = ['includes', '_includes'];
@@ -67,8 +67,8 @@ function getContentDir(locale, version) {
 
   if (isDefault && isCurrent) return DOCS_DIR;
   if (isDefault && !isCurrent) return path.join(ROOT, 'versioned_docs', version);
-  if (!isDefault && isCurrent) return path.join(ROOT, 'i18n', locale, 'docs');
-  return path.join(ROOT, 'i18n', locale, 'versioned_docs', version);
+  if (!isDefault && isCurrent) return path.join(ROOT, 'content/i18n', locale, 'docs');
+  return path.join(ROOT, 'content/i18n', locale, 'versioned_docs', version);
 }
 
 function buildUrlPrefix(locale, version) {

@@ -11,8 +11,8 @@ last_update:
 
 ## How It Works
 
-- `docs/` is always the **current** (latest) version
-- When you cut a release, a snapshot script copies `docs/` into `versioned_docs/<version>/`
+- `content/docs/` is always the **current** (latest) version
+- When you cut a release, a snapshot script copies `content/docs/` into `versioned_docs/<version>/`
 - A `versions.json` file at the project root tracks all archived versions
 - A dropdown in the navbar lets readers switch between versions
 - The current version's URLs have **no prefix**; archived versions are prefixed: `/v1/getting-started/`
@@ -47,16 +47,17 @@ npm run version:snapshot v1
 
 Replace `v1` with your version label (e.g., `v1`, `v2.0`, `1.x`). The script does the following:
 
-1. Copies `docs/` to `versioned_docs/v1/`
+1. Copies `content/docs/` to `versioned_docs/v1/`
 2. Copies `config/sidebar.ts` to `versioned_sidebars/v1.ts`
 3. Creates or updates `versions.json` at the project root
-4. If [i18n](/guides/i18n/) is enabled, copies each locale's `i18n/<code>/docs/` to `i18n/<code>/versioned_docs/v1/`
+4. If [i18n](/guides/i18n/) is enabled, copies each locale's `content/i18n/<code>/docs/` to `content/i18n/<code>/versioned_docs/v1/`
 
 After running the script, your project will look like:
 
 ```
 my-docs/
-├── docs/              # Current version (keep editing here)
+├── content/
+│   └── docs/                  # Current version (keep editing here)
 ├── versioned_docs/
 │   └── v1/                    # Frozen snapshot of docs at v1
 ├── versioned_sidebars/
@@ -93,11 +94,11 @@ When versioning is enabled and at least one archived version exists, a dropdown 
 
 ## Editing Versioned Content
 
-- **Current version**: Edit files in `docs/` as usual
+- **Current version**: Edit files in `content/docs/` as usual
 - **Archived versions**: Edit files directly in `versioned_docs/<version>/`. These are regular MDX files, not read-only
 
 :::tip
-Archived versions are independent snapshots. Changes to `docs/` do not affect `versioned_docs/v1/`, and vice versa.
+Archived versions are independent snapshots. Changes to `content/docs/` do not affect `versioned_docs/v1/`, and vice versa.
 :::
 
 ## Search
@@ -113,18 +114,18 @@ Each version snapshot includes a copy of `config/sidebar.ts` saved to `versioned
 Here's a typical versioning workflow:
 
 ```bash
-# 1. You've been writing docs in docs/ for your v1 release
+# 1. You've been writing docs in content/docs/ for your v1 release
 # 2. v1 is ready to ship — freeze the docs
 npm run version:snapshot v1
 
-# 3. Continue working on docs for v2 in docs/
+# 3. Continue working on docs for v2 in content/docs/
 #    Add new pages, update existing ones, etc.
 
 # 4. When v2 is ready, freeze again
 npm run version:snapshot v2
 
 # 5. Now you have:
-#    - docs/         → current (v3-in-progress)
+#    - content/docs/         → current (v3-in-progress)
 #    - versioned_docs/v2/    → frozen v2
 #    - versioned_docs/v1/    → frozen v1
 ```
@@ -146,5 +147,5 @@ To remove an archived version:
 1. Delete the `versioned_docs/<version>/` directory
 2. Delete `versioned_sidebars/<version>.ts`
 3. Remove the version string from `versions.json`
-4. If i18n is enabled, delete `i18n/<code>/versioned_docs/<version>/` for each locale
+4. If i18n is enabled, delete `content/i18n/<code>/versioned_docs/<version>/` for each locale
 5. Rebuild the site

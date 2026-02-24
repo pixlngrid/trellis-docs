@@ -29,7 +29,7 @@ graph TB
     end
 
     subgraph "Content"
-        K[docs/*.mdx]
+        K[content/docs/*.mdx]
         L[app/**/*.tsx]
     end
 
@@ -119,7 +119,10 @@ trellis/
 │   ├── build-tokens.js       # Token → CSS converter
 │   ├── build-search-index.js # Search index generator
 │   └── build-faq-index.js    # FAQ index generator
-├── docs/                     # Documentation content (MDX)
+├── content/
+│   ├── docs/                 # Documentation content (MDX)
+│   ├── blog/                 # Blog posts
+│   └── release-notes/        # Release notes
 ├── app/
 │   ├── (docs)/[...slug]/     # Doc page route (dynamic)
 │   ├── blog/                 # Blog page route

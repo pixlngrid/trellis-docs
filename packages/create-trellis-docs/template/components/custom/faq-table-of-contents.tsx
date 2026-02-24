@@ -73,7 +73,7 @@ export function FaqTableOfContents({
     return (
       <div className="py-4">
         <p className="text-[var(--muted-foreground)]">
-          No FAQ topics found. Ensure <code>docs/faq/</code> contains{' '}
+          No FAQ topics found. Ensure <code>content/docs/faq/</code> contains{' '}
           <code>.mdx</code> files with <code>###</code> question headings.
         </p>
       </div>

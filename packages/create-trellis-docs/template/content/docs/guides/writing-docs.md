@@ -6,7 +6,7 @@ Learn how to write and organize your documentation content.
 
 ## File Structure
 
-Place your documentation files in `docs/`. Files can be organized in subdirectories.
+Place your documentation files in `content/docs/`. Files can be organized in subdirectories.
 
 ## Frontmatter
 
