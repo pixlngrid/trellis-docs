@@ -4,7 +4,7 @@ const path = require('path');
 const matter = require('gray-matter');
 
 const ROOT = path.join(__dirname, '..');
-const FAQ_DIR = path.join(ROOT, 'content/docs/faq');
+const FAQ_DIR = path.join(ROOT, 'docs/faq');
 const OUT_FILE = path.join(ROOT, 'public/faqIndex.json');
 const BASE_PERMALINK = '/faq';
 
@@ -60,8 +60,8 @@ function getFaqDir(locale, version) {
 
   if (isDefault && isCurrent) return FAQ_DIR;
   if (isDefault && !isCurrent) return path.join(ROOT, 'versioned_docs', version, 'faq');
-  if (!isDefault && isCurrent) return path.join(ROOT, 'content/i18n', locale, 'docs/faq');
-  return path.join(ROOT, 'content/i18n', locale, 'versioned_docs', version, 'faq');
+  if (!isDefault && isCurrent) return path.join(ROOT, 'i18n', locale, 'docs/faq');
+  return path.join(ROOT, 'i18n', locale, 'versioned_docs', version, 'faq');
 }
 
 function buildUrlPrefix(locale, version) {

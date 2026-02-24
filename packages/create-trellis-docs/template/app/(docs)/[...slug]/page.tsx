@@ -103,7 +103,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
               )}
               {siteConfig.editBaseUrl && (
                 <a
-                  href={`${siteConfig.editBaseUrl}/${doc.filePath.replace(/\\/g, '/').replace(/^.*?content\//, 'content/')}`}
+                  href={`${siteConfig.editBaseUrl}/${doc.filePath.replace(/\\/g, '/').replace(process.cwd().replace(/\\/g, '/') + '/', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-[var(--primary)] hover:underline no-underline shrink-0 ml-auto"

@@ -20,8 +20,8 @@ npm run build
 This executes four steps in sequence:
 
 1. **Design tokens** — `build-tokens.js` converts `design-tokens.json` into `app/tokens.css` (a `@theme` block for Tailwind CSS)
-2. **Search index** — `build-search-index.js` scans `content/docs/` and generates `public/searchIndex.json`
-3. **FAQ index** — `build-faq-index.js` extracts FAQ questions from `content/docs/faq/` into `public/faqIndex.json`
+2. **Search index** — `build-search-index.js` scans `docs/` and generates `public/searchIndex.json`
+3. **FAQ index** — `build-faq-index.js` extracts FAQ questions from `docs/faq/` into `public/faqIndex.json`
 4. **Next.js build** — compiles the app and exports static HTML to `out/`
 
 :::tip

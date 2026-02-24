@@ -16,7 +16,7 @@ Trellis includes native support for rendering OpenAPI (Swagger) specifications a
 ```ts title="config/site.ts"
 apiDocs: {
   enabled: true,
-  specDir: 'content/api',
+  specDir: 'api',
   routeBasePath: 'api',
   redocOptions: {},
 },
@@ -24,13 +24,12 @@ apiDocs: {
 
 ### 2. Add a Spec File
 
-Place your OpenAPI spec (YAML or JSON) in the `content/api/` directory:
+Place your OpenAPI spec (YAML or JSON) in the `api/` directory:
 
 ```
-content/
-  api/
-    petstore.yaml      # → /api/petstore/
-    payments.json       # → /api/payments/
+api/
+  petstore.yaml      # → /api/petstore/
+  payments.json       # → /api/payments/
 ```
 
 The filename (without extension) becomes the URL slug.
@@ -58,7 +57,7 @@ npm run build
 ```
 
 The build script automatically:
-- Scans `content/api/` for `.yaml`, `.yml`, and `.json` files
+- Scans `api/` for `.yaml`, `.yml`, and `.json` files
 - Validates each spec has an `openapi` or `swagger` top-level key
 - Converts YAML specs to JSON
 - Outputs processed specs to `public/api-specs/`
@@ -69,7 +68,7 @@ The build script automatically:
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `enabled` | `boolean` | `false` | Enable/disable API docs feature |
-| `specDir` | `string` | `'content/api'` | Directory containing OpenAPI spec files |
+| `specDir` | `string` | `'api'` | Directory containing OpenAPI spec files |
 | `routeBasePath` | `string` | `'api'` | URL prefix for API doc pages |
 | `redocOptions` | `object` | `{}` | Options passed directly to Redoc |
 
@@ -80,7 +79,7 @@ The `redocOptions` object is passed directly to the [Redoc configuration](https:
 ```ts title="config/site.ts"
 apiDocs: {
   enabled: true,
-  specDir: 'content/api',
+  specDir: 'api',
   routeBasePath: 'api',
   redocOptions: {
     hideDownloadButton: true,
@@ -111,9 +110,8 @@ versioned_docs/
   v1.0/
     api/
       petstore.yaml    # → /v1.0/api/petstore/
-content/
-  api/
-    petstore.yaml      # → /api/petstore/ (current version)
+api/
+  petstore.yaml      # → /api/petstore/ (current version)
 ```
 
 ## Limitations

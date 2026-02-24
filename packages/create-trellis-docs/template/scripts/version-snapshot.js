@@ -28,8 +28,8 @@ function copyDirSync(src, dest) {
   }
 }
 
-// 1. Copy content/docs/ -> versioned_docs/<version>/
-const docsSrc = path.join(ROOT, 'content/docs')
+// 1. Copy docs/ -> versioned_docs/<version>/
+const docsSrc = path.join(ROOT, 'docs')
 const docsDest = path.join(ROOT, 'versioned_docs', version)
 
 if (fs.existsSync(docsDest)) {
@@ -38,7 +38,7 @@ if (fs.existsSync(docsDest)) {
 }
 
 copyDirSync(docsSrc, docsDest)
-console.log(`  Copied docs -> versioned_docs/${version}/`)
+console.log(`  Copied docs/ -> versioned_docs/${version}/`)
 
 // 2. Copy sidebar config -> versioned_sidebars/<version>.ts
 const sidebarSrc = path.join(ROOT, 'config/sidebar.ts')
@@ -65,7 +65,7 @@ if (!versions.includes(version)) {
 }
 
 // 4. Copy i18n locale docs if they exist
-const i18nDir = path.join(ROOT, 'content/i18n')
+const i18nDir = path.join(ROOT, 'i18n')
 if (fs.existsSync(i18nDir)) {
   const locales = fs.readdirSync(i18nDir, { withFileTypes: true })
     .filter((d) => d.isDirectory())

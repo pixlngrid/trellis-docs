@@ -14,10 +14,10 @@ try {
   const configRaw = fs.readFileSync(configPath, 'utf-8');
   siteConfig.apiDocsEnabled = /apiDocs:\s*\{[^}]*enabled:\s*true/s.test(configRaw);
   const specDirMatch = configRaw.match(/specDir:\s*['"]([^'"]+)['"]/);
-  siteConfig.specDir = specDirMatch ? specDirMatch[1] : 'content/api';
+  siteConfig.specDir = specDirMatch ? specDirMatch[1] : 'api';
   siteConfig.versioningEnabled = /versioning:\s*\{[^}]*enabled:\s*true/s.test(configRaw);
 } catch {
-  siteConfig = { apiDocsEnabled: false, specDir: 'content/api', versioningEnabled: false };
+  siteConfig = { apiDocsEnabled: false, specDir: 'api', versioningEnabled: false };
 }
 
 if (!siteConfig.apiDocsEnabled) {

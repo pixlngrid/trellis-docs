@@ -16,7 +16,7 @@ const path = require('path')
 const matter = require('gray-matter')
 
 const ROOT = path.join(__dirname, '..')
-const DOCS_DIR = path.join(ROOT, 'content/docs')
+const DOCS_DIR = path.join(ROOT, 'docs')
 
 // Load sidebar config by reading the TypeScript file and extracting the array
 function loadSidebar() {

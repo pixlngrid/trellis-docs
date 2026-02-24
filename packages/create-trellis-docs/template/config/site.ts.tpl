@@ -34,14 +34,14 @@ export const siteConfig = {
     },
   },
   faq: {
-    faqDir: 'content/docs/faq',
+    faqDir: 'docs/faq',
     basePermalink: '/faq',
   },
 
-  // OpenAPI / API documentation — set enabled: true and place specs in content/api/
+  // OpenAPI / API documentation — set enabled: true and place specs in api/
   apiDocs: {
     enabled: false,
-    specDir: 'content/api',
+    specDir: 'api',
     routeBasePath: 'api',
     viewerOptions: {} as Record<string, unknown>,
   },
