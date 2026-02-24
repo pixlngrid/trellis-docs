@@ -43,7 +43,7 @@ export const siteConfig = {
     enabled: false,
     specDir: 'content/api',
     routeBasePath: 'api',
-    redocOptions: {} as Record<string, unknown>,
+    viewerOptions: {} as Record<string, unknown>,
   },
 
   // Internationalization — set enabled: true and add locales to activate
