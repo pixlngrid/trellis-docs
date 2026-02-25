@@ -26,6 +26,10 @@ export async function CodeBlock({ children, className, meta }: CodeBlockProps) {
 
   const code = children.trim()
 
+  // Extract title="..." from meta string
+  const titleMatch = meta?.match(/title="([^"]*)"/)
+  const title = titleMatch?.[1]
+
   const html = await codeToHtml(code, {
     lang,
     meta: { __raw: meta },
@@ -41,7 +45,7 @@ export async function CodeBlock({ children, className, meta }: CodeBlockProps) {
     ],
   })
 
-  return <CodeBlockClient html={html} code={code} />
+  return <CodeBlockClient html={html} code={code} title={title} />
 }
 
 function MermaidBlock({ code }: { code: string }) {

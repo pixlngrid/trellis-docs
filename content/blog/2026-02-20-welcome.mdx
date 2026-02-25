@@ -1,23 +1,152 @@
 ---
-title: Welcome to Trellis
-description: Introducing the Trellis docs framework.
+title: Introducing Trellis
+description: A Docs-as-Code Framework Built by a Technical Writer
 slug: welcome
 authors:
-  - name: Trellis
+  - name: Patricia McPhee
+    role: Framework Founder 
+    img: /img/authors/avatar-patriciamcphee.png 
+category: Announcement
+featured: true
 ---
 
-Welcome to the {vars.productName} Docs-as-Code framework! This is the first release of our opinionated documentation framework built on {vars.frameworkName}.
+Welcome to {vars.productName}, an opinionated documentation framework built on {vars.frameworkName} — designed from the ground up by a technical writer with 30 years of experience shipping docs for Microsoft, Amazon, GE Healthcare, LivePerson, and Expedia Group.
 
 {/* truncate */}
 
-## What's Included
+Most docs frameworks make you choose between power and simplicity. Docusaurus lacks reusable variables. Nextra has no design token system. Starlight is tied to Astro. GitBook locks you into a paid platform. {vars.productName} takes the best ideas from all of them and brings them together in a single, self-hosted framework built on {vars.frameworkName} — the React framework most teams already know.
 
-- Custom theme with UX improvements
-- Design token system (JSON to CSS)
-- Smart search
-- FAQ indexing
-- Redirect management
-- Image lightbox
-- Mermaid diagram support
+## The problem {vars.productName} solves
 
-Stay tuned for more updates.
+{vars.frameworkName} is a powerful React framework, but setting up a polished documentation site still requires significant work: building theme components, configuring search, adding image zoom, managing redirects, and aligning your design system. Every new project starts from scratch. Every team reinvents the same wheel.
+
+{vars.productName} does that work upfront so every project starts with a consistent, production-ready baseline. You focus on writing content. {vars.productName} handles the rest.
+
+One thing worth clarifying upfront: {vars.productName} is built **on top of** {vars.frameworkName}, not in place of it. Everything {vars.frameworkName} provides still works exactly as you'd expect — MDX content authoring, file-based routing, the plugin system, static deployment, versioning, i18n, and Shiki-powered syntax highlighting are all unchanged. {vars.productName} adds a layer of theme customizations, bundled plugins, and developer experience improvements. You're not giving anything up.
+
+## Who it's for
+
+{vars.productName} is built for anyone who wants to start writing docs, not configuring build tools:
+
+- **Technical writers** who want a polished docs site without front-end configuration overhead
+- **Platform teams** building internal developer portals
+- **Open-source projects** that need more than a vanilla docs setup out of the box
+
+## What's included
+
+### Theme and navigation
+
+Every default in {vars.productName} reflects real documentation experience. Last-updated dates appear at the top of every page — below the title, where readers actually check for them — not buried in footers. Heading anchors copy on click. Tabs sync their state to the URL so links always point to the right tab. Tab styling uses pill-style tabs with accent colors instead of the default underline style. Custom callout components — tip, note, info, caution, and danger — ship with SVG icons instead of emoji. The sidebar is collapsible and persists its state. Breadcrumb navigation and an active-heading-tracking table of contents are included out of the box.
+
+Dark mode ships as the default with `respectPrefersColorScheme` enabled, so the site adapts to a user's system preference automatically. Users can also toggle between light and dark mode using the switch in the navbar.
+
+### Design token system
+
+Design tokens are named values — colors, spacing, border radii — defined once in `design-tokens.json` at the project root. A build script converts them into CSS custom properties that the entire theme consumes, giving you a single place to manage your brand. Run `npm run build-tokens` to regenerate the CSS manually, or just run `npm run dev` and it runs automatically. The token system includes separate color mappings for both light and dark modes.
+
+### Smart search
+
+The smart search plugin indexes all documentation at build time, generating a `searchIndex.json` file. Search is performed client-side using Fuse.js for fast, fuzzy matching — triggered with Cmd+K — with configurable field weights in `config/site.ts`. No Algolia account, no API key, no external dependency.
+
+You can read more about the search plugin in the [blog post announcing it](/blog/smart-search/).
+
+### Reusable content variables
+
+Define product names, version numbers, or any repeated term once in `config/variables.ts` and reference it anywhere in your MDX content using `{vars.variableName}` syntax. Variable expressions resolve correctly in page content, headings, the table of contents, the search index, and the FAQ index. Rename a product? Change one file.
+
+```js
+export const docVariables: Record<string, string> = {
+  productName: 'Product Name',
+  companyName: "Company Name",
+  version: '1.0.0',
+  frameworkName: 'Next.js',
+}
+```
+
+### FAQ indexer
+
+Create a `.mdx` file in the `content/docs/faq/` directory, use `###` headings for each question, and the FAQ index plugin automatically picks up the file and adds its questions to a searchable FAQ table of contents. No manual index to maintain.
+
+![Alt text](/img/faq-indexer.png "width=100%")
+
+### Redirect management
+
+When you move or rename a page, add an entry to `redirects.json` at the project root — for example, `{ "from": "/old-path/", "to": "/new-path/" }`. The redirects plugin generates HTML files with meta-refresh tags at build time so existing links keep working and you don't lose search equity.
+
+```json
+[
+  {
+    "from": "/old-path/",
+    "to": "/new-path/"
+  },
+  {
+    "from": "/outdated-page/",
+    "to": "/updated-page/"
+  }
+]
+```
+
+### OpenAPI and API reference
+
+{vars.productName} includes native OpenAPI and Redoc integration. Place spec files in the `api/` directory and they are automatically discovered, validated, and built into static API reference pages with Redoc's three-panel layout, schema explorer, and endpoint navigation. API docs automatically adapt to the {vars.productName} light and dark theme and re-render on theme toggle.
+
+![Alt text](/img/api-docs-layout.png "width=100%")
+
+### Components
+
+{vars.productName} ships a library of ready-to-use React components globally registered so no import is needed in MDX files. The **Glossary** component renders an alphabetically filtered term list. The **Feedback widget** collects page-level user feedback and posts it to a configurable backend. The **Tooltip** component provides inline hover definitions for terms, acronyms, and jargon without interrupting reading flow — CSS-only, no JavaScript. **Flipping cards** add interactive visual elements to landing pages and overview content.
+
+### Feedback dashboard
+
+A built-in admin dashboard at `/feedback-dashboard/` lets you view and analyze page-level feedback across your docs site. It includes KPI metric cards for total responses, likes, dislikes, and satisfaction rate; a sortable page breakdown table with inline progress bars; an option breakdown bar chart; and a paginated recent feedback list with period filtering. A setup script — `npm run setup:feedback-api <database>` — scaffolds a ready-to-run Express backend for MongoDB, Azure Cosmos DB, PostgreSQL, or Firebase Firestore.
+
+### Blog and release notes
+
+{vars.productName} includes a full blog section and a structured release notes section. Both support two layout options configured in `config/site.ts`. The blog offers a `modern` layout with a gradient hero, animated card grid, and author bio cards, or a `minimal` layout with clean, typography-driven presentation. The release notes section offers a `modern` layout with a gradient featured hero and icon-decorated section cards, or a `changelog` layout with a simple card list and colored section badges. Set a `subscribeUrl` to add a "Never Miss an Update" call-to-action, and a `feedbackUrl` to add a feedback prompt to release note articles.
+
+### Audience and content metadata
+
+A `role` frontmatter field renders colored chips below the page title to indicate the target audience — Developer, Admin, and so on. A `doc_type` field classifies content as concept, how-to, reference, or tutorial for content auditing purposes. Mark pages as `draft: true` to exclude them from the production build, search index, and FAQ index while keeping them visible in sidebar exports during content planning.
+
+![Alt text](/img/role-badge.png "width=40%")
+
+```yaml title="role badges"
+---
+title: Architecture
+keywords: [architecture, design tokens, theme, plugins, build]
+role: [Developer, Admin] # [!code highlight]
+last_update:
+  date: 02/20/2026
+---
+```
+
+### Content auditing
+
+Run `npm run export:sidebar` to generate a CSV of all sidebar entries with frontmatter metadata. The export includes role tags, document types, draft status, and last-updated dates — everything you need for a spreadsheet-based content audit or gap analysis.
+
+### CLI scaffolder
+
+Run `npx create-trellis-docs` to scaffold a new project with the full {vars.productName} template. The scaffolder sets up the directory structure, config files, sample content, and all dependencies in one step.
+
+## How it all fits together
+
+The {vars.productName} build pipeline follows a straightforward sequence. Design tokens defined in `design-tokens.json` are converted to CSS custom properties. Theme components consume those tokens through CSS variables. Plugins for search, FAQ indexing, redirects, image lightbox, and API docs hook into the build lifecycle. {vars.frameworkName} compiles everything into a static site you can deploy anywhere — Vercel, Netlify, GitHub Pages, Cloudflare Pages, S3 + CloudFront, or your own server — via `npm run build`, with output going to the `out/` directory. No runtime server. No vendor lock-in. No SaaS subscription.
+
+Because {vars.productName} sits on top of {vars.frameworkName} rather than replacing it, the fundamentals you already know stay intact: MDX authoring, file-based routing, the plugin system, and deployment all work exactly as they do in a vanilla {vars.frameworkName} project. {vars.productName} simply removes the setup work that every documentation project otherwise has to do from scratch.
+
+## Is {vars.productName} right for you?
+
+{vars.productName} is the right choice when you want a polished docs site without spending time on theme customization, need built-in search without Algolia, want a design token system for consistent branding, or are building internal developer documentation.
+
+Stick with vanilla {vars.frameworkName} when you need complete control over every theme component from scratch, prefer to pick and choose individual plugins, or have specific theme requirements that conflict with {vars.productName} defaults. {vars.productName} has opinions, and that's by design — but those opinions aren't for everyone.
+
+
+## What's next
+
+{vars.productName} is currently a standalone project. The plan is to publish it as `@pixlngrid/{vars.productName}` so you can install it into any {vars.frameworkName} project directly. Future releases will expand on the existing foundation — more components, deeper content tooling, and continued improvements based on real-world documentation workflows.
+
+{vars.productName} will also be available as a framework in **[TechWrit AI](https://techwrit.ai)**, {vars.organizationName}' code-aware documentation platform. Stay tuned for updates on that integration.
+
+Explore the docs to see what {vars.productName} adds on top of {vars.frameworkName}, understand how the architecture fits together, or jump straight into the getting started guide to set up your first project.
+
+

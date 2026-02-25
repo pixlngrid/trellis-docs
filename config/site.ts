@@ -1,6 +1,6 @@
 export const siteConfig = {
-  title: 'Trellis',
-  tagline: 'Docs Framework',
+  title: 'Trellis Docs',
+  tagline: 'A Docs-as-Code Framework',
   url: 'https://trellis-docs.io',
   baseUrl: '/',
   favicon: '/img/favicon.svg',
@@ -19,10 +19,10 @@ export const siteConfig = {
     // When true, the image paths above are ignored.
     useBuiltIn: true,
   },
-  organizationName: 'pixlngrid',
-  projectName: 'trellis',
-  repoUrl: 'https://github.com/pixlngrid/trellis',
-  editBaseUrl: 'https://github.com/pixlngrid/trellis/edit/main',
+  organizationName: 'Pixl\'n Grid Studios',
+  projectName: 'trellis-docs',
+  repoUrl: 'https://github.com/pixlngrid/trellis-docs',
+  editBaseUrl: 'https://github.com/pixlngrid/trellis-docs/edit/main',
   lastUpdated: {
     showAuthor: false,
   },
@@ -45,6 +45,21 @@ export const siteConfig = {
   faq: {
     faqDir: 'content/docs/faq',
     basePermalink: '/faq',
+  },
+
+  // External URL for subscribe CTA (e.g., Mailchimp, Buttondown). Shown on blog & release notes when set.
+  subscribeUrl: 'subscribe@trellis-docs.io',
+  // External URL for feedback CTA (e.g., Google Form, Typeform). Shown on release note articles when set.
+  feedbackUrl: 'feedback@trellis-docs.io',
+
+  // Blog layout — 'modern' (gradient hero + animated cards) or 'minimal' (clean list)
+  blog: {
+    layout: 'modern' as 'modern' | 'minimal',
+  },
+
+  // Release notes layout — 'modern' (gradient hero + categorized sections) or 'changelog' (simple list)
+  releaseNotes: {
+    layout: 'modern' as 'modern' | 'changelog',
   },
 
   // OpenAPI / API documentation — set enabled: true and place specs in content/api/

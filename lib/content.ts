@@ -137,7 +137,7 @@ async function loadDoc(
       slug: '/' + slugPath,
     },
     content,
-    filePath,
+    filePath: path.relative(process.cwd(), filePath).replace(/\\/g, '/'),
   }
 }
 
@@ -208,7 +208,10 @@ export interface BlogMeta {
   description?: string
   slug: string
   date: string
-  authors?: Array<{ name: string }>
+  authors?: Array<{ name: string; role?: string }>
+  category?: string
+  featured?: boolean
+  image?: string
 }
 
 export interface BlogEntry {
@@ -247,6 +250,9 @@ export async function getAllBlogPosts(): Promise<BlogEntry[]> {
         slug: data.slug || fileSlug,
         date,
         authors: data.authors,
+        category: data.category,
+        featured: data.featured === true,
+        image: data.image,
       },
       content,
       excerpt,

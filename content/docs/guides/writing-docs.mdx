@@ -35,7 +35,43 @@ spec:
   owner: team-platform
 ```
 
-Every code block includes a **copy button** that appears on hover in the top-right corner.
+Every code block includes a **copy button** and a **word wrap toggle** that appear on hover in the top-right corner.
+
+### Title Bar
+
+Add a filename or label above a code block with `title="..."` in the meta string:
+
+````md
+```ts title="config/site.ts"
+export const siteConfig = {
+  name: 'My Docs',
+}
+```
+````
+
+```ts title="config/site.ts"
+export const siteConfig = {
+  name: 'My Docs',
+}
+```
+
+The title bar appears above the code block with a muted background. Code blocks without a `title` render normally with no extra bar.
+
+You can combine `title` with other meta features like line highlighting:
+
+````md
+```ts title="config/site.ts" {2}
+export const siteConfig = {
+  name: 'My Docs',  // this line is highlighted
+}
+```
+````
+
+```ts title="config/site.ts" {2}
+export const siteConfig = {
+  name: 'My Docs',
+}
+```
 
 ### Highlighting Lines
 
@@ -113,6 +149,35 @@ const b = 2 // [!code focus]
 const c = 3
 ```
 
+### Comment Syntax by Language
+
+The inline notations (`[!code highlight]`, `[!code ++]`, `[!code --]`, `[!code focus]`) use the comment syntax of the code block's language. Here are the most common:
+
+| Language | Comment syntax | Example |
+|----------|--------------|---------|
+| JavaScript, TypeScript, Java, C, Go | `//` | `// [!code highlight]` |
+| Python, Ruby, Bash, YAML | `#` | `# [!code highlight]` |
+| HTML, XML, MDX | `<!-- -->` | `<!-- [!code highlight] -->` |
+| CSS | `/* */` | `/* [!code highlight] */` |
+| SQL | `--` | `-- [!code highlight]` |
+
+For example, highlighting a line in a YAML block:
+
+```yaml
+server:
+  host: localhost
+  port: 8080 # [!code highlight]
+```
+
+### Best Practices
+
+- **Use `title` for filenames** — When showing config files or code that readers will create, add `title="path/to/file"` so they know where to put it
+- **Use meta line numbers for multiple highlights** — `{2,4-5}` is cleaner than adding `[!code highlight]` to every line
+- **Use inline comments for single-line emphasis** — `[!code highlight]` is better when you want to draw attention to one specific line in a longer block
+- **Use diff notation for before/after** — `[!code ++]` and `[!code --]` are clearer than describing changes in prose
+- **Use focus for teaching** — `[!code focus]` dims everything except the important lines, which is ideal for tutorials where you want to draw attention to a specific part of a larger snippet
+- **Don't mix meta highlights with inline highlights** — Pick one approach per code block. Using both can produce unexpected results
+
 ## Admonitions
 
 :::note
@@ -138,6 +203,32 @@ This is a **danger** admonition. Use it for critical warnings.
 ## Tabs
 
 Use the `<Tabs>` and `<TabItem>` components for tabbed content. Tab state syncs to the URL so tabs are shareable:
+
+`````text
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+
+    ```bash
+    npm install @pixlngrid/trellis
+    ```
+
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+
+    ```bash
+    yarn add @pixlngrid/trellis
+    ```
+
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+
+    ```bash
+    pnpm add @pixlngrid/trellis
+    ```
+
+  </TabItem>
+</Tabs>
+`````
 
 <Tabs>
   <TabItem value="npm" label="npm" default>

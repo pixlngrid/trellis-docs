@@ -71,6 +71,7 @@ export const mainSidebar: SidebarItem[] = [
       { type: 'doc', id: 'guides/i18n' },
       { type: 'doc', id: 'guides/versioning' },
       { type: 'doc', id: 'guides/deployment' },
+      { type: 'doc', id: 'guides/upgrading' },
     ],
   },
   {

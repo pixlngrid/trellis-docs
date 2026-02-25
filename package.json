@@ -1,8 +1,8 @@
 {
   "name": "trellis",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "node scripts/build-tokens.js && cross-env NODE_ENV=development next dev",
     "build": "node scripts/build-tokens.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && node scripts/build-api-index.js && next build",
