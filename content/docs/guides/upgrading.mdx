@@ -1,0 +1,76 @@
+---
+title: Upgrading
+description: How to upgrade an existing Trellis project to the latest version.
+keywords: [upgrade, update, migration, version]
+last_update:
+  date: 02/25/2026
+  author: Trellis
+---
+
+{vars.productName} does not have a CLI upgrade command. When a new version is released, you manually update your project by comparing against the latest template and pulling in the changes you need.
+
+## General upgrade steps
+
+For every new version:
+
+1. **Check the release notes** — Read the [release notes](/release-notes/) for all versions between your current version and the target version
+2. **Update dependencies** — Compare your `package.json` against the latest template and add/update any new or changed packages
+3. **Copy new files** — Add any new components, utilities, or config files introduced in the release
+4. **Update existing files** — Apply changes to config files, layouts, and components as noted in the version-specific sections below
+5. **Install and build** — Run `npm install` then `npm run build` to verify everything works
+
+:::tip
+You can find the latest template files in the [`create-trellis-docs` package](https://github.com) or by scaffolding a fresh project with `npx create-trellis-docs@latest` and comparing it against your existing project.
+:::
+
+---
+
+## Troubleshooting
+
+### `lightningcss` or `@tailwindcss/oxide` errors on Windows
+
+If your `.npmrc` contains `os = "linux"`, npm will skip Windows-specific optional dependencies. Fix by running:
+
+```bash title="Terminal"
+npm install --os=win32
+```
+
+Or add the Windows binaries to your `package.json`:
+
+```json title="package.json"
+{
+  "optionalDependencies": {
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.0",
+    "lightningcss-win32-x64-msvc": "^1.31.1"
+  }
+}
+```
+
+### `.next/trace` EPERM error during build
+
+On Windows, a stale Node.js process may hold a lock on the `.next` directory. Kill all Node processes and clean the build cache:
+
+```bash title="Terminal"
+taskkill /f /im node.exe
+rm -rf .next
+npm run build
+```
+
+### `vars is not defined` in MDX
+
+If you use `{vars.productName}` or similar expressions in MDX files, make sure the `MDXRemote` options include the `scope` property:
+
+```tsx title="MDXRemote usage"
+<MDXRemote
+  source={content}
+  components={mdxComponents}
+  options={{
+    scope: { vars: docVariables },
+    mdxOptions: { ... },
+  }}
+/>
+```
+
+### Build fails with "Could not parse expression with acorn"
+
+This occurs if `rehype-mdx-code-props` is installed — it tries to parse code block meta strings like `{2,4-5}` as JavaScript expressions. Use the custom `rehypeCodeMeta` plugin from `lib/rehype-code-meta.ts` instead.

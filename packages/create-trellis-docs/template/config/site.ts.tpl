@@ -38,6 +38,21 @@ export const siteConfig = {
     basePermalink: '/faq',
   },
 
+  // External URL for subscribe CTA (e.g., Mailchimp, Buttondown). Shown on blog & release notes when set.
+  subscribeUrl: '',
+  // External URL for feedback CTA (e.g., Google Form, Typeform). Shown on release note articles when set.
+  feedbackUrl: '',
+
+  // Blog layout — 'modern' (gradient hero + animated cards) or 'minimal' (clean list)
+  blog: {
+    layout: 'minimal' as 'modern' | 'minimal',
+  },
+
+  // Release notes layout — 'modern' (gradient hero + categorized sections) or 'changelog' (simple list)
+  releaseNotes: {
+    layout: 'changelog' as 'modern' | 'changelog',
+  },
+
   // OpenAPI / API documentation — set enabled: true and place specs in api/
   apiDocs: {
     enabled: false,

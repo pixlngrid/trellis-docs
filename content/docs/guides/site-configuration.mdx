@@ -3,7 +3,7 @@ title: Site Configuration
 description: Customize your site identity, navigation, sidebar, and content variables.
 keywords: [configuration, site, settings, sidebar, navigation, variables]
 last_update:
-  date: 02/24/2026
+  date: 02/25/2026
   author: Trellis
 ---
 
@@ -66,6 +66,54 @@ The built-in search indexes all documentation pages at build time. You can tune 
 | `search.excludedPrefixes` | File prefixes to skip (default `['_']`) |
 
 See [Smart Search](/plugins/smart-search/) for more details.
+
+### Blog Layout
+
+Choose between two blog designs. Change the `layout` value to switch instantly — no other changes needed.
+
+| Value | Description |
+|-------|-------------|
+| `'minimal'` | Clean typography-driven list with featured post hero and simple article pages |
+| `'modern'` | Gradient heroes, animated card grid, author bio cards, and related posts |
+
+```ts title="config/site.ts"
+blog: {
+  layout: 'minimal' as 'modern' | 'minimal',
+},
+```
+
+### Release Notes Layout
+
+Choose between two release notes designs. The content sections (`## Added`, `## Changed`, `## Fixed`, `## Removed`) are automatically detected and styled.
+
+| Value | Description |
+|-------|-------------|
+| `'changelog'` | Simple card list with colored section badges — classic changelog style |
+| `'modern'` | Gradient featured hero, icon-decorated section cards with item counts |
+
+```ts title="config/site.ts"
+releaseNotes: {
+  layout: 'changelog' as 'modern' | 'changelog',
+},
+```
+
+### Subscribe & Feedback CTAs
+
+Optional call-to-action blocks that appear on blog and release notes pages. Both fields accept a URL or an email address (auto-detected and converted to `mailto:`).
+
+| Setting | Description |
+|---------|-------------|
+| `subscribeUrl` | External subscribe link (e.g., Mailchimp, Buttondown, or an email address). Shown on blog and release notes landing pages when set. |
+| `feedbackUrl` | External feedback link (e.g., Google Form, Typeform, or an email address). Shown on release note articles when set. |
+
+```ts title="config/site.ts"
+subscribeUrl: 'https://buttondown.com/your-newsletter',
+feedbackUrl: 'https://forms.gle/your-form-id',
+```
+
+The subscribe CTA renders a dark gradient card with a "Subscribe" button. The feedback CTA renders "Share Feedback" and "Report an Issue" buttons — the issue button links to `repoUrl/issues` automatically.
+
+When either field is empty (`''`), the corresponding CTA is hidden. No setup needed by default.
 
 ### Feature Flags
 
@@ -158,6 +206,14 @@ export const siteConfig = {
   faq: {
     faqDir: 'content/docs/faq',
     basePermalink: '/faq',
+  },
+  subscribeUrl: 'https://buttondown.com/acme-docs',
+  feedbackUrl: 'https://forms.gle/acme-feedback',
+  blog: {
+    layout: 'minimal' as 'modern' | 'minimal',
+  },
+  releaseNotes: {
+    layout: 'changelog' as 'modern' | 'changelog',
   },
   apiDocs: {
     enabled: true,

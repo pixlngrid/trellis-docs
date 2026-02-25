@@ -8,7 +8,7 @@
  * through the MDXRemote `scope` prop at build time.
  */
 export const docVariables: Record<string, string> = {
-  productName: 'Trellis',
+  productName: 'Trellis Docs',
   companyName: "Pixl'n Grid",
   version: '1.2.0',
   frameworkName: 'Next.js',

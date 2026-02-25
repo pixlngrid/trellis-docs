@@ -276,6 +276,26 @@ Place images in `public/img/` and reference them with an absolute path:
 
 All images automatically support **click-to-zoom** via the built-in lightbox — no extra markup needed. Click any image to open it in a modal overlay.
 
+### Image Sizing
+
+By default, images render at 60% of the content width. To override the size, add a width value in the title position of the markdown image syntax:
+
+```md
+![Screenshot](/img/screenshot.png "50%")
+![Logo](/img/logo.png "200px")
+![Diagram](/img/diagram.png "width=75%")
+```
+
+Supported formats:
+
+| Syntax | Example | Result |
+|--------|---------|--------|
+| Percentage | `"50%"` | 50% of the content width |
+| Pixels | `"400px"` | Fixed 400px width |
+| `width=` prefix | `"width=75%"` | Same as `"75%"` — explicit prefix is optional |
+
+When a custom width is set, it replaces the default 60% max-width. The image title attribute is consumed by the width parser, so it won't appear as a tooltip.
+
 ## Blog Posts
 
 Blog posts live in `content/blog/`. Name files with a date prefix:

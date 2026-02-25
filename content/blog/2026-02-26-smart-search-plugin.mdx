@@ -1,0 +1,194 @@
+---
+title: Smart Search in Trellis
+description: 'How Trellis delivers fast, metadata-driven search with build-time indexing and Fuse.js — no external APIs, no Algolia, fully offline.'
+slug: smart-search
+authors:
+  - name: Patricia McPhee
+    role: Framework Founder & Lead Technical Writer
+    img: /img/authors/avatar-patriciamcphee.png
+category: Feature
+featured: false
+---
+
+Search functionality is at the heart of a great documentation experience. Yet modern search systems often overwhelm users with irrelevant results, straying far from their original purpose of helping users find information quickly. **{vars.productName}** takes a different approach — build-time indexing powered by **metadata keywords** and **Fuse.js** — to deliver targeted, efficient, and fully offline search.
+
+{/* truncate */}
+
+No external APIs. No Algolia subscription. No third-party services behind a firewall. {vars.productName} search works entirely at build time and runs client-side, making it ideal for secure environments, local development, and static deployments.
+
+---
+
+## The evolution of search: Lessons from metadata-driven systems
+
+Twenty years ago, XML-based authoring tools relied on metadata keywords to power search in online help systems and create document indices. This approach targeted user queries with precision, delivering highly relevant results by matching specific keywords. For example, users searching for "password reset" would only see results directly related to that topic, avoiding an overload of tangentially related content.
+
+Somewhere along the way, this simplicity was replaced by overly complex systems that attempt to guess user intent by indexing entire documents. While this might sound advanced, it often leads to **information overload**. As the Nielsen Norman Group highlights, users faced with irrelevant or excessive search results often feel frustrated, losing confidence in the system's ability to provide helpful answers ([Nielsen Norman Group, 2024](https://media.nngroup.com/media/reports/free/iPad_App_and_Website_Usability_2nd_Edition.pdf)).
+
+{vars.productName} returns to the proven principles of metadata-driven search while adding modern fuzzy matching, ensuring results are as focused and relevant as possible.
+
+---
+
+## How {vars.productName} search works
+
+The search pipeline has three stages:
+
+1. **Build time** — a Node.js script scans all documentation files, extracting titles, headings, descriptions, keywords, and content into a structured index
+2. **Index generation** — a `searchIndex.json` file is written to `public/`, ready to be served as a static asset
+3. **Client side** — the search UI loads the index and uses [Fuse.js](https://www.fusejs.io/) for fuzzy matching with configurable field weights
+
+Because the index is generated at build time and bundled as a static JSON file, search works instantly in the browser — no server round-trips, no API keys, no rate limits.
+
+---
+
+## Why metadata keywords matter
+
+Metadata keywords provide a bridge between how users think about their search terms and how the system retrieves results. Unlike generalized search algorithms that index every word in a document, metadata keywords focus on **curated, intentional tags** that reflect the language users are likely to use.
+
+### Benefits of metadata-driven search
+
+- **Targeted Results**: Only content tagged with relevant metadata appears, reducing irrelevant results.
+- **Intuitive Experience**: Users get results that match what they "think" their query will yield.
+- **Search Accuracy**: Limits noise by excluding unrelated terms that might appear in a full-text search.
+
+For example, if a user searches "API token," {vars.productName} prioritizes results explicitly tagged with those terms, avoiding results that merely mention "API" or "token" incidentally.
+
+---
+
+## Configuration
+
+Search is configured in `config/site.ts` under the `search` key:
+
+```ts title="config/site.ts"
+search: {
+  // Folders to exclude from indexing
+  excludedFolders: ['includes', '_includes'],
+
+  // File prefixes to exclude (e.g., _partial.mdx)
+  excludedPrefixes: ['_'],
+
+  // Field weights for search relevance (0.0 to 1.0)
+  weights: {
+    title: 1.0,              // Page title — highest weight
+    'sections.heading': 1.0, // Section headings — highest weight
+    keywords: 0.8,           // Frontmatter keywords
+    description: 0.6,        // Frontmatter description
+    'sections.content': 0.5, // Section body content
+    content: 0.4,            // Full page content — lowest weight
+  },
+},
+```
+
+### Search weights
+
+Weights control how much each field contributes to search relevance. A weight of `1.0` means the field has maximum influence; `0.0` would exclude it entirely.
+
+| Field | Default Weight | Description |
+|-------|---------------|-------------|
+| `title` | 1.0 | The page title from frontmatter |
+| `sections.heading` | 1.0 | Individual section headings (`##`, `###`) |
+| `keywords` | 0.8 | The `keywords` array from frontmatter |
+| `description` | 0.6 | The `description` field from frontmatter |
+| `sections.content` | 0.5 | Text content within each section |
+| `content` | 0.4 | Full page text content |
+
+---
+
+## Adding keywords to your pages
+
+Add a `keywords` array to your frontmatter to improve search discoverability:
+
+```yaml title="Any .mdx file"
+---
+title: Getting Started
+keywords: [introduction, getting started, beginner guide]
+---
+```
+
+Keywords are weighted at `0.8` by default — higher than content but lower than titles. Use them for synonyms or terms that don't appear in the page text.
+
+### Inline array
+
+```yaml
+---
+title: Getting Started
+keywords: [introduction, getting started, beginner guide]
+---
+```
+
+- All elements enclosed in square brackets `[ ]`, separated by commas
+- Best for short arrays with a small number of elements
+
+### Block array
+
+```yaml
+---
+title: Getting Started
+keywords:
+  - introduction
+  - getting started
+  - beginner guide
+---
+```
+
+- Each element on a separate line, preceded by a hyphen `-`
+- Best for longer arrays or when individual elements need extra clarity
+
+Both are valid YAML syntax — the choice depends on personal or team preference.
+
+---
+
+## The search UI
+
+The search interface renders as a search icon in the navbar that opens a modal with:
+
+- Text input with instant results
+- Highlighted matching text
+- Section-level results (not just page-level)
+- Keyboard navigation support
+
+1. **Inactive state**
+
+   ![Search bar in its inactive state](/img/search-icon-only.png)
+
+2. **Active state with results**
+
+   ![Expanded search bar showing results](/img/search-results.png)
+
+---
+
+## Key advantages
+
+1. **Works behind a firewall** — Unlike search-as-a-service tools like Algolia or Typesense, {vars.productName} search works entirely offline, making it ideal for secure environments where external API calls are not permitted.
+2. **Offline testing** — Test search functionality during local development without deploying your site. Run `npm run build` and the index is regenerated.
+3. **Precision through metadata** — By weighting metadata keywords above raw content, the search ensures users find what they need without the noise of broad full-text indexing.
+4. **No external dependencies** — No API keys, no third-party accounts, no recurring costs. Everything runs at build time and in the browser.
+5. **Configurable relevance** — Adjust field weights in `config/site.ts` to tune search behavior for your content structure.
+
+---
+
+## A case for metadata-driven search
+
+Metadata keyword functionality echoes the simplicity and effectiveness of **indexing in XML-based authoring tools** used two decades ago. These systems empowered technical writers to carefully curate terms users were likely to search for, creating intuitive and efficient help experiences. {vars.productName} brings this proven approach into a modern static-site framework, combining it with fuzzy matching for the best of both worlds.
+
+Studies confirm that overly broad search strategies are a major contributor to poor user experience:
+
+- In systematic reviews, inefficient searches often fail to retrieve relevant information, creating incomplete or biased results ([Systematic Reviews Journal, 2024](https://systematicreviewsjournal.biomedcentral.com/articles/10.1186/s13643-016-0371-9)).
+- Users report frustration when faced with excessive irrelevant results, as noted in usability studies ([Nielsen Norman Group, 2024](https://media.nngroup.com/media/reports/free/iPad_App_and_Website_Usability_2nd_Edition.pdf)).
+
+{vars.productName} search eliminates these inefficiencies by weighting metadata keywords above raw content, ensuring results are relevant, precise, and aligned with user intent.
+
+---
+
+## Conclusion
+
+{vars.productName} search combines modern fuzzy matching with time-tested principles of metadata-driven search. Its build-time indexing, offline capability, and zero external dependencies make it an ideal solution for documentation sites that need fast, accurate, and secure search out of the box.
+
+By focusing on metadata keywords and configurable weights, {vars.productName} gives documentation teams full control over search relevance — no API keys required.
+
+---
+
+## References
+
+1. Nielsen Norman Group. *Usability Studies on Search Functionality*. Available at: [NNG](https://media.nngroup.com/media/reports/free/iPad_App_and_Website_Usability_2nd_Edition.pdf).
+2. Tandfonline. *Inefficient Search Strategies Persist for Self-Associated Targets*. Available at: [Tandfonline](https://www.tandfonline.com/doi/pdf/10.1080/13506285.2024.2393890).
+3. Systematic Reviews Journal. *Exploring Issues in Website Searching*. Available at: [Systematic Reviews](https://systematicreviewsjournal.biomedcentral.com/articles/10.1186/s13643-016-0371-9).
