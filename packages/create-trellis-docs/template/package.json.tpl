@@ -35,7 +35,7 @@
     "mermaid": "^11.11.0",
     "motion": "^12.34.3",
     "next": "^15.2.0",
-    "next-mdx-remote": "^5.0.0",
+    "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.4.4",
     "panzoom": "^9.4.3",
     "postcss": "^8.5.6",
