@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function BlogIndex() {
   const posts = await getAllBlogPosts()
-  const layout = siteConfig.blog?.layout ?? 'modern'
+  const layout = (siteConfig as any).blog?.layout ?? 'modern'
 
   return (
     <div className="min-h-screen flex flex-col">

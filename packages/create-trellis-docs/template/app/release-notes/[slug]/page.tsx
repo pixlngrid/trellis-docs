@@ -25,7 +25,7 @@ export default async function ReleaseNotePage({ params }: { params: Promise<{ sl
   if (!note) notFound()
 
   const allNotes = await getAllReleaseNotes()
-  const layout = siteConfig.releaseNotes?.layout ?? 'changelog'
+  const layout = (siteConfig as any).releaseNotes?.layout ?? 'changelog'
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function ReleaseNotesIndex() {
   const notes = await getAllReleaseNotes()
-  const layout = siteConfig.releaseNotes?.layout ?? 'changelog'
+  const layout = (siteConfig as any).releaseNotes?.layout ?? 'changelog'
 
   return (
     <div className="min-h-screen flex flex-col">

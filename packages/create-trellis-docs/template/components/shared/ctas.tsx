@@ -8,9 +8,10 @@ function resolveHref(value: string): { href: string; isEmail: boolean } {
 }
 
 export function SubscribeCTA() {
-  if (!siteConfig.subscribeUrl) return null
+  const config = siteConfig as any
+  if (!config.subscribeUrl) return null
 
-  const { href, isEmail } = resolveHref(siteConfig.subscribeUrl)
+  const { href, isEmail } = resolveHref(config.subscribeUrl)
 
   return (
     <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 md:p-12 text-center">
@@ -33,7 +34,8 @@ export function SubscribeCTA() {
 }
 
 export function FeedbackCTA() {
-  const hasAnyLink = siteConfig.feedbackUrl || siteConfig.repoUrl
+  const config = siteConfig as any
+  const hasAnyLink = config.feedbackUrl || siteConfig.repoUrl
   if (!hasAnyLink) return null
 
   return (
@@ -43,8 +45,8 @@ export function FeedbackCTA() {
         We&apos;d love to hear your feedback on this release. Let us know what you think!
       </p>
       <div className="flex items-center justify-center gap-3">
-        {siteConfig.feedbackUrl && (() => {
-          const { href, isEmail } = resolveHref(siteConfig.feedbackUrl)
+        {config.feedbackUrl && (() => {
+          const { href, isEmail } = resolveHref(config.feedbackUrl)
           return (
             <a
               href={isEmail ? `${href}?subject=Release Feedback` : href}

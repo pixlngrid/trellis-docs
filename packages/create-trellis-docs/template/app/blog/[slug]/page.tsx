@@ -25,7 +25,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   if (!post) notFound()
 
   const allPosts = await getAllBlogPosts()
-  const layout = siteConfig.blog?.layout ?? 'modern'
+  const layout = (siteConfig as any).blog?.layout ?? 'modern'
 
   return (
     <div className="min-h-screen flex flex-col">
