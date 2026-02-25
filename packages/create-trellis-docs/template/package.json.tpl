@@ -11,7 +11,8 @@
     "build-tokens": "node scripts/build-tokens.js",
     "version:snapshot": "node scripts/version-snapshot.js",
     "export:sidebar": "node scripts/export-sidebar.js",
-    "setup:feedback-api": "node scripts/setup-feedback-api.js"
+    "setup:feedback-api": "node scripts/setup-feedback-api.js",
+    "migrate:docusaurus": "node scripts/migrate-docusaurus.js"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.3",
