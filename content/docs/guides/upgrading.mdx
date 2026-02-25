@@ -7,9 +7,44 @@ last_update:
   author: Trellis
 ---
 
-{vars.productName} does not have a CLI upgrade command. When a new version is released, you manually update dependencies, copy new files, and update config to match the latest template.
+Starting with v1.6.1, {vars.productName} includes a CLI upgrade command that updates framework files and dependencies in an existing project. For older versions, follow the manual steps below.
 
-## General upgrade steps
+## Upgrade with the CLI
+
+Run from your project root:
+
+```bash title="Terminal"
+npx create-trellis-docs@latest upgrade
+```
+
+This will:
+- Copy updated framework files (components, lib, scripts, app routes)
+- Merge new dependencies and scripts into your `package.json`
+- Skip your user files (`config/`, `content/`, `public/`, `components/brand/`)
+
+Preview what would change without modifying anything:
+
+```bash title="Terminal"
+npx create-trellis-docs@latest upgrade --dry-run
+```
+
+After upgrading, review the diff, install, and build:
+
+```bash title="Terminal"
+git diff
+npm install
+npm run build
+```
+
+:::tip
+The CLI upgrade does not modify your `config/site.ts`. Check the version-specific sections below for any new config options you should add manually.
+:::
+
+---
+
+## Manual upgrade steps
+
+If you prefer to upgrade manually, or are upgrading from a version older than v1.6.1:
 
 1. **Check the release notes** — Read the [release notes](/release-notes/) for all versions between your current version and the target
 2. **Follow the version-specific steps below** — Each section lists the exact files and dependencies to update
@@ -18,6 +53,28 @@ last_update:
 :::tip
 To see the full latest template, scaffold a fresh project in a temporary directory with `npx create-trellis-docs@latest temp-docs` and diff it against your project. This is a reference copy for comparison — don't run the scaffolder inside your existing project.
 :::
+
+---
+
+## v1.6.1
+
+Security fix: upgrade `next-mdx-remote` from v5 to v6.
+
+### Step 1: Update dependency
+
+```bash title="Terminal"
+npm install next-mdx-remote@^6.0.0
+```
+
+This is a drop-in replacement — the `MDXRemote` API is unchanged for server components.
+
+### Step 2: Verify the build
+
+```bash title="Terminal"
+npm run build
+```
+
+No code changes are required. If you use `MDXRemote` in any custom components, the import path and props remain the same.
 
 ---
 
