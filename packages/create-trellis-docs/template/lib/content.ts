@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
 import { siteConfig } from '@/config/site'
+import { resolveIncludes } from './resolve-includes'
 
 const DOCS_DIR = path.join(process.cwd(), 'content/docs')
 const BLOG_DIR = path.join(process.cwd(), 'content/blog')
@@ -124,6 +125,9 @@ async function loadDoc(
   const raw = await fs.readFile(filePath, 'utf-8')
   const { data, content } = matter(raw)
 
+  // Resolve @include directives (inline partials before MDX compilation)
+  const resolvedContent = await resolveIncludes(content, path.dirname(filePath))
+
   return {
     meta: {
       title: data.title || slug[slug.length - 1],
@@ -136,7 +140,7 @@ async function loadDoc(
       draft: data.draft === true,
       slug: '/' + slugPath,
     },
-    content,
+    content: resolvedContent,
     filePath: path.relative(process.cwd(), filePath).replace(/\\/g, '/'),
   }
 }
