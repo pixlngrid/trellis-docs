@@ -14,6 +14,10 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
 
   if (!src) return null
 
+  // Prepend basePath for absolute paths so images resolve in subdirectory deployments
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+  const resolvedSrc = basePath && src.startsWith('/') ? `${basePath}${src}` : src
+
   // Parse width from title: ![alt](src "50%") or ![alt](src "400px") or ![alt](src "width=75%")
   let customWidth: string | undefined
   let displayTitle: string | undefined = title
@@ -33,7 +37,7 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={src}
+        src={resolvedSrc}
         alt={alt || ''}
         title={displayTitle}
         {...props}
@@ -56,7 +60,7 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={src}
+            src={resolvedSrc}
             alt={alt || ''}
             className="max-h-[90vh] max-w-[90vw] object-contain border-none rounded-none"
             onClick={(e) => e.stopPropagation()}
