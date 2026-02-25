@@ -1,7 +1,7 @@
 ---
 title: Content Authoring
 description: Create new pages, blog posts, and release notes in the Trellis docs framework.
-keywords: [content, authoring, pages, blog, release-notes, frontmatter, images, sidebar]
+keywords: [content, authoring, pages, blog, release-notes, frontmatter, images, sidebar, includes, partials]
 last_update:
   date: 02/22/2026
   author: Trellis
@@ -39,7 +39,7 @@ Use partials for:
 
 - **Internal reference notes** that shouldn't be published
 - **Draft content** that isn't ready for readers yet
-- **Reusable snippets** you plan to incorporate into other pages
+- **Reusable snippets** you include in other pages with `@include`
 
 To hide a file, simply prefix its name with `_`:
 
@@ -52,6 +52,81 @@ mv content/docs/internal content/docs/_internal
 ```
 
 Partial files are also excluded from the [Smart Search](/plugins/smart-search/) index via the `excludedPrefixes` option.
+
+### Including Partials
+
+Use the `@include` directive to inline a partial's content into another page. The directive must be on its own line:
+
+```mdx
+@include ./_shared-setup-steps.mdx
+```
+
+The path is relative to the file containing the directive. Frontmatter in the partial is automatically stripped — only the body content is inlined.
+
+#### Example
+
+Create a partial:
+
+```mdx title="content/docs/guides/_install-steps.mdx"
+---
+title: Install Steps (partial)
+---
+
+1. Install dependencies: `npm install`
+2. Run the dev server: `npm run dev`
+3. Open `http://localhost:3000`
+```
+
+Include it in a page:
+
+```mdx title="content/docs/guides/quickstart.mdx"
+---
+title: Quickstart
+---
+
+## Getting Started
+
+@include ./_install-steps.mdx
+
+## Next Steps
+...
+```
+
+The numbered list renders inline as if it were written directly in `quickstart.mdx`.
+
+#### What works inside partials
+
+Included content goes through the full MDX pipeline, so everything works:
+
+- Admonitions (`:::tip`, `:::warning`, etc.)
+- Variables (`{vars.productName}`)
+- Tabs, code blocks, tables, and all other markdown features
+- Components (`<Callout>`, `<Tabs>`, etc.)
+
+#### Nested includes
+
+Partials can include other partials, up to 5 levels deep:
+
+```mdx title="content/docs/_shared/_prerequisites.mdx"
+@include ./_node-version.mdx
+@include ./_editor-setup.mdx
+```
+
+#### Migrating from Docusaurus
+
+If you're migrating from Docusaurus, the [migration script](#) automatically converts the Docusaurus import pattern:
+
+```mdx
+import SetupSteps from './_setup-steps.mdx';
+
+<SetupSteps />
+```
+
+Into the Trellis `@include` directive:
+
+```mdx
+@include ./_setup-steps.mdx
+```
 
 ### Frontmatter
 
