@@ -93,7 +93,7 @@ function SectionCard({ section }: { section: ReleaseSection }) {
             <MDXRemote
               source={section.content}
               components={mdxComponents}
-              options={{ mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug, rehypeCodeMeta] } }}
+              options={{ blockJS: false, mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug, rehypeCodeMeta] } }}
             />
           </div>
         </div>
@@ -120,7 +120,7 @@ function SectionCard({ section }: { section: ReleaseSection }) {
           <MDXRemote
             source={section.content}
             components={mdxComponents}
-            options={{ mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug, rehypeCodeMeta] } }}
+            options={{ blockJS: false, mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug, rehypeCodeMeta] } }}
           />
         </div>
       </div>

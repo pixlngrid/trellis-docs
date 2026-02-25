@@ -83,18 +83,30 @@ draft: false
 | `role` | No | Array of audience roles (e.g. `[Developer, Admin]`). Rendered as colored chips below the page title |
 | `draft` | No | Set to `true` to exclude the page from the production build, search index, and FAQ index |
 
+
+
+
+
 ### Role Chips
 
 When you add a `role` array to a page's frontmatter, Trellis renders each role as a colored chip below the title. This helps readers quickly identify whether a page is relevant to them.
 
+Roles are purely informational — they don't restrict access. Use any labels that make sense for your audience (e.g. `Developer`, `Admin`, `Designer`, `Product Manager`). The default color scheme assigns a unique color to each role, but you can customize colors in `config/site.ts` with the `roleColors` field:
+
 ```yaml
 ---
-title: API Authentication
-role: [Developer, Admin]
+title: Architecture
+keywords: [architecture, design tokens, theme, plugins, build]
+role: [Developer, Admin] # [!code highlight]
+last_update:
+  date: 02/20/2026
 ---
 ```
 
-Roles are purely informational — they don't restrict access. Use any labels that make sense for your audience (e.g. `Developer`, `Admin`, `Designer`, `Product Manager`).
+![Alt text](/img/role-badge.png "width=40%")
+
+![Alt text](/img/role-badge-custom-color.png "width=40%")
+
 
 ### Document Type
 

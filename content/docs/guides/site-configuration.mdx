@@ -115,6 +115,21 @@ The subscribe CTA renders a dark gradient card with a "Subscribe" button. The fe
 
 When either field is empty (`''`), the corresponding CTA is hidden. No setup needed by default.
 
+### Role Chip Colors
+
+Customize the background color of role chips per role name. Text color is automatically calculated (black or white) based on contrast.
+
+```ts title="config/site.ts"
+roleColor: {
+  Admin: '#DAFA87',
+  Editor: '#f7c948',
+  Viewer: '#6bc4ff',
+  Developer: '#EA5353',
+},
+```
+
+Roles not listed in `roleColor` fall back to the theme's `--primary` color. This setting is optional — omit it entirely to use the default color for all roles.
+
 ### Feature Flags
 
 These features are disabled by default. To enable one, set its `enabled` property to `true` and configure the related settings. Each feature has a dedicated guide with full setup instructions.
@@ -190,6 +205,11 @@ export const siteConfig = {
   colorMode: {
     defaultMode: 'dark' as const,
     respectPrefersColorScheme: true,
+  },
+  roleColor: {
+    Admin: '#DAFA87',
+    Editor: '#f7c948',
+    Viewer: '#6bc4ff',
   },
   search: {
     excludedFolders: ['includes', '_includes'],

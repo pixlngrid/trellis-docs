@@ -75,6 +75,7 @@ export function ChangelogReleaseArticle({ note }: ReleaseArticleLayoutProps) {
             source={note.content}
             components={components}
             options={{
+              blockJS: false,
               mdxOptions: {
                 remarkPlugins: [remarkGfm],
                 rehypePlugins: [rehypeSlug, rehypeCodeMeta],

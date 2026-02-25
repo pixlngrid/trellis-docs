@@ -131,6 +131,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
               components={mdxComponents}
               options={{
                 scope: { vars: docVariables },
+                blockJS: false,
                 mdxOptions: {
                   remarkPlugins: [remarkGfm, remarkDirective, remarkCallout],
                   rehypePlugins: [rehypeSlug, rehypeCodeMeta],

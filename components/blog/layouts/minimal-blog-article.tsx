@@ -59,6 +59,7 @@ export function MinimalBlogArticle({ post, allPosts }: BlogArticleLayoutProps) {
             components={mdxComponents}
             options={{
               scope: { vars: docVariables },
+              blockJS: false,
               mdxOptions: {
                 remarkPlugins: [remarkGfm],
                 rehypePlugins: [rehypeSlug, rehypeCodeMeta],
