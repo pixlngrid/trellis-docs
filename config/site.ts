@@ -1,7 +1,7 @@
 export const siteConfig = {
   title: 'Trellis',
   tagline: 'Docs Framework',
-  url: 'https://trellis.pixlngrid.com',
+  url: 'https://trellis-docs.io',
   baseUrl: '/',
   favicon: '/img/favicon.svg',
 

@@ -11,6 +11,7 @@ import { Footer } from '@/components/docs/footer'
 
 export async function generateStaticParams() {
   const notes = await getAllReleaseNotes()
+  if (notes.length === 0) return [{ slug: '_placeholder' }]
   return notes.map((note) => ({ slug: note.meta.slug }))
 }
 
