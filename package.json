@@ -1,6 +1,6 @@
 {
   "name": "trellis",
-  "version": "1.6.0",
+  "version": "1.6.2",
   "license": "MIT",
   "private": false,
   "scripts": {
@@ -38,7 +38,7 @@
     "mobx": "^6.15.0",
     "motion": "^12.34.3",
     "next": "^15.2.0",
-    "next-mdx-remote": "^5.0.0",
+    "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.4.4",
     "panzoom": "^9.4.3",
     "postcss": "^8.5.6",

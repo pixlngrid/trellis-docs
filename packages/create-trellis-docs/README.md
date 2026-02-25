@@ -1,6 +1,6 @@
 # create-trellis-docs
 
-Scaffold a new documentation site powered by [Trellis](https://github.com/pixlngrid/trellis) — an opinionated docs framework built on Next.js, Tailwind CSS v4, and shadcn/ui.
+Scaffold a new documentation site powered by [Trellis Docs](https://github.com/pixlngrid/trellis-docs) — an opinionated docs framework built on Next.js, Tailwind CSS v4, and shadcn/ui.
 
 ## Usage
 
