@@ -32,6 +32,53 @@ Options:
 - **Design token system** — define your brand in JSON, get CSS and Tailwind utilities
 - Starter documentation content to get you going
 
+## Migrating from Docusaurus
+
+New projects include a migration script that converts Docusaurus content, sidebar, and MDX imports into Trellis format:
+
+```bash
+cd my-docs
+node scripts/migrate-docusaurus.js /path/to/docusaurus-project
+```
+
+Run with `--dry-run` to preview changes without writing files, or `--force` to overwrite existing content. See the [Content Authoring guide](https://trellis-docs.dev/guides/content-authoring/) for details on `@include` partials and other features.
+
 ## Requirements
 
 - Node.js 18+
+
+## Troubleshooting
+
+### `Cannot find module '../lightningcss.win32-x64-msvc.node'`
+
+This error occurs when npm skips platform-specific native dependencies during installation. It's typically caused by a global `.npmrc` that overrides the `os` setting (e.g., `os = "linux"` on a Windows machine).
+
+**Fix:** reinstall with the correct platform flag:
+
+```bash
+# Windows
+npm install --os=win32
+
+# macOS (Intel/Apple Silicon)
+npm install --os=darwin
+
+# Linux
+npm install --os=linux
+```
+
+To check if your global `.npmrc` is the cause:
+
+```bash
+npm config get os
+```
+
+If it returns a value that doesn't match your actual OS, that's the problem. You can either remove the `os` line from your global `.npmrc` (`~/.npmrc`) or continue using the `--os` flag when installing.
+
+### `EPERM: operation not permitted, scandir '.next/trace'`
+
+This is a Windows file-locking issue unrelated to Trellis. Close any running `next dev` processes, delete the `.next` folder, and rebuild:
+
+```bash
+rm -rf .next
+npm run build
+```
