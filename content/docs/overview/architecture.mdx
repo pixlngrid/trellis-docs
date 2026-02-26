@@ -9,7 +9,7 @@ last_update:
 
 {vars.productName} extends the standard {vars.frameworkName} architecture with three layers: a design token pipeline, custom theme components, and bundled plugins.
 
-## Build Pipeline
+## Build pipeline
 
 ```mermaid
 graph TB
@@ -41,7 +41,7 @@ graph TB
     N --> O[Static Site &#40out/&#41]
 ```
 
-## Design Token Pipeline
+## Design token pipeline
 
 The token pipeline converts a single JSON file into CSS custom properties that the entire theme consumes.
 
@@ -51,29 +51,27 @@ design-tokens.json  →  scripts/build-tokens.js  →  app/tokens.css
 
 **How it works:**
 
-1. `design-tokens.json` defines colors, spacing, border radii, and typography as nested objects with `value` and `type` properties
-2. `scripts/build-tokens.js` recursively traverses the JSON and generates a `:root {}` block with CSS custom properties
-3. The output lands in `app/tokens.css`, which is imported in `app/globals.css`
-4. `globals.css` maps these tokens to semantic CSS variables (e.g., `--primary`, `--muted`)
+1. `design-tokens.json` defines colors, spacing, border radii, and typography as nested objects with `value` and `type` properties.
+2. `scripts/build-tokens.js` recursively traverses the JSON and generates a `:root {}` block with CSS custom properties.
+3. The output lands in `app/tokens.css`, which is imported in `app/globals.css`.
+4. `globals.css` maps these tokens to semantic CSS variables (for example, `--primary`, `--muted`).
 
-This means you change colors in one place (`design-tokens.json`) and they propagate everywhere.
-
-## Theme Layer
+## Theme layer
 
 {vars.productName} uses custom theme components that provide complete control over rendering and layout.
 
-### Directory Structure
+### Directory structure
 
 ```
 components/docs/
 ├── mdx/
-│   ├── index.tsx            # MDX component registry
+│   ├── index.tsx            # MDX (Markdown with JSX) component registry
 │   ├── callout.tsx          # Admonitions (note, tip, info, caution, danger) with custom SVG icons
 │   ├── code-block.tsx       # Shiki syntax highlighting (server component)
 │   ├── code-block-client.tsx # Copy button + word wrap toggle (client component)
 │   ├── heading.tsx          # Heading anchors with copy-to-clipboard
 │   ├── tabs.tsx             # Pill-style tabs with URL sync
-│   ├── image-lightbox.tsx   # Click-to-zoom image modal
+│   ├── image-lightbox.tsx   # Select-to-zoom image modal
 │   └── mermaid.tsx          # Mermaid diagram renderer with pan/zoom
 ├── search/
 │   └── search-dialog.tsx    # Cmd+K search modal (Fuse.js)
@@ -84,17 +82,17 @@ components/docs/
 └── footer.tsx               # Site footer
 ```
 
-### Key Components
+### Key components
 
 | Component | What it does |
 |-----------|-------------|
 | `callout.tsx` | Each admonition type (note, tip, info, caution, danger) has a custom SVG icon and styled container |
 | `tabs.tsx` | Tab selection synced to URL query parameters; pill-style CSS with accent colors |
-| `heading.tsx` | Heading anchors with click-to-copy URL functionality |
+| `heading.tsx` | Heading anchors with select-to-copy URL functionality |
 | `code-block.tsx` | Shiki dual-theme syntax highlighting with line highlighting, diffs, and focus |
 | `code-block-client.tsx` | Copy button and word wrap toggle for code blocks |
 
-## Build Scripts & Features
+## Build scripts and features
 
 {vars.productName} uses pre-build scripts and client-side components for additional functionality:
 
@@ -103,10 +101,10 @@ components/docs/
 | `build-search-index.js` | Pre-build | Indexes all docs, generates `public/searchIndex.json` for client-side Fuse.js search |
 | `build-faq-index.js` | Pre-build | Scans FAQ directory for `###` headings, generates `public/faqIndex.json` |
 | `build-tokens.js` | Pre-build | Converts `design-tokens.json` into `app/tokens.css` |
-| `image-lightbox.tsx` | Client-side | Click-to-zoom modal for images in MDX content |
+| `image-lightbox.tsx` | Client-side | Select-to-zoom modal for images in MDX content |
 | `mermaid.tsx` | Client-side | Mermaid diagram renderer with pan and zoom support |
 
-## Project Structure
+## Project structure
 
 ```
 trellis/  

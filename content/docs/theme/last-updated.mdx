@@ -9,11 +9,11 @@ last_update:
 
 In many documentation frameworks, the last-updated date and "Edit this page" link appear at the **bottom** of the page, in the footer area. {vars.productName} moves them to the **top**, directly below the page title.
 
-## Why Top Placement?
+## Why top placement?
 
 Readers want to know immediately whether the content they're reading is current. Placing the date at the top gives instant context about freshness — no scrolling required. This is especially important for documentation that changes frequently, like API references or configuration guides.
 
-## How It Works
+## How it works
 
 The last-updated row is rendered in the doc page layout at `app/(docs)/[...slug]/page.tsx`, directly between the `<h1>` title and the MDX content:
 
@@ -56,4 +56,3 @@ lastUpdated: {
 ```
 
 When `showAuthor` is `false` (the default), only the date renders. The author remains in the frontmatter for contributor reference.
-

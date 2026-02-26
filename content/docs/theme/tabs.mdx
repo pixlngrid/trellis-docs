@@ -10,11 +10,7 @@ last_update:
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-{vars.productName} tabs have two enhancements: **pill-style design** and **URL query parameter synchronization**.
-
-## Pill-Style Tabs
-
-Instead of the default underline-style tabs, {vars.productName} uses pill-shaped tabs with accent colors for the active state. This provides a clearer visual distinction between selected and unselected tabs.
+{vars.productName} tabs use a **pill-style design** with **URL query parameter synchronization**.
 
 <Tabs>
   <TabItem value="npm" label="npm" default>
@@ -40,7 +36,7 @@ pnpm install
   </TabItem>
 </Tabs>
 
-## URL Synchronization
+## URL synchronization
 
 When you select a tab, the choice is saved to the URL as a query parameter. This means:
 
@@ -48,19 +44,19 @@ When you select a tab, the choice is saved to the URL as a query parameter. This
 - **Bookmarkable** — browser bookmarks preserve the tab selection
 - **Back/forward** — browser history tracks tab changes
 
-For example, clicking the "yarn" tab above adds `?tabs=yarn` to the URL.
+For example, selecting the "yarn" tab above adds `?tabs=yarn` to the URL.
 
-### How It Works
+### How it works
 
-The customization lives in `components/docs/Tabs/index.js`. On tab selection:
+The logic lives in `components/docs/Tabs/index.js`. On tab selection:
 
-1. The component reads the current URL search parameters
-2. Updates the `tabs` parameter (or a custom parameter name if `queryString` is set)
-3. Pushes the new URL to the browser history
+1. The component reads the current URL search parameters.
+2. The component updates the `tabs` parameter (or a custom parameter name if `queryString` is set).
+3. The component pushes the new URL to the browser history.
 
 On page load, the component checks for a matching query parameter and selects that tab.
 
-### Custom Query Parameter Names
+### Custom query parameter names
 
 By default, the parameter is named `tabs`. You can customize it per tab group:
 

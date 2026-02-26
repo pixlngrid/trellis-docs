@@ -9,7 +9,7 @@ last_update:
 
 {vars.productName} uses custom SVG admonition icons, giving each type a distinct visual identity.
 
-## Admonition Types
+## Admonition types
 
 :::note
 **Note** — use for supplementary information that adds context.
@@ -57,7 +57,7 @@ This is critical — read carefully.
 :::
 ```
 
-## Custom Titles
+## Custom titles
 
 Add a custom title after the type:
 
@@ -71,7 +71,7 @@ Always run `npm run build` before deploying.
 Always run `npm run build` before deploying.
 :::
 
-## How the Icons Work
+## How the icons work
 
 All admonition icons and layout are defined in a single file: `components/docs/mdx/callout.tsx`. Each type (note, tip, info, caution, danger, warning) has a dedicated inline SVG stored in an `icons` record:
 
@@ -93,7 +93,7 @@ To customize an icon, edit the corresponding SVG in the `icons` record.
 
 ## Layout
 
-The `Callout` component renders the container, icon, optional title, and content in a single component. Admonition type determines the accent color via a `styles` record that maps each type to Tailwind classes:
+The `Callout` component renders the container, icon, optional title, and content. Admonition type determines the accent color via a `styles` record that maps each type to Tailwind classes:
 
 ```tsx title="components/docs/mdx/callout.tsx (simplified)"
 const styles: Record<string, { border: string; bg: string; text: string }> = {

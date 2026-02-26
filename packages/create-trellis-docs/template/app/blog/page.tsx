@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { getAllBlogPosts } from '@/lib/content'
 import { siteConfig } from '@/config/site'
 import { Navbar } from '@/components/docs/navbar'
@@ -10,6 +11,7 @@ export const metadata = {
 }
 
 export default async function BlogIndex() {
+  if (!(siteConfig as any).blog?.enabled) notFound()
   const posts = await getAllBlogPosts()
   const layout = (siteConfig as any).blog?.layout ?? 'modern'
 

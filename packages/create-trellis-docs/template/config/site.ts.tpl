@@ -38,18 +38,21 @@ export const siteConfig = {
     basePermalink: '/faq',
   },
 
-  // External URL for subscribe CTA (e.g., Mailchimp, Buttondown). Shown on blog & release notes when set.
-  subscribeUrl: '',
-  // External URL for feedback CTA (e.g., Google Form, Typeform). Shown on release note articles when set.
-  feedbackUrl: '',
+  // Subscribe CTA — shown on blog index & release notes when enabled
+  subscribe: {
+    enabled: false,
+    url: '', // external URL to subscription form (e.g., Mailchimp, Buttondown, ConvertKit)
+  },
 
-  // Blog layout — 'modern' (gradient hero + animated cards) or 'minimal' (clean list)
+  // Blog — set enabled: false to disable /blog routes and hide nav link
   blog: {
+    enabled: true,
     layout: 'minimal' as 'modern' | 'minimal',
   },
 
-  // Release notes layout — 'modern' (gradient hero + categorized sections) or 'changelog' (simple list)
+  // Release notes — set enabled: false to disable /release-notes routes and hide nav link
   releaseNotes: {
+    enabled: true,
     layout: 'changelog' as 'modern' | 'changelog',
   },
 

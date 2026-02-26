@@ -44,7 +44,7 @@ Then place it inside the `<article>` element, after the closing `</div>` of the 
         </article>
 ```
 
-The widget then renders automatically on every documentation topic. No per-page MDX changes are needed.
+The widget renders automatically on every documentation topic. No per-page MDX changes are needed.
 
 **Advantages:**
 - Consistent — every doc page gets the feedback prompt without authors having to remember to add it.
@@ -52,8 +52,8 @@ The widget then renders automatically on every documentation topic. No per-page 
 - No content clutter — MDX files stay focused on the topic content.
 
 **Disadvantages:**
-- All or nothing — every doc page gets the widget, including pages where feedback may not be relevant (e.g. changelogs, index pages).
-- To exclude specific pages, you would need to add conditional logic in the layout (e.g. checking `doc.meta` for an opt-out flag).
+- All or nothing — every doc page gets the widget, including pages where feedback might not be relevant (for example, changelogs, index pages).
+- To exclude specific pages, add conditional logic in the layout (for example, check `doc.meta` for an opt-out flag).
 
 ### Option B: Per-page via MDX
 
@@ -63,7 +63,7 @@ The component is registered globally in MDX, so you can add it selectively to in
 <Feedback />
 ```
 
-If you need to use it outside of MDX (e.g. in a custom page or layout), import it explicitly:
+If you need to use it outside of MDX (for example, in a custom page or layout), import it explicitly:
 
 ```tsx
 import { Feedback } from '@/components/custom/feedback'
@@ -72,11 +72,11 @@ import { Feedback } from '@/components/custom/feedback'
 **Advantages:**
 - Selective — you choose exactly which pages show the widget.
 - No layout changes — everything is controlled at the content level, so authors can add or remove it per topic.
-- Good for sites where only a subset of pages benefit from feedback (e.g. tutorials, guides) while others don't (e.g. reference tables, legal pages).
+- Good for sites where only a subset of pages benefit from feedback (for example, tutorials, guides) while others don't (for example, reference tables, legal pages).
 
 **Disadvantages:**
 - Easy to forget — authors must remember to add `<Feedback />` to each page that needs it.
-- Inconsistent — different pages may or may not have the widget depending on who authored them.
+- Inconsistent — different pages might not have the widget depending on who authored them.
 - Harder to audit — no single place to see which pages have feedback enabled.
 
 ### Which should I use?
@@ -85,11 +85,11 @@ For most documentation sites, **Option A (automatic)** is recommended. It ensure
 
 ## How it works
 
-1. The reader clicks thumbs up or thumbs down.
-2. A modal appears with contextual options (e.g. "Easy to follow" for likes, "Hard to understand" for dislikes).
+1. The reader selects thumbs up or thumbs down.
+2. A modal appears with contextual options (for example, "Easy to follow" for likes, "Hard to understand" for dislikes).
 3. If the reader selects "Provide details", a free-text field appears.
 4. On submit, the widget POSTs the data to your feedback API endpoint.
-5. A confirmation (or error) modal is shown.
+5. A confirmation or error modal is shown.
 
 ## Component structure
 
@@ -100,7 +100,7 @@ The component lives in a single file at `components/custom/feedback.tsx` and is 
 | `getBaseUrl()` | Determines the API endpoint URL based on the current environment (localhost vs production). |
 | `submitFeedback()` | Sends the feedback payload to the backend via `POST`. |
 | `Feedback` (main) | Renders the thumbs up/down prompt, manages state, and orchestrates the modals. |
-| Feedback modal | Displays contextual checkbox options and an optional text field after the reader clicks a thumb button. |
+| Feedback modal | Displays contextual checkbox options and an optional text field after the reader selects a thumb button. |
 | Thank-you modal | Confirms successful submission. |
 | Error modal | Shown on submission failure, with a link to report the issue on GitHub. |
 
@@ -134,7 +134,7 @@ The `getBaseUrl()` function in `lib/feedback-api.ts` determines where requests a
 | Development (`localhost`) | `http://localhost:3002/api/feedback` |
 | Production | `/api/feedback` (relative to your site origin) |
 
-If your backend lives at a different URL, update this function. For multi-environment deployments (e.g. dev, staging, production), you can extend the logic based on `window.location.hostname`:
+If your backend lives at a different URL, update this function. For multi-environment deployments (for example, dev, staging, production), you can extend the logic based on `window.location.hostname`:
 
 ```ts title="lib/feedback-api.ts"
 export function getBaseUrl() {
@@ -265,7 +265,7 @@ The `api/` directory has its own `package.json` and `node_modules` — it runs a
 
 Below are complete, runnable Express.js backends for each supported database. Each implementation includes both endpoints (`POST /api/feedback/submit` and `GET /api/feedback/summary`) with input validation, CORS, date filtering, and aggregation. Pick the one that matches your stack.
 
-All servers run on port `3002` by default, matching the `getBaseUrl()` development configuration. Start your docs site with `npm run dev` and both the widget and dashboard will connect automatically.
+All servers run on port `3002` by default, matching the `getBaseUrl()` development configuration. Start your docs site with `npm run dev`. Both the widget and dashboard connect automatically.
 
 ### CORS configuration
 
@@ -429,7 +429,7 @@ MONGODB_URI=mongodb://localhost:27017 node server.js
 
 | Variable | Required | Description |
 |---|---|---|
-| `MONGODB_URI` | Yes | MongoDB connection string (e.g. `mongodb://localhost:27017` or your Atlas URI). |
+| `MONGODB_URI` | Yes | MongoDB connection string (for example, `mongodb://localhost:27017` or your Atlas URI). |
 | `PORT` | No | Server port. Defaults to `3002`. |
 
 **Hosting options:** MongoDB Atlas (free tier available), or self-hosted.
@@ -584,7 +584,7 @@ COSMOS_ENDPOINT=https://your-account.documents.azure.com:443/ COSMOS_KEY=your-pr
 
 | Variable | Required | Description |
 |---|---|---|
-| `COSMOS_ENDPOINT` | Yes | Cosmos DB account URI (e.g. `https://your-account.documents.azure.com:443/`). |
+| `COSMOS_ENDPOINT` | Yes | Cosmos DB account URI (for example, `https://your-account.documents.azure.com:443/`). |
 | `COSMOS_KEY` | Yes | Cosmos DB primary or secondary key. |
 | `PORT` | No | Server port. Defaults to `3002`. |
 
@@ -922,7 +922,7 @@ To change the options presented to readers, edit the `LikeOptions` and `DislikeO
 
 ## Feedback Dashboard
 
-Trellis includes a built-in dashboard for viewing and analyzing collected feedback. It is intended for doc admins and content owners — not site readers — and is accessed directly at `/feedback-dashboard/`. It is not linked in the site navigation.
+Trellis includes a built-in dashboard for viewing and analyzing collected feedback. It is intended for doc admins and content owners — not site readers — and is accessed directly at `/feedback-dashboard/`.
 
 ### Accessing the dashboard
 
@@ -937,7 +937,7 @@ http://localhost:3000/feedback-dashboard/
 | Section | Description |
 |---|---|
 | Metric cards | Total feedback count, likes, dislikes, and overall satisfaction rate. |
-| Feedback by page | Sortable table of every page that received feedback, with inline satisfaction bars. Click column headers to sort. |
+| Feedback by page | Sortable table of every page that received feedback, with inline satisfaction bars. Select column headers to sort. |
 | Feedback reasons | Horizontal bar chart showing how often each option was selected, split into positive and negative. |
 | Recent feedback | Chronological list of individual entries with option pills, comments, and relative timestamps. |
 
@@ -968,9 +968,9 @@ The dashboard is composed of modular sub-components in `components/custom/feedba
 
 ## Troubleshooting
 
-- **Modal not opening:** Verify that the `Feedback` component is rendered client-side. It uses the `'use client'` directive, so it should work in any MDX page or layout, but will not work if imported from a server component at module scope.
+- **Modal not opening:** Verify that the `Feedback` component is rendered client-side. It uses the `'use client'` directive, so it works in any MDX page or layout, but not if imported from a server component at module scope.
 - **Feedback not submitting:** Check the Network tab in browser DevTools for errors in the `POST` request. Confirm that your backend is running and the URL in `getBaseUrl()` matches your setup.
-- **CORS errors in development:** If your backend runs on a different port (e.g. `3002`) than the dev server, ensure the backend sets appropriate `Access-Control-Allow-Origin` headers.
-- **API endpoint returning errors:** Verify your backend logs for exceptions during feedback processing. Confirm the database connection is healthy.
+- **CORS errors in development:** If your backend runs on a different port (for example, `3002`) than the dev server, ensure the backend sets appropriate `Access-Control-Allow-Origin` headers.
+- **API endpoint returning errors:** Check your backend logs for exceptions during feedback processing. Confirm the database connection is healthy.
 - **"Report the issue" link broken:** Check that `siteConfig.repoUrl` in `config/site.ts` points to a valid GitHub repository.
 - **Dashboard shows "Unable to load feedback data":** Your backend must provide a `GET /api/feedback/summary` endpoint. Check that it is running and returns the expected JSON shape described above.

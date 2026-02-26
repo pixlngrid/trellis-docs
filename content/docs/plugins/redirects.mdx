@@ -9,12 +9,12 @@ last_update:
 
 The redirects plugin reads a JSON file of redirect rules and generates HTML pages with meta-refresh redirects at build time.
 
-## How It Works
+## How it works
 
-1. **Reads** redirect definitions from `redirects.json` (or a file specified in config)
-2. **Generates** an HTML file for each redirect source at build time
-3. Each HTML file contains a `<meta http-equiv="refresh">` tag and a JavaScript fallback
-4. Both `path.html` and `path/index.html` are created to handle trailing slash variations
+1. **Reads** redirect definitions from `redirects.json` (or a file specified in config).
+2. **Generates** an HTML file for each redirect source at build time.
+3. **Embeds** a `<meta http-equiv="refresh">` tag and a JavaScript fallback in each HTML file.
+4. **Creates** both `path.html` and `path/index.html` to handle trailing slash variations.
 
 ## Configuration
 
@@ -35,7 +35,7 @@ The plugin also supports inline redirects in the config:
 }]
 ```
 
-## Redirect File Format
+## Redirect file format
 
 Create a `redirects.json` file at the project root:
 
@@ -65,7 +65,7 @@ Create a `redirects.json` file at the project root:
 | `to` | Yes | — | The destination URL (relative path or absolute URL) |
 | `type` | No | `301` | HTTP redirect type (used for documentation; the actual redirect uses meta-refresh) |
 
-## Trailing Slash Handling
+## Trailing slash handling
 
 The plugin respects the `trailingSlash` setting in `config/site.ts`:
 
@@ -73,7 +73,7 @@ The plugin respects the `trailingSlash` setting in `config/site.ts`:
 - **`trailingSlash: false`** — strips trailing slashes from `to` URLs
 - **`trailingSlash: undefined`** — uses `to` URLs as-is
 
-## Auto-Detection
+## Auto-detection
 
 If `redirectsFile` is not specified, the plugin automatically checks these locations:
 
@@ -83,7 +83,7 @@ If `redirectsFile` is not specified, the plugin automatically checks these locat
 
 The first valid file found is used.
 
-## Generated Output
+## Generated output
 
 For a redirect `{ "from": "/old-page/", "to": "/new-page/" }`, the plugin creates:
 

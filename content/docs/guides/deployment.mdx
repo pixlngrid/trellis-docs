@@ -9,7 +9,7 @@ last_update:
 
 {vars.productName} uses Next.js [static export](https://nextjs.org/docs/app/building-your-application/deploying/static-exports) to generate a fully static site. The output is a plain `out/` directory that can be deployed anywhere — no Node.js server required.
 
-## Build Pipeline
+## Build pipeline
 
 Run the full build with:
 
@@ -28,7 +28,7 @@ This executes four steps in sequence:
 During development, only the token step runs automatically. Use `npm run dev` to start the dev server on `http://localhost:3000`.
 :::
 
-## Output Structure
+## Output structure
 
 After building, the `out/` directory contains everything needed to serve the site:
 
@@ -54,7 +54,7 @@ Upload or serve the contents of `out/` with any static hosting provider.
 
 ### Vercel
 
-Connect your Git repository and Vercel will detect Next.js automatically:
+Connect your Git repository. Vercel detects Next.js automatically:
 
 - **Build command:** `npm run build`
 - **Output directory:** `out`
@@ -115,11 +115,11 @@ aws s3 sync out/ s3://your-bucket-name --delete
 aws cloudfront create-invalidation --distribution-id YOUR_DIST_ID --paths "/*"
 ```
 
-### Any Static Host
+### Any static host
 
 The `out/` folder is self-contained. Upload it to any web server or CDN that can serve static files — Apache, Nginx, Cloudflare Pages, Firebase Hosting, etc.
 
-## Configuration Reference
+## Configuration reference
 
 Key settings in `next.config.mjs` that affect deployment:
 

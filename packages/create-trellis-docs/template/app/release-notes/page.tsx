@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { getAllReleaseNotes } from '@/lib/content'
 import { siteConfig } from '@/config/site'
 import { Navbar } from '@/components/docs/navbar'
@@ -10,6 +11,7 @@ export const metadata = {
 }
 
 export default async function ReleaseNotesIndex() {
+  if (!(siteConfig as any).releaseNotes?.enabled) notFound()
   const notes = await getAllReleaseNotes()
   const layout = (siteConfig as any).releaseNotes?.layout ?? 'changelog'
 

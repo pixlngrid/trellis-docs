@@ -9,7 +9,7 @@ last_update:
 
 This guide walks through customizing design tokens to match your brand.
 
-## Changing Brand Colors
+## Changing brand colors
 
 Open `design-tokens.json` and update the `brand` section. The default uses a navy blue scale:
 
@@ -38,13 +38,13 @@ After editing, regenerate the CSS:
 npm run build-tokens
 ```
 
-Or simply restart the dev server — it runs `build-tokens` automatically:
+Or restart the dev server — it runs `build-tokens` automatically:
 
 ```bash
 npm run dev
 ```
 
-## Changing Accent Colors
+## Changing accent colors
 
 The `accent` section controls secondary colors used for interactive elements like links and highlights in dark mode:
 
@@ -64,9 +64,9 @@ The `accent` section controls secondary colors used for interactive elements lik
 When choosing accent colors, ensure sufficient contrast against both light and dark backgrounds. The `400` shade is used most often.
 :::
 
-## Adding New Tokens
+## Adding tokens
 
-Add new categories or tokens by extending the JSON structure:
+Add categories or tokens by extending the JSON structure:
 
 ```json title="Adding a secondary brand color"
 {
@@ -77,7 +77,7 @@ Add new categories or tokens by extending the JSON structure:
 }
 ```
 
-This generates:
+The build script generates:
 
 ```css
 --color-brand-secondary-600: #2563eb;
@@ -91,7 +91,7 @@ You can then use it in `app/globals.css` or any component:
 }
 ```
 
-## Changing Typography
+## Changing typography
 
 Update the font family in the `typography` section:
 
@@ -112,7 +112,7 @@ If using a web font, add the import in `app/globals.css`:
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 ```
 
-## Replacing the Logo
+## Replacing the logo
 
 Trellis ships with built-in SVG logo components. To use your own logo:
 
@@ -151,17 +151,17 @@ Keep `useBuiltIn: true` in `config/site.ts` to use these components.
 Logo text elements use `fill="currentColor"` so they automatically adapt to light and dark mode. Follow this pattern for your own SVG components.
 :::
 
-## Full Rebranding Checklist
+## Full rebranding checklist
 
-1. **Colors** — Update `brand` and `accent` sections in `design-tokens.json`
-2. **Typography** — Update `typography.fontFamily` (add web font import if needed)
-3. **Logo** — Replace images in `public/img/` or update components in `components/brand/`
-4. **Config** — Update `title`, `tagline`, `url`, `repoUrl`, and `logo` in `config/site.ts`
-5. **Navigation** — Update links in `config/navigation.ts` and copyright in `footerConfig`
-6. **Regenerate** — Run `npm run build-tokens`
-7. **Verify** — Run `npm run build` and check for errors, then `npm run dev` for visual review
+1. **Colors** — Update `brand` and `accent` sections in `design-tokens.json`.
+2. **Typography** — Update `typography.fontFamily` (add web font import if needed).
+3. **Logo** — Replace images in `public/img/` or update components in `components/brand/`.
+4. **Config** — Update `title`, `tagline`, `url`, `repoUrl`, and `logo` in `config/site.ts`.
+5. **Navigation** — Update links in `config/navigation.ts` and copyright in `footerConfig`.
+6. **Regenerate** — Run `npm run build-tokens`.
+7. **Verify** — Run `npm run build` and check for errors, then `npm run dev` for visual review.
 
-## Token Naming Conventions
+## Token naming conventions
 
 Follow these conventions for consistency:
 

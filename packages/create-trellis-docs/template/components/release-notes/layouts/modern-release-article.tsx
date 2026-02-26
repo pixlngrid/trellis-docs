@@ -6,7 +6,6 @@ import { rehypeCodeMeta } from '@/lib/rehype-code-meta'
 import { ArrowLeft, Calendar, Sparkles, Zap, Bug, Trash2 } from 'lucide-react'
 import { mdxComponents } from '@/components/docs/mdx'
 import { formatReleaseDate, parseReleaseSections, countTotalChanges } from '@/lib/release-notes-utils'
-import { FeedbackCTA } from '@/components/shared/ctas'
 import type { ReleaseArticleLayoutProps } from './types'
 import type { ReleaseSection } from '@/lib/release-notes-utils'
 
@@ -73,8 +72,6 @@ export function ModernReleaseArticle({ note }: ReleaseArticleLayoutProps) {
           <SectionCard key={index} section={section} />
         ))}
 
-        {/* Feedback CTA */}
-        <FeedbackCTA />
       </article>
     </>
   )
