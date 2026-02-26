@@ -1,5 +1,10 @@
 ---
 title: Getting Started
+description: Get up and running with the Trellis docs framework.
+keywords: [getting-started, setup, introduction]
+last_update:
+  date: 02/20/2026
+  author: Trellis
 ---
 
 Welcome to your documentation site powered by **{vars.productName}**.

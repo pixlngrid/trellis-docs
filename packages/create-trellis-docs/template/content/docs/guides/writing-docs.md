@@ -1,5 +1,8 @@
 ---
 title: Writing Documentation
+last_update:
+  date: 02/20/2026
+  author: Trellis
 ---
 
 Learn how to write and organize your documentation content.
