@@ -9,7 +9,7 @@ last_update:
 
 {vars.productName} uses a design token system that converts a single JSON file into CSS custom properties. This gives you a centralized place to define your brand colors, spacing, typography, and other design values.
 
-## How It Works
+## How it works
 
 ```
 design-tokens.json  →  build-tokens.js  →  app/tokens.css  →  globals.css
@@ -22,7 +22,7 @@ design-tokens.json  →  build-tokens.js  →  app/tokens.css  →  globals.css
 
 The script runs automatically before `npm run dev` and `npm run build` (via the `prebuild` and `predev` npm scripts).
 
-## Token File Structure
+## Token file structure
 
 ```json title="design-tokens.json"
 {
@@ -63,7 +63,7 @@ The build script converts nested keys into CSS custom property names using `--` 
 }
 ```
 
-## Token Categories
+## Token categories
 
 The default `design-tokens.json` includes these categories:
 
@@ -78,7 +78,7 @@ The default `design-tokens.json` includes these categories:
 | `border-width` | `border-width-1/2/none` | Border width values |
 | `typography` | `fontFamily` | Font family stack |
 
-## Using Tokens in CSS
+## Using tokens in CSS
 
 Reference generated tokens in `globals.css` or any CSS module:
 
@@ -91,7 +91,7 @@ Reference generated tokens in `globals.css` or any CSS module:
 }
 ```
 
-## Mapping to Theme Variables
+## Mapping to theme variables
 
 `globals.css` maps tokens to theme CSS variables so the entire theme responds to token changes:
 

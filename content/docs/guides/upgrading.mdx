@@ -17,12 +17,12 @@ Run from your project root:
 npx create-trellis-docs@latest upgrade
 ```
 
-This will:
-- Copy updated framework files (components, lib, scripts, app routes)
-- Merge new dependencies and scripts into your `package.json`
-- Skip your user files (`config/`, `content/`, `public/`, `components/brand/`)
+This command:
+- Copies updated framework files (components, lib, scripts, app routes)
+- Merges new dependencies and scripts into your `package.json`
+- Skips your user files (`config/`, `content/`, `public/`, `components/brand/`)
 
-Preview what would change without modifying anything:
+Preview what changes without modifying anything:
 
 ```bash title="Terminal"
 npx create-trellis-docs@latest upgrade --dry-run
@@ -46,9 +46,9 @@ The CLI upgrade does not modify your `config/site.ts`. Check the version-specifi
 
 If you prefer to upgrade manually, or are upgrading from a version older than v1.6.2:
 
-1. **Check the release notes** — Read the [release notes](/release-notes/) for all versions between your current version and the target
-2. **Follow the version-specific steps below** — Each section lists the exact files and dependencies to update
-3. **Install and build** — Run `npm install` then `npm run build` to verify everything works
+1. **Check the release notes** — Read the [release notes](/release-notes/) for all versions between your current version and the target.
+2. **Follow the version-specific steps below** — Each section lists the exact files and dependencies to update.
+3. **Install and build** — Run `npm install` then `npm run build` to verify everything works.
 
 :::tip
 To see the full latest template, scaffold a fresh project in a temporary directory with `npx create-trellis-docs@latest temp-docs` and diff it against your project. This is a reference copy for comparison — don't run the scaffolder inside your existing project.
@@ -60,7 +60,7 @@ To see the full latest template, scaffold a fresh project in a temporary directo
 
 ### `lightningcss` or `@tailwindcss/oxide` errors on Windows
 
-If your `.npmrc` contains `os = "linux"`, npm will skip Windows-specific optional dependencies. Fix by running:
+If your `.npmrc` contains `os = "linux"`, npm skips Windows-specific optional dependencies. Fix by running:
 
 ```bash title="Terminal"
 npm install --os=win32
@@ -79,7 +79,7 @@ Or add the Windows binaries to your `package.json`:
 
 ### `.next/trace` EPERM error during build
 
-On Windows, a stale Node.js process may hold a lock on the `.next` directory. Kill all Node processes and clean the build cache:
+On Windows, a stale Node.js process might hold a lock on the `.next` directory. Kill all Node processes and clean the build cache:
 
 ```bash title="Terminal"
 taskkill /f /im node.exe
@@ -89,7 +89,7 @@ npm run build
 
 ### `vars is not defined` in MDX
 
-Make sure the `MDXRemote` options include the `scope` property:
+Ensure the `MDXRemote` options include the `scope` property:
 
 ```tsx title="MDXRemote usage"
 <MDXRemote
@@ -104,4 +104,4 @@ Make sure the `MDXRemote` options include the `scope` property:
 
 ### Build fails with "Could not parse expression with acorn"
 
-This occurs if `rehype-mdx-code-props` is installed — it tries to parse code block meta strings like `{2,4-5}` as JavaScript expressions. Remove it and use the custom `rehypeCodeMeta` plugin from `lib/rehype-code-meta.ts` instead.
+This error occurs when `rehype-mdx-code-props` is installed. It tries to parse code block meta strings like `{2,4-5}` as JavaScript expressions. Remove it and use the custom `rehypeCodeMeta` plugin from `lib/rehype-code-meta.ts` instead.

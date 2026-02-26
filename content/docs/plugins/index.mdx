@@ -9,17 +9,17 @@ last_update:
 
 {vars.productName} bundles five plugins that extend the framework with search, FAQ indexing, redirects, image zoom, and diagram pan/zoom.
 
-## Bundled Plugins
+## Bundled plugins
 
 | Plugin | Type | Description |
 |--------|------|-------------|
 | [Smart Search](/plugins/smart-search/) | Build-time + client | Full-text search with Fuse.js — no external service required |
 | [FAQ Index](/plugins/faq-index/) | Build-time | Auto-generates a searchable FAQ table of contents from `###` headings |
 | [Redirects](/plugins/redirects/) | Build-time | Manages URL redirects via JSON — generates HTML meta-refresh pages |
-| Image Lightbox | Client-side | Click-to-zoom on any markdown image — no markup changes needed |
+| Image Lightbox | Client-side | Select to zoom on any markdown image |
 | Mermaid Pan/Zoom | Client-side | Pan and zoom on Mermaid diagrams |
 
-## Plugin Registration
+## Plugin registration
 
 All plugins are registered in `config/site.ts`:
 
@@ -55,7 +55,7 @@ plugins: [
 
 ## Image Lightbox
 
-The lightbox plugin automatically makes all images in markdown content zoomable. Click any image to open it in a full-screen overlay. No special syntax needed — standard markdown images work:
+The lightbox plugin makes all images in markdown content zoomable. Select any image to open it in a full-screen overlay. Standard markdown images work:
 
 ```markdown
 ![Screenshot of the dashboard](./images/dashboard.png)
@@ -75,7 +75,7 @@ The lightbox plugin automatically makes all images in markdown content zoomable.
 
 ## Mermaid Pan/Zoom
 
-Mermaid diagrams are rendered with built-in Mermaid support and enhanced with pan/zoom. This is configured in the theme config:
+The framework renders Mermaid diagrams with built-in support and enhances them with pan/zoom. Configure this in the theme config:
 
 ```ts title="config/site.ts"
 themeConfig: {
@@ -87,4 +87,4 @@ themeConfig: {
 },
 ```
 
-Users can scroll-wheel to zoom in/out and click-drag to pan. Double-click resets to the original view.
+Scroll to zoom in and out, and click-drag to pan. Double-select resets to the original view.

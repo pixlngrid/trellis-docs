@@ -7,9 +7,9 @@ last_update:
   author: Trellis
 ---
 
-{vars.productName} includes several reusable React components you can import and use in your MDX files.
+{vars.productName} includes several reusable React components you can import and use in your MDX (Markdown with JSX, a format that lets you use React components inside Markdown files) files.
 
-## Included Components
+## Included components
 
 | Component | Location | Description |
 |-----------|----------|-------------|
@@ -20,7 +20,7 @@ last_update:
 | [FlippingCard](/components/flipping-card/) | `components/custom/flipping-card.tsx` | Interactive flip cards with quiz/option selection support |
 | Search | `components/docs/search/search-dialog.tsx` | Search UI with dialog, powered by Fuse.js (Cmd+K) |
 
-## Using Components in MDX
+## Using components in MDX
 
 Import any component at the top of your MDX file:
 
@@ -40,7 +40,7 @@ The `@/` alias resolves to your project root directory.
 
 ## Search
 
-The search component is already wired into the navbar. It renders a search icon that opens a dialog with instant search results. You typically don't need to import this directly — it's built into the navbar and accessible via **Cmd+K** (Mac) or **Ctrl+K** (Windows/Linux).
+The search component renders a search icon that opens a dialog with instant search results. You typically don't need to import this directly — it's accessible via **Cmd+K** (Mac) or **Ctrl+K** (Windows/Linux).
 
 ## Tooltip
 

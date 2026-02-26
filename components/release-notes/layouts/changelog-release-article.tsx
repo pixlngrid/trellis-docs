@@ -6,7 +6,6 @@ import { rehypeCodeMeta } from '@/lib/rehype-code-meta'
 import { ChevronLeft } from 'lucide-react'
 import { mdxComponents } from '@/components/docs/mdx'
 import { formatReleaseDate } from '@/lib/release-notes-utils'
-import { FeedbackCTA } from '@/components/shared/ctas'
 import type { ReleaseArticleLayoutProps } from './types'
 
 const sectionColors: Record<string, string> = {
@@ -84,10 +83,6 @@ export function ChangelogReleaseArticle({ note }: ReleaseArticleLayoutProps) {
           />
         </div>
 
-        {/* Feedback CTA */}
-        <div className="mt-8">
-          <FeedbackCTA />
-        </div>
       </article>
     </div>
   )

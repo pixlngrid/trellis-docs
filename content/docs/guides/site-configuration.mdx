@@ -16,7 +16,7 @@ After scaffolding a project, the first thing you'll want to do is configure it f
 | `config/sidebar.ts` | Documentation sidebar structure |
 | `config/variables.ts` | Reusable content variables for MDX pages |
 
-## Site Settings
+## Site settings
 
 `config/site.ts` is the main configuration file. It controls your site's identity, branding, and optional features.
 
@@ -43,7 +43,7 @@ After scaffolding a project, the first thing you'll want to do is configure it f
 | `logo.alt` | Alt text for the logo image |
 | `logo.useBuiltIn` | When `true`, renders the SVG component from `components/brand/` instead of an `<img>` tag |
 
-### Color Mode
+### Color mode
 
 | Setting | Description |
 |---------|-------------|
@@ -67,57 +67,59 @@ The built-in search indexes all documentation pages at build time. You can tune 
 
 See [Smart Search](/plugins/smart-search/) for more details.
 
-### Blog Layout
+### Blog
 
-Choose between two blog designs. Change the `layout` value to switch instantly — no other changes needed.
+Set `enabled: false` to disable the `/blog` route and hide the Blog link from the navigation. When enabled, choose between two layouts.
 
-| Value | Description |
-|-------|-------------|
+| Layout | Description |
+|--------|-------------|
 | `'minimal'` | Clean typography-driven list with featured post hero and simple article pages |
 | `'modern'` | Gradient heroes, animated card grid, author bio cards, and related posts |
 
 ```ts title="config/site.ts"
 blog: {
+  enabled: true,
   layout: 'minimal' as 'modern' | 'minimal',
 },
 ```
 
-### Release Notes Layout
+### Release notes
 
-Choose between two release notes designs. The content sections (`## Added`, `## Changed`, `## Fixed`, `## Removed`) are automatically detected and styled.
+Set `enabled: false` to disable the `/release-notes` route and hide the Release Notes link from the navigation. When enabled, choose between two layouts. {vars.productName} automatically detects and styles the content sections (`## Added`, `## Changed`, `## Fixed`, `## Removed`).
 
-| Value | Description |
-|-------|-------------|
+| Layout | Description |
+|--------|-------------|
 | `'changelog'` | Simple card list with colored section badges — classic changelog style |
 | `'modern'` | Gradient featured hero, icon-decorated section cards with item counts |
 
 ```ts title="config/site.ts"
 releaseNotes: {
+  enabled: true,
   layout: 'changelog' as 'modern' | 'changelog',
 },
 ```
 
-### Subscribe & Feedback CTAs
+### Subscribe call-to-action (CTA)
 
-Optional call-to-action blocks that appear on blog and release notes pages. Both fields accept a URL or an email address (auto-detected and converted to `mailto:`).
+An optional email subscription form shown on the blog index and release notes index pages. When enabled, a dark gradient card with an email input and "Subscribe" button appears at the bottom of each page. The form POSTs `{ email }` as JSON to your configured URL.
 
 | Setting | Description |
 |---------|-------------|
-| `subscribeUrl` | External subscribe link (e.g., Mailchimp, Buttondown, or an email address). Shown on blog and release notes landing pages when set. |
-| `feedbackUrl` | External feedback link (e.g., Google Form, Typeform, or an email address). Shown on release note articles when set. |
+| `subscribe.enabled` | Set to `true` to show the subscribe form |
+| `subscribe.url` | The endpoint that receives the POST request (e.g., Mailchimp, Buttondown, ConvertKit, or a custom API) |
 
 ```ts title="config/site.ts"
-subscribeUrl: 'https://buttondown.com/your-newsletter',
-feedbackUrl: 'https://forms.gle/your-form-id',
+subscribe: {
+  enabled: true,
+  url: 'https://buttondown.com/api/emails/your-newsletter',
+},
 ```
 
-The subscribe CTA renders a dark gradient card with a "Subscribe" button. The feedback CTA renders "Share Feedback" and "Report an Issue" buttons — the issue button links to `repoUrl/issues` automatically.
+When `enabled` is `false` or `url` is empty, the subscribe form is hidden. No setup needed by default.
 
-When either field is empty (`''`), the corresponding CTA is hidden. No setup needed by default.
+### Role chip colors
 
-### Role Chip Colors
-
-Customize the background color of role chips per role name. Text color is automatically calculated (black or white) based on contrast.
+Customize the background color of role chips per role name. {vars.productName} automatically calculates text color (black or white) based on contrast.
 
 ```ts title="config/site.ts"
 roleColor: {
@@ -130,11 +132,11 @@ roleColor: {
 
 Roles not listed in `roleColor` fall back to the theme's `--primary` color. This setting is optional — omit it entirely to use the default color for all roles.
 
-### Feature Flags
+### Feature flags
 
-These features are disabled by default. To enable one, set its `enabled` property to `true` and configure the related settings. Each feature has a dedicated guide with full setup instructions.
+Several features can be toggled with an `enabled` property. Blog and release notes are enabled by default — set `enabled: false` to turn them off. The features below are disabled by default. Each has a dedicated guide with full setup instructions.
 
-#### API Documentation
+#### API documentation
 
 Render OpenAPI/Swagger specs as interactive API reference pages. Place your spec files (YAML or JSON) in the `specDir` directory. See the [API Documentation](/plugins/api-docs/) guide.
 
@@ -180,7 +182,7 @@ After enabling, run the snapshot script to create your first version:
 npm run version:snapshot 1.0.0
 ```
 
-### Full Example
+### Full example
 
 ```ts title="config/site.ts"
 export const siteConfig = {
@@ -227,12 +229,16 @@ export const siteConfig = {
     faqDir: 'content/docs/faq',
     basePermalink: '/faq',
   },
-  subscribeUrl: 'https://buttondown.com/acme-docs',
-  feedbackUrl: 'https://forms.gle/acme-feedback',
+  subscribe: {
+    enabled: true,
+    url: 'https://buttondown.com/api/emails/acme-docs',
+  },
   blog: {
+    enabled: true,
     layout: 'minimal' as 'modern' | 'minimal',
   },
   releaseNotes: {
+    enabled: true,
     layout: 'changelog' as 'modern' | 'changelog',
   },
   apiDocs: {
@@ -298,7 +304,7 @@ export const footerConfig = {
 
 `config/sidebar.ts` defines the documentation sidebar. It exports a `mainSidebar` array of items that can be nested to any depth.
 
-### Item Types
+### Item types
 
 | Type | Fields | Description |
 |------|--------|-------------|
@@ -338,7 +344,7 @@ export const mainSidebar: SidebarItem[] = [
 The `id` field maps to a file path under `content/docs/`. For example, `id: 'guides/writing-docs'` resolves to `content/docs/guides/writing-docs.mdx` (or `.md`).
 :::
 
-## Content Variables
+## Content variables
 
 `config/variables.ts` defines key-value pairs that you can reference in any MDX page using `{vars.key}`.
 
@@ -359,7 +365,7 @@ Welcome to {vars.productName} version {vars.version}.
 
 This renders as: "Welcome to Acme Platform version 2.1.0."
 
-Variables are injected at build time, so changes require restarting the dev server or rebuilding.
+{vars.productName} injects variables at build time, so changes require restarting the dev server or rebuilding.
 
 :::tip
 After scaffolding, start by customizing `config/site.ts` (your site identity and logo) and `config/sidebar.ts` (your page structure). The other two files work well with their defaults.

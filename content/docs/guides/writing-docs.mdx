@@ -13,9 +13,9 @@ This guide covers the markdown features available in the {vars.productName} docs
 
 Use standard markdown headings (`##`, `###`, `####`). Each heading automatically gets an anchor link with a copy-to-clipboard button on hover.
 
-## Code Blocks
+## Code blocks
 
-Fenced code blocks support syntax highlighting via [Shiki](https://shiki.style/) with dual light/dark themes. Just specify the language after the opening fence:
+Fenced code blocks (blocks delimited by triple backticks) support syntax highlighting via [Shiki](https://shiki.style/) with dual light/dark themes. Specify the language after the opening fence:
 
 ```javascript
 function greet(name) {
@@ -37,7 +37,7 @@ spec:
 
 Every code block includes a **copy button** and a **word wrap toggle** that appear on hover in the top-right corner.
 
-### Title Bar
+### Title bar
 
 Add a filename or label above a code block with `title="..."` in the meta string:
 
@@ -55,7 +55,7 @@ export const siteConfig = {
 }
 ```
 
-The title bar appears above the code block with a muted background. Code blocks without a `title` render normally with no extra bar.
+The title bar appears above the code block with a muted background.
 
 You can combine `title` with other meta features like line highlighting:
 
@@ -73,9 +73,9 @@ export const siteConfig = {
 }
 ```
 
-### Highlighting Lines
+### Highlighting lines
 
-You can highlight specific lines by adding line numbers in curly braces after the language:
+Highlight specific lines by adding line numbers in curly braces after the language:
 
 ````md
 ```js {2,4-5}
@@ -95,9 +95,9 @@ const d = 4
 const e = 5
 ```
 
-### Inline Highlight Comments
+### Inline highlight comments
 
-You can highlight individual lines using an inline comment. The comment is removed from the rendered output:
+Highlight individual lines using an inline comment. The comment is removed from the rendered output:
 
 ````md
 ```js
@@ -111,7 +111,7 @@ const regular = true
 const highlighted = true // [!code highlight]
 ```
 
-### Diff Lines
+### Diff lines
 
 Show added and removed lines with `[!code ++]` and `[!code --]`:
 
@@ -131,7 +131,7 @@ const config = {
 }
 ```
 
-### Focus Lines
+### Focus lines
 
 Dim all lines except the focused ones. Non-focused lines become visible on hover:
 
@@ -149,7 +149,7 @@ const b = 2 // [!code focus]
 const c = 3
 ```
 
-### Comment Syntax by Language
+### Comment syntax by language
 
 The inline notations (`[!code highlight]`, `[!code ++]`, `[!code --]`, `[!code focus]`) use the comment syntax of the code block's language. Here are the most common:
 
@@ -169,14 +169,14 @@ server:
   port: 8080 # [!code highlight]
 ```
 
-### Best Practices
+### Best practices
 
-- **Use `title` for filenames** — When showing config files or code that readers will create, add `title="path/to/file"` so they know where to put it
-- **Use meta line numbers for multiple highlights** — `{2,4-5}` is cleaner than adding `[!code highlight]` to every line
-- **Use inline comments for single-line emphasis** — `[!code highlight]` is better when you want to draw attention to one specific line in a longer block
-- **Use diff notation for before/after** — `[!code ++]` and `[!code --]` are clearer than describing changes in prose
-- **Use focus for teaching** — `[!code focus]` dims everything except the important lines, which is ideal for tutorials where you want to draw attention to a specific part of a larger snippet
-- **Don't mix meta highlights with inline highlights** — Pick one approach per code block. Using both can produce unexpected results
+- **Use `title` for filenames** — When showing config files or code that readers create, add `title="path/to/file"` so they know where to put it.
+- **Use meta line numbers for multiple highlights** — `{2,4-5}` is cleaner than adding `[!code highlight]` to every line.
+- **Use inline comments for single-line emphasis** — `[!code highlight]` is better when you want to highlight one specific line in a longer block.
+- **Use diff notation for before/after** — `[!code ++]` and `[!code --]` are clearer than describing changes in prose.
+- **Use focus for teaching** — `[!code focus]` dims everything except the important lines, which is ideal for tutorials where you need to highlight a specific part of a larger snippet.
+- **Don't mix meta highlights with inline highlights** — Pick one approach per code block. Using both can produce unexpected results.
 
 ## Admonitions
 
@@ -259,11 +259,11 @@ pnpm add @pixlngrid/trellis
 | Feature | Status | Description |
 |---------|--------|-------------|
 | Smart Search | Available | Full-text search with configurable weights |
-| Lightbox | Available | Click-to-zoom for images |
+| Lightbox | Available | Select-to-zoom for images |
 | Mermaid | Available | Diagram rendering with pan/zoom |
 | FAQ Index | Available | Auto-generated FAQ table of contents |
 
-## Mermaid Diagrams
+## Mermaid diagrams
 
 ```mermaid
 graph LR
@@ -276,9 +276,9 @@ graph LR
 ## Details/Collapsible
 
 <details>
-  <summary>Click to expand</summary>
+  <summary>Select to expand</summary>
 
-  This content is hidden by default and shown when the user clicks the summary.
+  This content is hidden by default and shown when you select the summary.
 
   You can include any markdown content here, including:
   - Lists

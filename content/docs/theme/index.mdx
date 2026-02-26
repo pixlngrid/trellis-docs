@@ -9,24 +9,11 @@ last_update:
 
 {vars.productName} includes custom theme components that provide a customized look and improved UX out of the box.
 
-## Custom Components
+## Custom components
 
 {vars.productName} uses fully custom theme components. This gives complete control over every aspect of rendering — from where the last-updated date appears to what icons admonitions use.
 
-## What's Customized
-
-The significant customizations are:
-
-| Area | What changed | Details |
-|------|-------------|---------|
-| [Last Updated](/theme/last-updated/) | Date moved to page top | Appears right below the title instead of at the bottom |
-| [Heading Anchors](/theme/heading-anchors/) | Copy-to-clipboard | Click the link icon to copy the heading URL |
-| [Tabs](/theme/tabs/) | URL sync + pill styling | Tab selection saved to URL query params, pill-style design |
-| [Admonitions](/theme/admonitions/) | Custom SVG icons | Each type (note, tip, info, caution, danger) has a unique icon |
-| Sidebar | Enhanced styling | Accent colors, hover states, active indicators via CSS tokens |
-| Dark mode | Default to dark | Ships with dark mode as default, respects system preference |
-
-## Directory Structure
+## Directory structure
 
 ```
 components/docs/
@@ -48,7 +35,7 @@ components/docs/
 └── footer.tsx               # Site footer
 ```
 
-## Modifying Theme Components
+## Modifying theme components
 
 To customize a component, edit it directly in `components/docs/`.
 
@@ -57,5 +44,5 @@ Before making changes, read the existing component code to understand what it do
 :::
 
 :::caution
-Since these are custom components, they are maintained within the Trellis project. When upgrading Next.js, check for any breaking changes that may affect theme components.
+Since these are custom components, they are maintained within the Trellis project. When upgrading Next.js, check for any breaking changes that might affect theme components.
 :::

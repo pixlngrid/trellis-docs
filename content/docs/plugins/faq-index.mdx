@@ -9,9 +9,9 @@ last_update:
 
 The FAQ index plugin scans your FAQ directory for `###` headings, treats each one as a question, and exposes the data so the `FaqTableOfContents` component can render a searchable, filterable question list.
 
-## How It Works
+## How it works
 
-1. **Scans** all `.mdx` and `.md` files in the configured FAQ directory (excluding `index.mdx`)
+1. **Scans** all MDX (Markdown with JSX) and `.md` files in the configured FAQ directory (excluding `index.mdx`)
 2. **Extracts** `###` headings from each file as questions
 3. **Generates** anchor links from the heading text
 4. **Exposes** the data so any component can consume it
@@ -25,7 +25,7 @@ The FAQ index plugin scans your FAQ directory for `###` headings, treats each on
 }]
 ```
 
-## Writing FAQ Pages
+## Writing FAQ pages
 
 Each FAQ page is a standard MDX file in the `content/docs/faq/` directory. Use `###` headings for questions:
 
@@ -48,7 +48,7 @@ The plugin extracts each `###` heading as a question and generates an anchor fro
 - `### What is {vars.productName}?` → anchor: `what-is-trellis`
 - `### How do I customize the colors?` → anchor: `how-do-i-customize-the-colors`
 
-## FaqTableOfContents Component
+## FaqTableOfContents component
 
 The companion component renders the indexed questions as a searchable list. Import and use it on your FAQ index page:
 
@@ -71,7 +71,7 @@ The component:
 - Provides a text filter for searching across all questions
 - Links each question directly to its anchor on the source page
 
-## Data Structure
+## Data structure
 
 The plugin generates the following data structure:
 

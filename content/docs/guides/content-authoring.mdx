@@ -9,7 +9,7 @@ last_update:
 
 This guide covers how to create and organize content in {vars.productName}. For markdown syntax and features (code blocks, admonitions, tabs), see [Writing Docs](/guides/writing-docs/).
 
-## Creating a New Page
+## Creating a new page
 
 Add an `.mdx` file under `content/docs/`. The file path determines its URL:
 
@@ -21,9 +21,9 @@ Add an `.mdx` file under `content/docs/`. The file path determines its URL:
 
 Use `index.mdx` for the landing page of a section (e.g. `theme/index.mdx` → `/theme/`).
 
-### Partial Files
+### Partial files
 
-Files and folders that start with an underscore (`_`) are treated as **partials** — they are excluded from routing, search indexing, and the sidebar. This convention matches [Docusaurus behavior](https://docusaurus.io/docs/creating-pages#routing), so content that worked in Docusaurus carries over.
+Files and folders that start with an underscore (`_`) are treated as **partials** — excluded from routing, search indexing, and the sidebar. This convention matches [Docusaurus behavior](https://docusaurus.io/docs/creating-pages#routing), so content that worked in Docusaurus carries over.
 
 ```
 content/docs/
@@ -41,7 +41,7 @@ Use partials for:
 - **Draft content** that isn't ready for readers yet
 - **Reusable snippets** you include in other pages with `@include`
 
-To hide a file, simply prefix its name with `_`:
+To hide a file, prefix its name with `_`:
 
 ```bash
 # Hide a page
@@ -51,9 +51,9 @@ mv content/docs/guides/draft.mdx content/docs/guides/_draft.mdx
 mv content/docs/internal content/docs/_internal
 ```
 
-Partial files are also excluded from the [Smart Search](/plugins/smart-search/) index via the `excludedPrefixes` option.
+The `excludedPrefixes` option also excludes partial files from the [Smart Search](/plugins/smart-search/) index.
 
-### Including Partials
+### Including partials
 
 Use the `@include` directive to inline a partial's content into another page. The directive must be on its own line:
 
@@ -61,7 +61,7 @@ Use the `@include` directive to inline a partial's content into another page. Th
 @include ./_shared-setup-steps.mdx
 ```
 
-The path is relative to the file containing the directive. Frontmatter in the partial is automatically stripped — only the body content is inlined.
+The path is relative to the file containing the directive. Trellis automatically strips frontmatter from the partial and inlines only the body content.
 
 #### Example
 
@@ -96,7 +96,7 @@ The numbered list renders inline as if it were written directly in `quickstart.m
 
 #### What works inside partials
 
-Included content goes through the full MDX pipeline, so everything works:
+Included content goes through the full MDX (Markdown with JSX) pipeline, so everything works:
 
 - Admonitions (`:::tip`, `:::warning`, etc.)
 - Variables (`{vars.productName}`)
@@ -153,20 +153,16 @@ draft: false
 | `keywords` | No | Array of keywords to boost search relevance |
 | `last_update.date` | No | Displayed at the top of the page (MM/DD/YYYY) |
 | `last_update.author` | No | Subject matter expert for the page (visible when `lastUpdated.showAuthor` is `true` in `config/site.ts`) |
-| `hide_table_of_contents` | No | Set to `true` to hide the right-side TOC |
+| `hide_table_of_contents` | No | Set to `true` to hide the right-side table of contents (TOC) |
 | `doc_type` | No | Content type for auditing (e.g. `how-to`, `concept`, `reference`, `tutorial`). Not rendered on the page — used in sidebar exports |
 | `role` | No | Array of audience roles (e.g. `[Developer, Admin]`). Rendered as colored chips below the page title |
 | `draft` | No | Set to `true` to exclude the page from the production build, search index, and FAQ index |
 
-
-
-
-
-### Role Chips
+### Role chips
 
 When you add a `role` array to a page's frontmatter, Trellis renders each role as a colored chip below the title. This helps readers quickly identify whether a page is relevant to them.
 
-Roles are purely informational — they don't restrict access. Use any labels that make sense for your audience (e.g. `Developer`, `Admin`, `Designer`, `Product Manager`). The default color scheme assigns a unique color to each role, but you can customize colors in `config/site.ts` with the `roleColors` field:
+Roles are purely informational — they don't restrict access. Use any labels that make sense for your audience (e.g. `Developer`, `Admin`, `Designer`, `Product Manager`). The default color scheme assigns a unique color to each role. Customize colors in `config/site.ts` with the `roleColors` field:
 
 ```yaml
 ---
@@ -182,8 +178,7 @@ last_update:
 
 ![Alt text](/img/role-badge-custom-color.png "width=40%")
 
-
-### Document Type
+### Document type
 
 The `doc_type` field is metadata-only — it is not rendered on the page. Use it to classify pages for content auditing:
 
@@ -194,9 +189,9 @@ The `doc_type` field is metadata-only — it is not rendered on the page. Use it
 | `reference` | API docs, config options, parameter tables |
 | `tutorial` | End-to-end guided walkthrough |
 
-Both `doc_type` and `role` are included in the [sidebar export](#sidebar-export) for spreadsheet-based auditing.
+The [sidebar export](#sidebar-export) includes both `doc_type` and `role` for spreadsheet-based auditing.
 
-### Draft Pages
+### Draft pages
 
 Set `draft: true` in a page's frontmatter to exclude it from the production build:
 
@@ -218,13 +213,13 @@ Draft pages are:
 Use `draft: true` for pages that are actively being written. Unlike the `_` prefix convention (which hides files from the filesystem level), drafts stay in the sidebar config and appear in content audits — making them easier to track.
 :::
 
-## Configuring the Sidebar
+## Configuring the sidebar
 
 The sidebar is defined in `config/sidebar.ts`. If you've used Docusaurus, this plays the same role as `sidebars.js` — but it's a typed TypeScript array instead of a plain object.
 
-### Item Types
+### Item types
 
-There are two item types: **doc** (a link to a page) and **category** (a collapsible group).
+The sidebar supports two item types: **doc** (a link to a page) and **category** (a collapsible group).
 
 ```ts
 export const mainSidebar: SidebarItem[] = [
@@ -243,7 +238,7 @@ export const mainSidebar: SidebarItem[] = [
 ]
 ```
 
-### Doc Items
+### Doc items
 
 A `doc` item links to a page. The `id` is the file path under `content/docs/` without the extension:
 
@@ -253,7 +248,7 @@ A `doc` item links to a page. The `id` is the file path under `content/docs/` wi
 | `content/docs/guides/deployment.mdx` | `'guides/deployment'` |
 | `content/docs/theme/index.mdx` | `'theme/index'` |
 
-The sidebar label defaults to a title derived from the filename. Override it with the `label` property:
+Trellis derives the sidebar label from the filename by default. Override it with the `label` property:
 
 ```ts
 { type: 'doc', id: 'overview/index', label: 'What is Trellis?' }
@@ -280,17 +275,17 @@ A `category` is a collapsible group with a label and child items:
 | `label` | Yes | Display text in the sidebar |
 | `items` | Yes | Array of child `doc` or `category` items |
 | `collapsed` | No | Start collapsed (`true`) or expanded (`false`, default) |
-| `link` | No | Doc id to make the category label itself a clickable link |
+| `link` | No | Doc id to make the category label itself a selectable link |
 
-### Linking a Category to a Page
+### Linking a category to a page
 
-By default, clicking a category label just toggles it open/closed. Use the `link` property to make the label navigate to a page — the chevron still toggles expand/collapse independently:
+By default, selecting a category label toggles it open or closed. Use the `link` property to make the label navigate to a page — the chevron still toggles expand/collapse independently:
 
 ```ts
 {
   type: 'category',
   label: 'Theme',
-  link: 'theme/index',    // clicking "Theme" navigates to /theme/
+  link: 'theme/index',    // selecting "Theme" navigates to /theme/
   collapsed: true,
   items: [
     { type: 'doc', id: 'theme/last-updated' },
@@ -301,7 +296,7 @@ By default, clicking a category label just toggles it open/closed. Use the `link
 
 This avoids the need for a redundant child like "Theme Overview" under a "Theme" category. Categories without `link` (like "Guides") remain plain collapsible headers.
 
-### Nesting Categories
+### Nesting categories
 
 Categories can be nested for deeper hierarchies:
 
@@ -323,11 +318,11 @@ Categories can be nested for deeper hierarchies:
 }
 ```
 
-## Landing Page
+## Landing page
 
 By default, the root URL (`/`) renders a landing page with a hero section and feature cards. This is defined in `app/page.tsx`.
 
-### Skipping the Landing Page
+### Skipping the landing page
 
 Most documentation sites don't need a marketing-style landing page — visitors should go straight to the docs. To bypass the landing page and redirect `/` to your first doc, replace the contents of `app/page.tsx`:
 
@@ -342,16 +337,16 @@ export default function Home() {
 Change `'/getting-started/'` to whichever page you want as your entry point. The redirect works with static export — Next.js generates an HTML page with a `<meta http-equiv="refresh">` tag, so no server is required.
 
 :::tip
-After switching to a redirect you can also remove imports and assets that were only used by the landing page, such as the hero logo in `config/site.ts` (`logo.hero`) and any feature card data.
+After switching to a redirect, you can also remove imports and assets that were only used by the landing page, such as the hero logo in `config/site.ts` (`logo.hero`) and any feature card data.
 :::
 
-### Customizing the Landing Page
+### Customizing the landing page
 
-If you want to keep the landing page but tailor it, edit `app/page.tsx` directly. It's a regular React component — not MDX — so you have full control over layout. The key pieces to update are:
+To keep the landing page but tailor it, edit `app/page.tsx` directly. It's a regular React component — not MDX — so you have full control over layout. The key pieces to update are:
 
 - **Hero text** — the tagline and call-to-action buttons
 - **Feature cards** — the `features` array at the top of the file
-- **Hero logo** — controlled by `logo.hero` and `logo.useBuiltIn` in `config/site.ts`
+- **Hero logo** — the logo image, configured via `logo.hero` and `logo.useBuiltIn` in `config/site.ts`
 
 ## Images
 
@@ -361,9 +356,9 @@ Place images in `public/img/` and reference them with an absolute path:
 ![Architecture diagram](/img/architecture.png)
 ```
 
-All images automatically support **click-to-zoom** via the built-in lightbox — no extra markup needed. Click any image to open it in a modal overlay.
+All images automatically support **select-to-zoom** via the built-in lightbox — no extra markup needed. Select any image to open it in a modal overlay.
 
-### Image Sizing
+### Image sizing
 
 By default, images render at 60% of the content width. To override the size, add a width value in the title position of the markdown image syntax:
 
@@ -381,9 +376,9 @@ Supported formats:
 | Pixels | `"400px"` | Fixed 400px width |
 | `width=` prefix | `"width=75%"` | Same as `"75%"` — explicit prefix is optional |
 
-When a custom width is set, it replaces the default 60% max-width. The image title attribute is consumed by the width parser, so it won't appear as a tooltip.
+When a custom width is set, it replaces the default 60% max-width. The width parser consumes the image title attribute, so it does not appear as a tooltip.
 
-## Blog Posts
+## Blog posts
 
 Blog posts live in `content/blog/`. Name files with a date prefix:
 
@@ -391,7 +386,7 @@ Blog posts live in `content/blog/`. Name files with a date prefix:
 content/blog/2026-02-20-welcome.md
 ```
 
-### Blog Frontmatter
+### Blog frontmatter
 
 ```yaml
 ---
@@ -410,9 +405,9 @@ authors:
 | `slug` | URL slug (defaults to the filename slug) |
 | `authors` | Array of `{ name }` objects |
 
-The date is parsed from the filename. Posts are listed at `/blog/`, newest first.
+Trellis parses the date from the filename. Posts are listed at `/blog/`, newest first.
 
-### Excerpt Truncation
+### Excerpt truncation
 
 Use an MDX comment to mark where the excerpt ends on the blog index page:
 
@@ -424,7 +419,7 @@ This intro paragraph appears on the index page.
 This content only appears on the full post page.
 ```
 
-## Release Notes
+## Release notes
 
 Release notes live in `content/release-notes/`. Name files after the version:
 
@@ -432,7 +427,7 @@ Release notes live in `content/release-notes/`. Name files after the version:
 content/release-notes/v1.0.0.md
 ```
 
-### Release Notes Frontmatter
+### Release notes frontmatter
 
 ```yaml
 ---
@@ -464,75 +459,4 @@ Release notes are listed at `/release-notes/`, sorted by version (newest first).
 
 ## Variables
 
-{vars.productName} supports **reusable variables** in MDX files — a feature Docusaurus doesn't offer. Define variables once, use them across every page.
-
-### Defining Variables
-
-Edit `config/variables.ts` to add or change variables:
-
-```ts title="config/variables.ts"
-export const docVariables: Record<string, string> = {
-  productName: 'Trellis',
-  companyName: "Pixl'n Grid",
-  version: '1.0.0',
-  frameworkName: 'Next.js',
-}
-```
-
-### Using Variables in MDX
-
-Reference any variable in your content with `{vars.variableName}`:
-
-```mdx
-Welcome to {vars.productName} by {vars.companyName}.
-
-{vars.productName} is built on {vars.frameworkName} and is currently
-at version {vars.version}.
-```
-
-This renders as:
-
-> Welcome to {vars.productName} by {vars.companyName}.
->
-> {vars.productName} is built on {vars.frameworkName} and is currently at version {vars.version}.
-
-Variables work anywhere in MDX — paragraphs, headings, tables, admonitions, and JSX component props.
-
-:::tip
-When you rename a product or bump a version, update `config/variables.ts` once and every page reflects the change on the next build.
-:::
-
-## Sidebar Export
-
-Trellis includes a script that exports your sidebar structure as a CSV file for content auditing in spreadsheets. Run it with:
-
-```bash
-npm run export:sidebar > sidebar.csv
-```
-
-The CSV includes one row per sidebar entry with these columns:
-
-| Column | Source |
-|--------|--------|
-| Doc ID | The sidebar `id` (e.g. `guides/content-authoring`) |
-| Title | Sidebar label or frontmatter `title` |
-| URL | The page URL |
-| Category | Sidebar category path (e.g. `Guides > Content Authoring`) |
-| Draft | `Yes` if `draft: true`, blank otherwise |
-| Doc Type | Frontmatter `doc_type` |
-| Role | Frontmatter `role` (semicolon-separated) |
-| Last Updated | Frontmatter `last_update.date` |
-| Author | Frontmatter `last_update.author` |
-| Description | Frontmatter `description` |
-| Keywords | Frontmatter `keywords` (semicolon-separated) |
-| File Path | Relative file path from project root |
-
-:::tip
-Import the CSV into Google Sheets or Excel to audit coverage gaps, identify stale pages, and track which roles are documented.
-:::
-
-## MDX Tips
-
-- **Comments** must use `{/* comment */}` — HTML comments (`<!-- -->`) cause build errors in MDX.
-- **Components** are available globally in MDX without importing. See [Using Components](/guides/using-components/) for the full list.
-- **Blank lines** are required before and after fenced code blocks and JSX components for correct parsing.
+{vars.productName} supports **reusable variables** in MDX files — a feature Docusaurus doesn't offer.

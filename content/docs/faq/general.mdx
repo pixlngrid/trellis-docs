@@ -12,15 +12,15 @@ last_update:
 
 ### How do I customize the colors?
 
-Edit `design-tokens.json` at the project root. The build process converts this JSON file into CSS custom properties that are used throughout the theme. Run `npm run build-tokens` to regenerate the CSS, or simply `npm run dev` which runs it automatically.
+Edit `design-tokens.json` at the project root. The build process converts this JSON file into CSS custom properties used throughout the theme. Run `npm run build-tokens` to regenerate the CSS, or run `npm run dev` which runs it automatically.
 
 ### Can I use this with an existing Docusaurus project?
 
-Not yet directly. Currently, {vars.productName} is a standalone project. In the future, we plan to publish it as `@pixlngrid/trellis` that you can install into any {vars.frameworkName} project.
+Not yet directly. {vars.productName} is currently a standalone project. It is planned for release as `@pixlngrid/trellis`, installable into any {vars.frameworkName} project.
 
 ### How does the search work?
 
-The smart search plugin indexes all documentation at build time, generating a `searchIndex.json` file. Search is performed client-side using Fuse.js for fast, fuzzy matching. You can configure field weights in `config/site.ts`. See the [Smart Search](/plugins/smart-search/) docs for details.
+The smart search plugin indexes all documentation at build time, generating a `searchIndex.json` file. The plugin performs search client-side using Fuse.js for fast, fuzzy matching. Configure field weights in `config/site.ts`. See the [Smart Search](/plugins/smart-search/) docs for details.
 
 ### How do I add redirects when I move a page?
 
@@ -28,7 +28,7 @@ Add an entry to `redirects.json` at the project root. For example: `{ "from": "/
 
 ### What are design tokens?
 
-Design tokens are named values (colors, spacing, border radii, etc.) defined in a single JSON file (`design-tokens.json`). A build script converts them into CSS custom properties that the entire theme consumes. This gives you one place to manage your brand values. See [Design Tokens](/design-tokens/).
+Design tokens are named values (colors, spacing, border radii, and so on) defined in a single JSON file (`design-tokens.json`). A build script converts them into CSS custom properties that the entire theme consumes. This gives you one place to manage your brand values. See [Design Tokens](/design-tokens/).
 
 ### How do I add a new FAQ page?
 
