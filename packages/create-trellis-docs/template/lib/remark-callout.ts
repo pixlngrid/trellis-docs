@@ -9,7 +9,7 @@ const FENCE_SPLIT = /(````[\s\S]*?````|```[\s\S]*?```)/g
  * Converts `:::tip Custom Title` → `:::tip[Custom Title]` (outside of code blocks).
  */
 export function preprocessAdmonitions(content: string): string {
-  const re = new RegExp(`^(:::(?:${ADMONITION_TYPES}))\\s+(?![\\[{])(.+)$`, 'gm')
+  const re = new RegExp(`^(:::(?:${ADMONITION_TYPES}))[ \\t]+(?![\\[{])(.+)$`, 'gm')
   const parts = content.split(FENCE_SPLIT)
   for (let i = 0; i < parts.length; i++) {
     if (i % 2 !== 0) continue // skip code blocks
