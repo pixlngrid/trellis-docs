@@ -5,10 +5,23 @@ import matter from 'gray-matter'
 
 const INCLUDE_RE = /^@include\s+(.+)$/gm
 const MAX_DEPTH = 5
+const CONTENT_ROOT = path.join(process.cwd(), 'content')
 
 // Split content into prose and code-fence segments.
 // Even indices are prose (processable), odd indices are code blocks (skip).
 const FENCE_SPLIT = /(````[\s\S]*?````|```[\s\S]*?```)/g
+
+/**
+ * Resolve an include path to an absolute path.
+ * - Paths starting with `/` are root-relative (resolved from `content/`)
+ * - All other paths are resolved relative to the file's directory
+ */
+function resolveIncludePath(includePath: string, dirPath: string): string {
+  if (includePath.startsWith('/')) {
+    return path.join(CONTENT_ROOT, includePath)
+  }
+  return path.resolve(dirPath, includePath)
+}
 
 /**
  * Resolve `@include path/to/_partial.mdx` directives in MDX content.
@@ -16,6 +29,14 @@ const FENCE_SPLIT = /(````[\s\S]*?````|```[\s\S]*?```)/g
  * Reads the referenced file, strips its frontmatter, and inlines the
  * content in place of the directive.  Nested includes are supported up
  * to a depth of 5.  Directives inside fenced code blocks are ignored.
+ *
+ * Paths starting with `/` resolve from the `content/` directory, allowing
+ * shared partials across docs, blog, and release notes:
+ *   @include /docs/_includes/shared-note.mdx
+ *
+ * Relative paths resolve from the directory of the file containing the
+ * directive (the existing behavior):
+ *   @include ./_local-partial.mdx
  *
  * @param content  Raw MDX string (frontmatter already stripped)
  * @param dirPath  Absolute directory of the file containing the directives
@@ -41,7 +62,7 @@ export async function resolveIncludes(
     // Process in reverse so replacement indices stay valid
     for (const match of matches.reverse()) {
       const includePath = match[1].trim()
-      const absPath = path.resolve(dirPath, includePath)
+      const absPath = resolveIncludePath(includePath, dirPath)
 
       let partialContent: string
       try {
@@ -82,7 +103,7 @@ export function resolveIncludesSync(
 
     parts[i] = parts[i].replace(INCLUDE_RE, (_match, rawPath: string) => {
       const includePath = rawPath.trim()
-      const absPath = path.resolve(dirPath, includePath)
+      const absPath = resolveIncludePath(includePath, dirPath)
 
       if (!fsSync.existsSync(absPath)) {
         throw new Error(

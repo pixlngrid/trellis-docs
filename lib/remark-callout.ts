@@ -1,6 +1,23 @@
 import { visit } from 'unist-util-visit'
 import type { Plugin } from 'unified'
 
+const ADMONITION_TYPES = 'note|tip|info|caution|danger|warning'
+const FENCE_SPLIT = /(````[\s\S]*?````|```[\s\S]*?```)/g
+
+/**
+ * Preprocess admonition titles from Docusaurus space syntax to remark-directive bracket syntax.
+ * Converts `:::tip Custom Title` → `:::tip[Custom Title]` (outside of code blocks).
+ */
+export function preprocessAdmonitions(content: string): string {
+  const re = new RegExp(`^(:::(?:${ADMONITION_TYPES}))\\s+(?![\\[{])(.+)$`, 'gm')
+  const parts = content.split(FENCE_SPLIT)
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 !== 0) continue // skip code blocks
+    parts[i] = parts[i].replace(re, '$1[$2]')
+  }
+  return parts.join('')
+}
+
 /**
  * Remark plugin to transform Docusaurus-style admonitions (:::tip, :::note, etc.)
  * into JSX <Callout> components.

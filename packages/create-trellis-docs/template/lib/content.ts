@@ -3,6 +3,7 @@ import path from 'path'
 import matter from 'gray-matter'
 import { siteConfig } from '@/config/site'
 import { resolveIncludes } from './resolve-includes'
+import { preprocessAdmonitions } from './remark-callout'
 
 const DOCS_DIR = path.join(process.cwd(), 'content/docs')
 const BLOG_DIR = path.join(process.cwd(), 'content/blog')
@@ -127,6 +128,8 @@ async function loadDoc(
 
   // Resolve @include directives (inline partials before MDX compilation)
   const resolvedContent = await resolveIncludes(content, path.dirname(filePath))
+  // Convert :::type title → :::type[title] for remark-directive compatibility
+  const processedContent = preprocessAdmonitions(resolvedContent)
 
   return {
     meta: {
@@ -140,7 +143,7 @@ async function loadDoc(
       draft: data.draft === true,
       slug: '/' + slugPath,
     },
-    content: resolvedContent,
+    content: processedContent,
     filePath: path.relative(process.cwd(), filePath).replace(/\\/g, '/'),
   }
 }
@@ -235,8 +238,13 @@ export async function getAllBlogPosts(): Promise<BlogEntry[]> {
   const posts: BlogEntry[] = []
 
   for (const file of files) {
-    const raw = await fs.readFile(path.join(BLOG_DIR, file), 'utf-8')
+    const filePath = path.join(BLOG_DIR, file)
+    const raw = await fs.readFile(filePath, 'utf-8')
     const { data, content } = matter(raw)
+
+    // Resolve @include directives
+    const resolvedContent = await resolveIncludes(content, path.dirname(filePath))
+    const processedContent = preprocessAdmonitions(resolvedContent)
 
     // Parse date from filename: YYYY-MM-DD-slug.md
     const match = file.match(/^(\d{4}-\d{2}-\d{2})-(.+)\.mdx?$/)
@@ -244,7 +252,7 @@ export async function getAllBlogPosts(): Promise<BlogEntry[]> {
     const fileSlug = match ? match[2] : file.replace(/\.mdx?$/, '')
 
     // Handle {/* truncate */} marker (MDX comment syntax)
-    const parts = content.split(/\{\/\*\s*truncate\s*\*\/\}/)
+    const parts = processedContent.split(/\{\/\*\s*truncate\s*\*\/\}/)
     const excerpt = parts[0].trim()
 
     posts.push({
@@ -258,7 +266,7 @@ export async function getAllBlogPosts(): Promise<BlogEntry[]> {
         featured: data.featured === true,
         image: data.image,
       },
-      content,
+      content: processedContent,
       excerpt,
     })
   }
@@ -306,8 +314,13 @@ export async function getAllReleaseNotes(): Promise<ReleaseNoteEntry[]> {
   const notes: ReleaseNoteEntry[] = []
 
   for (const file of files) {
-    const raw = await fs.readFile(path.join(RELEASE_NOTES_DIR, file), 'utf-8')
+    const filePath = path.join(RELEASE_NOTES_DIR, file)
+    const raw = await fs.readFile(filePath, 'utf-8')
     const { data, content } = matter(raw)
+
+    // Resolve @include directives
+    const resolvedContent = await resolveIncludes(content, path.dirname(filePath))
+    const processedContent = preprocessAdmonitions(resolvedContent)
 
     const fileSlug = file.replace(/\.mdx?$/, '')
 
@@ -319,7 +332,7 @@ export async function getAllReleaseNotes(): Promise<ReleaseNoteEntry[]> {
         description: data.description,
         slug: fileSlug,
       },
-      content,
+      content: processedContent,
     })
   }
 

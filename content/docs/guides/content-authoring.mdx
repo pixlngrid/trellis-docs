@@ -26,20 +26,25 @@ Use `index.mdx` for the landing page of a section (e.g. `theme/index.mdx` → `/
 Files and folders that start with an underscore (`_`) are treated as **partials** — excluded from routing, search indexing, and the sidebar. This convention matches [Docusaurus behavior](https://docusaurus.io/docs/creating-pages#routing), so content that worked in Docusaurus carries over.
 
 ```
-content/docs/
-├── guides/
-│   ├── deployment.mdx            → /guides/deployment/
-│   └── _internal-notes.mdx       ✗ no route, not indexed
-├── _shared/
-│   └── common-setup.mdx          ✗ entire folder skipped
-└── getting-started.mdx           → /getting-started/
+content/
+├── _includes/                    ✗ shared partials (available to docs, blog, and release notes)
+│   └── common-warning.mdx
+├── docs/
+│   ├── guides/
+│   │   ├── deployment.mdx        → /guides/deployment/
+│   │   └── _internal-notes.mdx   ✗ no route, not indexed
+│   ├── _includes/                ✗ docs-only partials
+│   │   └── setup-steps.mdx
+│   └── getting-started.mdx       → /getting-started/
+├── blog/
+└── release-notes/
 ```
 
 Use partials for:
 
+- **Reusable snippets** you include in other pages with `@include`
 - **Internal reference notes** that shouldn't be published
 - **Draft content** that isn't ready for readers yet
-- **Reusable snippets** you include in other pages with `@include`
 
 To hide a file, prefix its name with `_`:
 
@@ -55,44 +60,71 @@ The `excludedPrefixes` option also excludes partial files from the [Smart Search
 
 ### Including partials
 
-Use the `@include` directive to inline a partial's content into another page. The directive must be on its own line:
+Use the `@include` directive to inline a partial's content into another page. The directive must be on its own line.
+
+#### Relative paths
+
+Paths starting with `./` or `../` resolve relative to the file containing the directive:
 
 ```mdx
-@include ./_shared-setup-steps.mdx
+@include ./_install-steps.mdx
 ```
 
-The path is relative to the file containing the directive. Trellis automatically strips frontmatter from the partial and inlines only the body content.
+#### Root-relative paths
+
+Paths starting with `/` resolve from the `content/` directory. This lets you share partials across docs, blog posts, and release notes:
+
+```mdx
+@include /_includes/common-warning.mdx
+@include /docs/_includes/setup-steps.mdx
+```
+
+{vars.productName} automatically strips frontmatter from the partial and inlines only the body content.
 
 #### Example
 
-Create a partial:
+Create a shared partial:
 
-```mdx title="content/docs/guides/_install-steps.mdx"
+```mdx title="content/_includes/support-note.mdx"
 ---
-title: Install Steps (partial)
+title: Support Note (partial)
 ---
 
-1. Install dependencies: `npm install`
-2. Run the dev server: `npm run dev`
-3. Open `http://localhost:3000`
+:::note
+Need help? Open an issue on [GitHub](https://github.com/your-org/your-repo/issues).
+:::
 ```
 
-Include it in a page:
+Include it in a doc page, a blog post, and a release note:
 
 ```mdx title="content/docs/guides/quickstart.mdx"
----
-title: Quickstart
----
-
 ## Getting Started
 
-@include ./_install-steps.mdx
-
-## Next Steps
-...
+@include /_includes/support-note.mdx
 ```
 
-The numbered list renders inline as if it were written directly in `quickstart.mdx`.
+```mdx title="content/blog/2026-02-20-welcome.md"
+Welcome to our documentation!
+
+@include /_includes/support-note.mdx
+```
+
+```mdx title="content/release-notes/v1.0.0.md"
+## Added
+- Initial release
+
+@include /_includes/support-note.mdx
+```
+
+The admonition renders inline as if it were written directly in each file.
+
+#### Where to put partials
+
+| Location | Use case |
+|----------|----------|
+| `content/_includes/` | Shared across docs, blog, and release notes |
+| `content/docs/_includes/` | Docs-only partials |
+| Any `_`-prefixed file or folder | Colocated partials next to the pages that use them |
 
 #### What works inside partials
 
@@ -107,7 +139,7 @@ Included content goes through the full MDX (Markdown with JSX) pipeline, so ever
 
 Partials can include other partials, up to 5 levels deep:
 
-```mdx title="content/docs/_shared/_prerequisites.mdx"
+```mdx title="content/docs/_includes/prerequisites.mdx"
 @include ./_node-version.mdx
 @include ./_editor-setup.mdx
 ```
@@ -174,9 +206,14 @@ last_update:
 ---
 ```
 
-![Alt text](/img/role-badge.png "width=40%")
+![Alt text](/img/role-badge.png "width=30%")
 
-![Alt text](/img/role-badge-custom-color.png "width=40%")
+:::tip hint
+You can customize role colors in [`config/site.ts`](/guides/site-configuration/#role-chip-colors).
+
+
+![Alt text](/img/role-badge-custom-color.png "width=30%")
+:::
 
 ### Document type
 
