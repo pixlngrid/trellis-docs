@@ -68,8 +68,22 @@ Docusaurus-only frontmatter fields are removed automatically:
 
 The `tags` field is converted to `keywords` (the Trellis equivalent).
 
-:::caution
-If your Docusaurus pages use custom `slug` values, the migration report will warn you. URLs may change after migration since {vars.productName} derives routes from file paths.
+#### Docusaurus `id` and `slug` fields
+
+Docusaurus is unique among docs-as-code platforms in supporting separate `id` and `slug` frontmatter fields:
+
+- **`id`** — An internal identifier used to reference the doc in `sidebars.js`. When omitted, Docusaurus derives it from the file path. For example, a file at `guides/setup.md` with `id: quickstart` would be referenced in the sidebar as `guides/quickstart`.
+- **`slug`** — Controls the URL path independently of the `id` and file path. A doc at `guides/setup.md` with `slug: /get-started` would be served at `/get-started`.
+
+{vars.productName} does not use either field. Instead, the **file path is the single source of truth** for both sidebar references and URL routing — the same approach used by MkDocs, VitePress, Starlight, and most other docs frameworks.
+
+The migration script strips both fields and maps sidebar entries to file paths. If your Docusaurus project relies on either:
+
+- **Custom `id` values** — No action needed. The generated `config/sidebar.ts` already references docs by file path, which is the {vars.productName} convention.
+- **Custom `slug` values** — URLs will change. The migration report warns about each affected file. Add entries to `redirects.json` so old links continue to work (see [Add redirects](#6-add-redirects) below).
+
+:::tip
+If your Docusaurus `sidebars.js` references docs by custom `id` values and the mapping isn't obvious, run the migration with `--dry-run` first and cross-reference the generated sidebar against your original to verify every doc is accounted for.
 :::
 
 #### Content body
