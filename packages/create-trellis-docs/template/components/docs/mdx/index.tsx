@@ -8,6 +8,19 @@ import { Feedback } from '@/components/custom/feedback'
 import { FlippingCard } from '@/components/custom/flipping-card'
 import { FaqTableOfContents } from '@/components/custom/faq-table-of-contents'
 import { Tooltip } from '@/components/docs/tooltip'
+import { DocCard } from '@/components/custom/doc-card'
+import { DocCardList } from '@/components/custom/doc-card-list'
+
+// Colored symbols for comparison tables
+function Check() {
+  return <span className="text-utility-green-100 font-bold">✓</span>
+}
+function Cross() {
+  return <span className="text-utility-red-100 font-bold">✗</span>
+}
+function Partial() {
+  return <span className="text-utility-yellow-100 font-bold">◐</span>
+}
 
 export const mdxComponents: Record<string, React.ComponentType<any>> = {
   h1: H1,
@@ -37,4 +50,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   FlippingCard,
   FaqTableOfContents,
   Tooltip,
+  DocCard,
+  DocCardList,
+  Check,
+  Cross,
+  Partial,
 }

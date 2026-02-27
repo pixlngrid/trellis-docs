@@ -54,6 +54,7 @@ export const mainSidebar: SidebarItem[] = [
     link: 'components/index',
     collapsed: true,
     items: [
+      { type: 'doc', id: 'components/doc-card-list' },
       { type: 'doc', id: 'components/glossary' },
       { type: 'doc', id: 'components/feedback' },
       { type: 'doc', id: 'components/flipping-card' },
@@ -71,6 +72,7 @@ export const mainSidebar: SidebarItem[] = [
       { type: 'doc', id: 'guides/i18n' },
       { type: 'doc', id: 'guides/versioning' },
       { type: 'doc', id: 'guides/deployment' },
+      { type: 'doc', id: 'guides/migrating-from-docusaurus', label: 'Migrating from Docusaurus' },
       { type: 'doc', id: 'guides/upgrading' },
     ],
   },
@@ -80,6 +82,7 @@ export const mainSidebar: SidebarItem[] = [
     collapsed: false,
     items: [
       { type: 'api', id: 'petstore', label: 'Petstore API' },
+       { type: 'api', id: 'auth', label: 'Movie API' },
     ],
   },
 ]

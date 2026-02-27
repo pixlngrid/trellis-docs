@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useTheme } from 'next-themes'
 
 interface RedocViewerProps {
@@ -14,6 +14,7 @@ export function RedocViewer({ specUrl, options = {} }: RedocViewerProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [RedocStandalone, setRedocStandalone] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -26,6 +27,57 @@ export function RedocViewer({ specUrl, options = {} }: RedocViewerProps) {
         setError('Failed to load API documentation viewer.')
       })
   }, [])
+
+  // Patch hardcoded light-mode colors in ReDoc styled-components for dark mode.
+  // ReDoc bakes some colors (e.g. server URL box: background:#fff, code labels:
+  // color:#e53935) into styled-components whose class names are random hashes,
+  // so normal CSS overrides can't reach them. We post-patch the DOM instead.
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || resolvedTheme !== 'dark') return
+
+    const patchDarkMode = () => {
+      // Server URL boxes — styled <div> with background:#fff, display:inline, white-space:nowrap
+      container.querySelectorAll<HTMLElement>('div').forEach((el) => {
+        if (el.dataset.darkPatched) return
+        const s = window.getComputedStyle(el)
+        if (
+          s.backgroundColor === 'rgb(255, 255, 255)' &&
+          s.display === 'inline' &&
+          s.whiteSpace === 'nowrap'
+        ) {
+          el.style.setProperty('background-color', '#334155', 'important')
+          el.style.setProperty('color', '#f1f5f9', 'important')
+          el.dataset.darkPatched = '1'
+        }
+      })
+
+      // Code/label elements with hardcoded red (#e53935 → rgb(229,57,53))
+      container.querySelectorAll<HTMLElement>('code, span').forEach((el) => {
+        if (el.dataset.darkPatched) return
+        const s = window.getComputedStyle(el)
+        if (s.color === 'rgb(229, 57, 53)') {
+          el.style.setProperty('color', '#93c5fd', 'important')
+          el.dataset.darkPatched = '1'
+        }
+      })
+    }
+
+    let timer: ReturnType<typeof setTimeout>
+    const observer = new MutationObserver(() => {
+      clearTimeout(timer)
+      timer = setTimeout(patchDarkMode, 200)
+    })
+
+    observer.observe(container, { childList: true, subtree: true })
+    const initialTimer = setTimeout(patchDarkMode, 500)
+
+    return () => {
+      observer.disconnect()
+      clearTimeout(timer)
+      clearTimeout(initialTimer)
+    }
+  }, [resolvedTheme])
 
   if (!mounted || !RedocStandalone) {
     return (
@@ -52,9 +104,17 @@ export function RedocViewer({ specUrl, options = {} }: RedocViewerProps) {
       primary: {
         main: isDark ? '#93c5fd' : '#2563eb',
       },
+      gray: {
+        50: isDark ? '#1e293b' : '#FAFAFA',
+        100: isDark ? '#334155' : '#F5F5F5',
+      },
       text: {
         primary: isDark ? '#f1f5f9' : '#0f172a',
-        secondary: isDark ? '#94a3b8' : '#64748b',
+        secondary: isDark ? '#cbd5e1' : '#64748b',
+      },
+      border: {
+        dark: isDark ? 'rgba(241, 245, 249, 0.15)' : 'rgba(0, 0, 0, 0.1)',
+        light: isDark ? '#1e293b' : '#ffffff',
       },
       http: {
         get: '#22c55e',
@@ -72,6 +132,8 @@ export function RedocViewer({ specUrl, options = {} }: RedocViewerProps) {
       },
       code: {
         fontSize: '14px',
+        color: isDark ? '#93c5fd' : '#e53935',
+        backgroundColor: isDark ? 'rgba(241, 245, 249, 0.07)' : 'rgba(38, 50, 56, 0.05)',
       },
     },
     sidebar: {
@@ -89,7 +151,7 @@ export function RedocViewer({ specUrl, options = {} }: RedocViewerProps) {
   }
 
   return (
-    <div className="redoc-container" key={resolvedTheme}>
+    <div className="redoc-container" key={resolvedTheme} ref={containerRef}>
       <RedocStandalone
         specUrl={specUrl}
         options={{

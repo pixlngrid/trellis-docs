@@ -128,7 +128,7 @@ export function Feedback() {
           onClick={() => setFeedbackType(FeedbackType.LIKE)}
           aria-label="Yes, this page was helpful"
         >
-          <ThumbsUp size={20} className="text-utility-green-100" />
+          <ThumbsUp size={20} className="text-(--muted-foreground)" />
         </button>
         <button
           className={cn(
@@ -139,7 +139,7 @@ export function Feedback() {
           onClick={() => setFeedbackType(FeedbackType.DISLIKE)}
           aria-label="No, this page was not helpful"
         >
-          <ThumbsDown size={20} className="text-utility-red-100" />
+          <ThumbsDown size={20} className="text-(--muted-foreground)" />
         </button>
       </div>
 

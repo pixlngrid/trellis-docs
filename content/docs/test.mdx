@@ -1,0 +1,370 @@
+---
+title: Scout AI User Guide
+description: Learn how to use Scout AI, the intelligent research assistant built into UserLens, to analyze session notes, generate deliverables, and accelerate research synthesis.
+keywords: [Scout AI, UserLens, research synthesis, AI assistant, UX research, pattern detection, hypothesis linking, persona generation, journey map]
+last_update:
+  date: 06/24/2025
+  author: TechWrit AI
+doc_type: how-to
+role: [Researcher, Designer, Analyst]
+draft: true
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { Tooltip } from '@theme/Tooltip';
+
+
+<Tooltip content="An AI-powered assistant built into UserLens for research synthesis, pattern detection, and deliverable generation.">Scout AI</Tooltip> is your intelligent research companion for accelerating synthesis and surfacing insights.
+
+---
+
+## Overview
+
+Scout AI is an AI-powered assistant built into <Tooltip content="The research operations platform that hosts Scout AI and your project data.">UserLens</Tooltip>. It analyzes session notes, generates reports, and accelerates your research synthesis workflow. Scout AI can identify patterns, extract quotes, validate hypotheses, and draft deliverables — while keeping you in control of the output.
+
+### What Scout AI can do
+
+| Capability | Description |
+|---|---|
+| **Pattern detection** | Automatically identify recurring themes across sessions |
+| **Quote extraction** | Surface notable quotes tagged by sentiment |
+| **Hypothesis linking** | Find evidence that supports or refutes your hypotheses |
+| **Ask Scout** | Ask natural language questions about your research data |
+| **Summary generation** | Create session summaries, cluster descriptions, and briefings |
+| **Report drafting** | Generate findings reports from your synthesis data |
+
+---
+
+## Getting started
+
+### Access Scout AI
+
+1. Open any project in UserLens.
+2. Navigate to the **Scout AI** panel in the right sidebar.
+3. The **Chat** tab opens by default.
+
+### Data Scout AI uses
+
+Scout AI analyzes data from your current project only:
+
+- **Session notes** — Documents containing participant observations, quotes, and task performance data
+- **Synthesis notes** — Your tagged observations and insights
+- **Hypotheses** — Research hypotheses you have created in the **Synthesis** tab
+
+:::tip[Better results]
+The more structured and complete your project data, the more accurate Scout AI's analysis will be. See [Best practices](#best-practices) for guidance on preparing your data.
+:::
+
+---
+
+## Tabs and features
+
+Scout AI is organized into five tabs, each serving a different purpose.
+
+### Chat tab
+
+The Chat tab provides a conversational interface for asking questions about your research data.
+
+1. Enter a question in the input field at the bottom of the panel.
+2. Press **Enter** or select **Send**.
+3. Scout AI responds based on your session notes and synthesis data.
+
+**Example questions:**
+
+- "Summarize the key findings from my sessions."
+- "What are the main pain points users mentioned?"
+- "What patterns do you see across participants?"
+- "Which hypotheses are supported by the research?"
+
+:::tip[Chat tips]
+- Scout AI retains conversation context, so you can ask follow-up questions without repeating yourself.
+- Select **Copy** on any response to copy it to your clipboard.
+- Select **Save as Document** to save a response directly to your project's **Documents** tab.
+- Select **New Chat** to start a fresh conversation and clear the current context.
+:::
+
+---
+
+### Sessions tab
+
+The Sessions tab generates summaries and analysis from your session notes.
+
+**Before you begin:** Ensure your project's **Documents** tab contains at least one session note.
+
+1. Select an output format from the dropdown.
+2. Select **Generate Summary** (or **Generate Findings Report** for the Findings Report format).
+3. Review the output, then select **Copy** or **Save as Document**.
+
+**Available output formats:**
+
+| Format | Best for |
+|---|---|
+| **Overview Summary** | Quick executive summary with key findings |
+| **Detailed Analysis** | Participant-by-participant breakdown with severity ratings |
+| **Theme Extraction** | Thematic analysis with patterns and relationships |
+| **Key Quotes & Insights** | Impactful quotes grouped by theme with sentiment |
+| **Findings Report** | Comprehensive report with full template structure |
+
+---
+
+### Artifacts tab
+
+The Artifacts tab generates common UX research deliverables from your project data.
+
+<Tabs queryString="artifact" defaultValue="personas">
+
+<TabItem value="personas" label="Personas">
+
+Generates user personas based on your research data.
+
+Select **Generate Personas** to produce output that includes:
+
+- Name, age, and occupation
+- Background and context
+- Goals and motivations
+- Pain points and frustrations
+- Behaviors and preferences
+- A representative quote
+- Relevant scenarios
+
+
+</TabItem>
+
+<TabItem value="journey-map" label="Journey map">
+
+Creates a customer journey map with emotional highs and lows.
+
+Select **Generate Journey Map** to produce output that includes:
+
+- Journey phases and stages
+- User actions at each stage
+- Touchpoints and channels
+- Emotional journey (thoughts and feelings)
+- Pain points per stage
+- Opportunities for improvement
+
+
+</TabItem>
+
+<TabItem value="theme-extraction" label="Theme extraction">
+
+Extracts and analyzes themes across your qualitative data.
+
+Select **Extract Themes** to produce output that includes:
+
+- 3–7 major themes with descriptions
+- Supporting evidence from sessions
+- Theme frequency and prevalence
+- Contradictions or outliers
+- Theme relationships
+
+
+</TabItem>
+
+<TabItem value="hypothesis-linking" label="Hypothesis linking">
+
+Analyzes your research data against existing hypotheses to find supporting or contradicting evidence.
+
+**Prerequisites:**
+- At least one hypothesis created in your **Synthesis** tab
+- Session notes or synthesis data in your project
+
+Select **Analyze Hypotheses** to produce output that includes, for each hypothesis:
+
+- Current status vs. recommended status
+- Confidence level (High, Medium, or Low)
+- Supporting evidence with citations
+- Contradicting evidence with citations
+- Analysis explanation
+- Suggested next steps
+
+A **Summary** section also provides:
+
+- Counts of validated, invalidated, partial, and untested hypotheses
+- Key insights across all hypotheses
+- Prioritized recommendations
+
+:::tip[Hypothesis linking tips]
+- Write clear, testable hypotheses. "Users struggle with onboarding" is more useful than "The app has problems."
+- Mark the current status of each hypothesis accurately — Scout AI uses this to provide meaningful recommendations.
+- Review contradicting evidence closely. Conflicting data often reveals important nuances.
+:::
+
+
+</TabItem>
+
+<TabItem value="interview-guide" label="Interview guide">
+
+Generates a structured interview guide based on your research objectives.
+
+1. Enter your research objectives, one per line.
+2. Select **Generate Guide**.
+
+Output includes:
+
+- Introduction script
+- Warm-up questions
+- Main questions organized by objective
+- Follow-up probes
+- Wrap-up questions
+- Closing script
+- Tips for the interviewer
+
+
+</TabItem>
+</Tabs>
+
+---
+
+### Templates tab
+
+The Templates tab provides quick access to common research deliverables. Select any template card to generate output — Scout AI switches to the **Chat** tab and produces the deliverable automatically.
+
+| Template | Description |
+|---|---|
+| **Stakeholder Summary** | One-page executive summary for leadership |
+| **Usability Test Report** | Standard usability report with task success rates |
+| **Research Debrief** | Quick team debrief with learnings and action items |
+| **Competitive Insights** | Extract competitive intelligence from session data |
+| **Findings Report** | Comprehensive findings with evidence |
+| **Persona Summary** | Generate three distinct user personas |
+
+---
+
+### Docs tab
+
+The Docs tab helps you write and improve research documentation.
+
+<Tabs queryString="docs-action" defaultValue="write">
+  <TabItem value="write" label="Write new documentation">
+
+1. Enter a topic in the input field (for example, "User testing best practices").
+2. Select **Write Documentation**.
+3. Scout AI generates structured documentation with headings and examples.
+
+  </TabItem>
+  <TabItem value="improve" label="Improve existing documentation">
+
+1. Paste your existing documentation into the text area.
+2. Select **Improve Documentation**.
+3. Scout AI enhances clarity, organization, and completeness.
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Working with output
+
+### Copy to clipboard
+
+Every Scout AI output includes a **Copy** button. Select it to copy the content to your clipboard for use in other applications.
+
+### Save as document
+
+Select **Save as Document** to save output directly to your project:
+
+1. Enter a document title in the dialog.
+2. Select **Save Document**.
+
+The document appears in your project's **Documents** tab.
+
+### Follow-up suggestions
+
+After generating output, Scout AI suggests relevant follow-up actions. For example, after generating personas, Scout AI might suggest:
+
+- "Create journey map"
+- "Find supporting quotes"
+- "Identify persona pain points"
+
+Select any suggestion to continue your analysis.
+
+### Output history
+
+Recent outputs appear at the bottom of the Scout AI panel. Select any item to view it again.
+
+---
+
+## Understanding citations
+
+Scout AI cites evidence from your session notes using bracketed references. These citations help you trace insights back to their source data for verification.
+
+| Citation format | Meaning |
+|---|---|
+| `[P1]` | Participant 1 |
+| `[Session P2]` | Session notes for Participant 2 |
+| `[Session Notes - P3]` | Session notes for Participant 3 |
+
+:::caution[Verify citations]
+Always check that cited evidence matches the original session notes before including it in a deliverable. Scout AI can misattribute or misrepresent source material.
+:::
+
+---
+
+## Best practices
+
+### Prepare your data
+
+- **Use a consistent session note format** — Include participant identifiers, task performance, observations, and direct quotes.
+- **Tag quotes clearly** — Use quotation marks and attribute each quote to a specific participant.
+- **Document task success** — Note whether each task succeeded, failed, or partially completed.
+
+### Get better results
+
+- **Be specific in your questions** — "What did participants say about the checkout flow?" yields better results than "Tell me about the app."
+- **Provide context** — Mention specific features, user types, or scenarios you want to analyze.
+- **Use follow-up questions** — Build on Scout AI's responses to dig deeper into a topic.
+- **Verify citations** — Confirm that cited evidence matches the original session notes before using it in a deliverable.
+
+---
+
+## Keyboard shortcuts
+
+| Action | Shortcut |
+|---|---|
+| Send message (Chat tab) | Enter |
+| New line in input | Shift + Enter |
+
+---
+
+## Troubleshooting
+
+### "No session notes found"
+
+Scout AI could not identify session notes in your project. Ensure your documents meet at least one of the following conditions:
+
+- The document title includes the words "session" and "note."
+- The document contains session note indicators such as participant info, task completion data, and direct quotes.
+
+### "No hypotheses found"
+
+The Hypothesis Linking feature requires at least one hypothesis. Create hypotheses in your project's **Synthesis** tab before using this feature.
+
+### Response seems incomplete
+
+For long or complex analyses, Scout AI might truncate output. Try the following:
+
+- Ask for a specific section (for example, "Show me only the top 5 findings").
+- Break your request into smaller, focused parts.
+- Select a more targeted template or output format.
+
+### API errors
+
+If you see "Failed to fetch" or a similar error:
+
+- Check your internet connection.
+- Confirm the API is available — contact your administrator if the issue persists.
+- Wait a few moments, then try again.
+
+---
+
+## Privacy and data
+
+- Scout AI only accesses data within your current project.
+- Your research data is sent to the AI service for processing.
+- Outputs are not stored externally unless you explicitly save them.
+
+:::info
+For questions about data handling and retention policies, contact your organization's administrator.
+:::
