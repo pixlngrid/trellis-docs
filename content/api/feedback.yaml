@@ -1,0 +1,202 @@
+openapi: 3.0.0
+info:
+  title: Feedback API
+  version: 1.0.0
+  description: >
+    Receives page-level feedback submitted by users of the documentation site.
+    Clients post a sentiment (like or dislike), one or more categorized options,
+    an optional free-text comment, and the pathname of the page being reviewed.
+    This API is consumed internally by the `Feedback` React component
+    (`feedback.tsx`) and is not intended for general third-party use.
+  contact:
+    name: "[VERIFY]"
+    email: "[VERIFY]"
+
+servers:
+  - url: "[VERIFY: resolved at runtime via getBaseUrl() from @/lib/feedback-api]"
+    description: >
+      Base URL resolved at runtime by the `getBaseUrl()` utility. The full
+      submission endpoint is `{baseUrl}/submit`. [VERIFY: document the logic
+      inside getBaseUrl() to confirm environment-specific URL resolution.]
+
+tags:
+  - name: Feedback
+    description: Operations for submitting documentation page feedback.
+
+paths:
+  /submit:
+    post:
+      tags:
+        - Feedback
+      summary: Submit page feedback
+      description: >
+        Records a user's feedback for a specific documentation page. The
+        request includes the page pathname, a sentiment type (`like` or
+        `dislike`), one or more predefined feedback option keys, and an
+        optional free-text comment.
+
+
+        The comment field is only expected when the user selects an option key
+        ending in `_ANOTHER_REASON` (`POSITIVE_ANOTHER_REASON` or
+        `NEGATIVE_ANOTHER_REASON`). For all other selections the comment may
+        be an empty string.
+
+
+        The client retries are not handled automatically — a non-`2xx`
+        response causes the component to display an error state.
+      operationId: submitFeedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackRequest"
+            examples:
+              like_with_options:
+                summary: Positive feedback with predefined options
+                value:
+                  page: /docs/getting-started
+                  type: like
+                  options:
+                    - ACCURATE
+                    - EASY_TO_FOLLOW
+                  comment: ""
+              dislike_with_comment:
+                summary: Negative feedback with free-text comment
+                value:
+                  page: /docs/api-reference
+                  type: dislike
+                  options:
+                    - NEGATIVE_ANOTHER_REASON
+                  comment: "The request body examples are missing required fields."
+              dislike_multiple_options:
+                summary: Negative feedback with multiple predefined options
+                value:
+                  page: /docs/authentication
+                  type: dislike
+                  options:
+                    - MISSING_INFO
+                    - CODE_ERRORS
+                  comment: ""
+      responses:
+        "200":
+          description: Feedback recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedbackResponse"
+        "400":
+          description: >
+            The request body is malformed or contains invalid values. [VERIFY:
+            confirm server-side validation rules and error response shape.]
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: >
+            An unexpected server-side error occurred. The client displays an
+            error modal and surfaces a link to report the issue on GitHub.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    FeedbackRequest:
+      type: object
+      description: >
+        The payload submitted when a user completes the feedback form. All
+        fields are required; `comment` must be present but may be an empty
+        string when no free-text option is selected.
+      required:
+        - page
+        - type
+        - options
+        - comment
+      properties:
+        page:
+          type: string
+          maxLength: 2048
+          description: >
+            The Next.js pathname of the page the user is reviewing, as returned
+            by `usePathname()`. For example: `/docs/getting-started`.
+        type:
+          type: string
+          enum:
+            - like
+            - dislike
+          description: >
+            The user's overall sentiment. `like` indicates the page was helpful;
+            `dislike` indicates it was not.
+        options:
+          type: array
+          description: >
+            One or more option keys selected by the user. For `like` feedback,
+            valid keys are defined in `LikeOptions`. For `dislike` feedback,
+            valid keys are defined in `DislikeOptions`. An empty array is
+            permitted if the user submits without selecting any option.
+          items:
+            $ref: "#/components/schemas/FeedbackOptionKey"
+        comment:
+          type: string
+          maxLength: 5000
+          description: >
+            Free-text comment entered by the user. Non-empty only when the user
+            selects an option key ending in `_ANOTHER_REASON`. Trimmed of
+            leading and trailing whitespace before submission. [VERIFY: confirm
+            maximum length enforced by the server.]
+
+    FeedbackOptionKey:
+      type: string
+      description: >
+        A predefined key identifying a specific feedback reason. Keys are
+        scoped to the feedback type: positive keys apply to `like` submissions
+        and negative keys apply to `dislike` submissions.
+      enum:
+        - ACCURATE
+        - RESOLVE_ISSUE
+        - EASY_TO_FOLLOW
+        - CLEAR_CODE_SAMPLES
+        - ADOPT_PLATFORM
+        - POSITIVE_ANOTHER_REASON
+        - INACCURATE
+        - NOT_FOUND
+        - MISSING_INFO
+        - HARD_TO_UNDERSTAND
+        - COMPLICATED
+        - CODE_ERRORS
+        - NEGATIVE_ANOTHER_REASON
+
+    FeedbackResponse:
+      type: object
+      description: >
+        Returned on successful submission. The client does not use the response
+        body — it transitions to a thank-you state on any `2xx` status.
+        [VERIFY: document the actual response shape returned by the server.]
+      properties:
+        success:
+          type: boolean
+          description: Indicates the feedback was recorded. [VERIFY]
+        id:
+          type: string
+          description: >
+            Unique identifier for the recorded feedback entry, if returned.
+            [VERIFY]
+
+    ErrorResponse:
+      type: object
+      description: >
+        Returned when the server cannot process the request. The client treats
+        any non-`2xx` response as a generic error and does not inspect the
+        response body. [VERIFY: confirm whether the server returns a structured
+        error body or plain text.]
+      properties:
+        message:
+          type: string
+          description: A human-readable description of the error.
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code associated with the error.

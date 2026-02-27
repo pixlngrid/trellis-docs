@@ -146,7 +146,7 @@ Partials can include other partials, up to 5 levels deep:
 
 #### Migrating from Docusaurus
 
-If you're migrating from Docusaurus, the [migration script](#) automatically converts the Docusaurus import pattern:
+If you're migrating from Docusaurus, the [migration script](/guides/migrating-from-docusaurus/) automatically converts the Docusaurus import pattern:
 
 ```mdx
 import SetupSteps from './_setup-steps.mdx';
@@ -397,7 +397,7 @@ All images automatically support **select-to-zoom** via the built-in lightbox â€
 
 ### Image sizing
 
-By default, images render at 60% of the content width. To override the size, add a width value in the title position of the markdown image syntax:
+Unlike Docusaurus, {vars.productName} lets you control image width directly in markdown â€” no HTML or custom components needed. By default, images render at 60% of the content width. To override the size, add a width value in the title position of the markdown image syntax:
 
 ```md
 ![Screenshot](/img/screenshot.png "50%")

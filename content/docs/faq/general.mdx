@@ -14,9 +14,9 @@ last_update:
 
 Edit `design-tokens.json` at the project root. The build process converts this JSON file into CSS custom properties used throughout the theme. Run `npm run build-tokens` to regenerate the CSS, or run `npm run dev` which runs it automatically.
 
-### Can I use this with an existing Docusaurus project?
+### Can I migrate from Docusaurus?
 
-Not yet directly. {vars.productName} is currently a standalone project. It is planned for release as `@pixlngrid/trellis`, installable into any {vars.frameworkName} project.
+Yes. {vars.productName} includes a migration script that copies your content, converts your sidebar, transforms frontmatter, and converts MDX partial imports to `@include` directives. Run `node scripts/migrate-docusaurus.js <path>` to migrate. See the [Migrating from Docusaurus](/guides/migrating-from-docusaurus/) guide for details.
 
 ### How does the search work?
 

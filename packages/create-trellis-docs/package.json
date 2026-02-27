@@ -1,8 +1,15 @@
 {
   "name": "create-trellis-docs",
-  "version": "1.6.8",
+  "version": "1.6.9",
   "description": "Create a new Trellis documentation site",
   "license": "MIT",
+    "keywords": [
+    "trellis docs",
+    "docs-as-code",
+    "documentation",
+    "static site generator",
+    "openapi"
+  ],
   "bin": {
     "create-trellis-docs": "bin/index.js"
   },

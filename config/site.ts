@@ -1,7 +1,7 @@
 export const siteConfig = {
   title: 'Trellis Docs',
   tagline: 'A Docs-as-Code Framework',
-  url: 'https://trellis-docs.io',
+  url: 'https://pixlngrid.github.io/trellis-docs',
   baseUrl: '/',
   favicon: '/img/favicon.svg',
 
@@ -49,7 +49,7 @@ export const siteConfig = {
 
   // Subscribe CTA — shown on blog index & release notes when enabled
   subscribe: {
-    enabled: true,
+    enabled: false,
     url: 'https://trellis-docs.io/api/subscribe', // external URL to subscription form (e.g., Mailchimp, Buttondown, ConvertKit)
   },
 

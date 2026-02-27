@@ -37,24 +37,24 @@ How {vars.productName} stacks up against the most popular docs-as-code framework
 
 | Feature | Trellis | Docusaurus | Nextra | Starlight | GitBook |
 |---------|:-------:|:----------:|:------:|:---------:|:-------:|
-| Static export | ✓ | ✓ | ✓ | ✓ | ✗ |
-| MDX support | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Reusable variables in content | ✓ | ✗ | ✗ | ✗ | ✓ |
-| Custom components in content | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Built-in search (no Algolia) | ✓ | ✗ | ✓ | ✓ | ✓ |
-| Design token pipeline | ✓ | ✗ | ✗ | ◐ | ✗ |
-| Dark mode out of the box | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Self-hosted / deploy anywhere | ✓ | ✓ | ✓ | ✓ | ✗ |
-| CLI scaffolding | ✓ | ✓ | ◐ | ✓ | ✗ |
-| TypeScript config | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Blog support | ✓ | ✓ | ✓ | ◐ | ✗ |
-| i18n / localization | ✓ | ✓ | ◐ | ✓ | ◐ |
-| Documentation versioning | ✓ | ✓ | ✗ | ◐ | ◐ |
-| Audience role tagging | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Content audit export | ✓ | ✗ | ✗ | ✗ | ◐ |
-| Free & open source | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Static export | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
+| MDX support | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
+| Reusable variables in content | <Check /> | <Cross /> | <Cross /> | <Cross /> | <Check /> |
+| Custom components in content | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
+| Built-in search (no Algolia) | <Check /> | <Cross /> | <Check /> | <Check /> | <Check /> |
+| Design token pipeline | <Check /> | <Cross /> | <Cross /> | <Partial /> | <Cross /> |
+| Dark mode out of the box | <Check /> | <Check /> | <Check /> | <Check /> | <Check /> |
+| Self-hosted / deploy anywhere | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
+| CLI scaffolding | <Check /> | <Check /> | <Partial /> | <Check /> | <Cross /> |
+| TypeScript config | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
+| Blog support | <Check /> | <Check /> | <Check /> | <Partial /> | <Cross /> |
+| i18n / localization | <Check /> | <Check /> | <Partial /> | <Check /> | <Partial /> |
+| Documentation versioning | <Check /> | <Check /> | <Cross /> | <Partial /> | <Partial /> |
+| Audience role tagging | <Check /> | <Cross /> | <Cross /> | <Cross /> | <Cross /> |
+| Content audit export | <Check /> | <Cross /> | <Cross /> | <Cross /> | <Partial /> |
+| Free & open source | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
 
-✓ = included &nbsp; ◐ = partial / plugin required &nbsp; ✗ = not available
+<Check /> = included &nbsp; <Partial /> = partial / plugin required &nbsp; <Cross /> = not available
 
 ## Tech stack
 
@@ -107,3 +107,4 @@ The build pipeline:
 - [{vars.productName} vs {vars.frameworkName}](/overview/trellis-vs-docusaurus/) — see exactly what {vars.productName} adds
 - [Architecture](/overview/architecture/) — understand how the pieces fit together
 - [Getting Started](/getting-started/) — set up a new project
+- [Migrating from Docusaurus](/guides/migrating-from-docusaurus/) — move an existing Docusaurus site to {vars.productName}
