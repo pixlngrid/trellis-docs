@@ -24,7 +24,7 @@
     --popover: var(--color-neutral-white);
     --popover-foreground: var(--color-neutral-slate-900);
     --input: var(--color-neutral-slate-200);
-    --sidebar-width: 240px;
+    --sidebar-width: 280px;
     --navbar-height: 56px;
   }
 
@@ -102,6 +102,13 @@
 
   .dark .prose h3 {
     color: var(--color-neutral-slate-300);
+  }
+
+  .prose :is(h1, h2, h3, h4, h5, h6) button {
+    color: var(--muted-foreground);
+  }
+  .prose :is(h1, h2, h3, h4, h5, h6) button:hover {
+    color: var(--primary);
   }
 
   .prose h4 {
