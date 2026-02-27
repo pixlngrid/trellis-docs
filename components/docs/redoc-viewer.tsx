@@ -37,28 +37,68 @@ export function RedocViewer({ specUrl, options = {} }: RedocViewerProps) {
     if (!container || resolvedTheme !== 'dark') return
 
     const patchDarkMode = () => {
-      // Server URL boxes — styled <div> with background:#fff, display:inline, white-space:nowrap
-      container.querySelectorAll<HTMLElement>('div').forEach((el) => {
+      // Elements with hardcoded white/near-white backgrounds inside the dark right panel
+      container.querySelectorAll<HTMLElement>('div, input, pre').forEach((el) => {
         if (el.dataset.darkPatched) return
         const s = window.getComputedStyle(el)
-        if (
-          s.backgroundColor === 'rgb(255, 255, 255)' &&
-          s.display === 'inline' &&
-          s.whiteSpace === 'nowrap'
-        ) {
-          el.style.setProperty('background-color', '#334155', 'important')
-          el.style.setProperty('color', '#f1f5f9', 'important')
-          el.dataset.darkPatched = '1'
+        const bgR = parseInt(s.backgroundColor.match(/\d+/)?.[0] ?? '0')
+        const bgG = parseInt(s.backgroundColor.match(/\d+/g)?.[1] ?? '0')
+        const bgB = parseInt(s.backgroundColor.match(/\d+/g)?.[2] ?? '0')
+        // Detect white or near-white backgrounds (rgb sum > 700 out of 765)
+        if (bgR + bgG + bgB > 700) {
+          // Only patch if a parent has a dark background
+          let parent = el.parentElement
+          while (parent && parent !== container) {
+            const ps = window.getComputedStyle(parent)
+            const pr = parseInt(ps.backgroundColor.match(/\d+/)?.[0] ?? '255')
+            const pg = parseInt(ps.backgroundColor.match(/\d+/g)?.[1] ?? '255')
+            const pb = parseInt(ps.backgroundColor.match(/\d+/g)?.[2] ?? '255')
+            if (pr + pg + pb < 150) {
+              el.style.setProperty('background-color', '#334155', 'important')
+              el.style.setProperty('color', '#f1f5f9', 'important')
+              el.dataset.darkPatched = '1'
+              // Fix links inside patched elements
+              el.querySelectorAll<HTMLElement>('a').forEach((a) => {
+                a.style.setProperty('color', '#93c5fd', 'important')
+              })
+              break
+            }
+            if (ps.backgroundColor !== 'rgba(0, 0, 0, 0)') break
+            parent = parent.parentElement
+          }
         }
       })
 
-      // Code/label elements with hardcoded red (#e53935 → rgb(229,57,53))
-      container.querySelectorAll<HTMLElement>('code, span').forEach((el) => {
+      // Code/label elements with hardcoded dark or red text colors
+      container.querySelectorAll<HTMLElement>('code, span, select, label').forEach((el) => {
         if (el.dataset.darkPatched) return
         const s = window.getComputedStyle(el)
+        // Hardcoded red (#e53935)
         if (s.color === 'rgb(229, 57, 53)') {
           el.style.setProperty('color', '#93c5fd', 'important')
           el.dataset.darkPatched = '1'
+          return
+        }
+        // Hardcoded dark text on dark backgrounds — check if parent bg is dark
+        const r = parseInt(s.color.match(/\d+/)?.[0] ?? '255')
+        const g = parseInt(s.color.match(/\d+/g)?.[1] ?? '255')
+        const b = parseInt(s.color.match(/\d+/g)?.[2] ?? '255')
+        if (r + g + b < 200 && el.textContent?.trim()) {
+          // Only patch if a parent has a dark background
+          let parent = el.parentElement
+          while (parent && parent !== container) {
+            const ps = window.getComputedStyle(parent)
+            const pr = parseInt(ps.backgroundColor.match(/\d+/)?.[0] ?? '255')
+            const pg = parseInt(ps.backgroundColor.match(/\d+/g)?.[1] ?? '255')
+            const pb = parseInt(ps.backgroundColor.match(/\d+/g)?.[2] ?? '255')
+            if (pr + pg + pb < 150) {
+              el.style.setProperty('color', '#f1f5f9', 'important')
+              el.dataset.darkPatched = '1'
+              break
+            }
+            if (ps.backgroundColor !== 'rgba(0, 0, 0, 0)') break
+            parent = parent.parentElement
+          }
         }
       })
     }

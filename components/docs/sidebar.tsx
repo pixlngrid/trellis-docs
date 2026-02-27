@@ -156,20 +156,28 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </button>
       </div>
 
-      {/* Collapse chevron (shown when expanded) */}
+      {/* Collapse chevron (shown when expanded) — sticky so it doesn't scroll away on long pages */}
       {!collapsed && (
-        <button
-          onClick={onToggle}
-          className={cn(
-            'absolute -right-3 top-3 z-10 flex items-center justify-center',
-            'w-6 h-6 rounded-full border bg-[var(--background)] text-[var(--muted-foreground)]',
-            'hover:text-[var(--foreground)] hover:border-[var(--foreground)] shadow-sm',
-            'transition-colors'
-          )}
-          aria-label="Collapse sidebar"
+        <div
+          className="sticky z-10"
+          style={{
+            top: 'var(--navbar-height)',
+            height: 0,
+          }}
         >
-          <ChevronLeft size={14} />
-        </button>
+          <button
+            onClick={onToggle}
+            className={cn(
+              'absolute -right-3 top-3 flex items-center justify-center',
+              'w-6 h-6 rounded-full border bg-[var(--background)] text-[var(--muted-foreground)]',
+              'hover:text-[var(--foreground)] hover:border-[var(--foreground)] shadow-sm',
+              'transition-colors'
+            )}
+            aria-label="Collapse sidebar"
+          >
+            <ChevronLeft size={14} />
+          </button>
+        </div>
       )}
     </div>
   )

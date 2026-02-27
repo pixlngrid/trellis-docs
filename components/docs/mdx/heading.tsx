@@ -94,7 +94,7 @@ export function Heading({ level, id, children }: HeadingProps) {
               <button
                 ref={buttonRef}
                 onClick={copyToClipboard}
-                className="p-0.5 rounded hover:bg-[var(--muted)] text-[var(--foreground)] opacity-60 hover:opacity-100"
+                className="p-0.5 rounded text-(--muted-foreground) hover:text-(--primary)"
                 title="Copy link to this section"
                 type="button"
                 aria-label="Copy link to this section"

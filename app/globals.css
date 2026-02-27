@@ -104,6 +104,13 @@
     color: var(--color-neutral-slate-300);
   }
 
+  .prose :is(h1, h2, h3, h4, h5, h6) button {
+    color: var(--muted-foreground);
+  }
+  .prose :is(h1, h2, h3, h4, h5, h6) button:hover {
+    color: var(--primary);
+  }
+
   .prose h4 {
     font-size: 1.1rem;
     font-weight: 600;
@@ -324,6 +331,23 @@
   .dark .redoc-container code {
     color: #93c5fd !important;
     background-color: rgba(241, 245, 249, 0.1) !important;
+  }
+
+  .dark .redoc-container select {
+    color: #f1f5f9 !important;
+    background-color: transparent !important;
+    border-color: rgba(241, 245, 249, 0.3) !important;
+  }
+
+  .dark .redoc-container option {
+    color: #f1f5f9 !important;
+    background-color: #1e293b !important;
+  }
+
+  .dark .redoc-container input {
+    color: #f1f5f9 !important;
+    background-color: #334155 !important;
+    border-color: rgba(241, 245, 249, 0.3) !important;
   }
 
   /* Shiki dark theme activation */
