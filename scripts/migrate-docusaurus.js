@@ -40,6 +40,7 @@ const report = {
   prefixesStripped: [],
   sidebarGenerated: false,
   variableSuggestions: [],
+  customComponentsUsed: new Map(), // componentName → [relPath, ...]
 };
 
 // ── CLI ──────────────────────────────────────────────────────────
@@ -171,7 +172,7 @@ function transformFrontmatter(data, relPath) {
 }
 
 // ── Content body transform ───────────────────────────────────────
-function transformContent(content, relPath) {
+function transformContent(content, relPath, customComponentNames) {
   const changes = [];
 
   // Split on fenced code blocks so we don't transform inside them.
@@ -212,6 +213,33 @@ function transformContent(content, relPath) {
       report.commentsConverted += commentCount;
     }
 
+    // 4. Transform require() image calls to static URL strings.
+    //    MDX (next-mdx-remote) blocks all require() calls for security.
+    //    Docusaurus: require('@site/static/img/foo.png').default
+    //    Trellis:    '/img/foo.png'
+    let requireCount = 0;
+    // @site/static/PATH → '/PATH'
+    text = text.replace(
+      /require\(['"]@site\/static\/([^'"]+)['"]\)(?:\.default)?/g,
+      (_, p) => { requireCount++; return `'/${p}'`; }
+    );
+    // Relative path containing /static/PATH → '/PATH'
+    text = text.replace(
+      /require\(['"][^'"]*\/static\/([^'"]+)['"]\)(?:\.default)?/g,
+      (_, p) => { requireCount++; return `'/${p}'`; }
+    );
+    if (requireCount > 0) {
+      changes.push(`Converted ${requireCount} require() path(s) to static URL(s)`);
+    }
+    // Warn about any require() calls that couldn't be auto-converted
+    const remainingRequires = (text.match(/require\s*\(/g) || []).length;
+    if (remainingRequires > 0) {
+      report.warnings.push(
+        `${relPath}: ${remainingRequires} require() call(s) could not be automatically converted — ` +
+        `MDX does not allow require(). Rewrite as static image paths or Next.js <Image> imports.`
+      );
+    }
+
     parts[i] = text;
   }
 
@@ -239,16 +267,28 @@ function transformContent(content, relPath) {
     // Remove the import lines
     result = result.replace(mdxImportRe, '');
 
-    // Replace <ComponentName /> (self-closing) and <ComponentName>...</ComponentName>
-    // with @include directives
+    // Replace <ComponentName /> (self-closing, with or without props) and
+    // <ComponentName>...</ComponentName> (block form, single or multiline)
+    // with @include directives.
     for (const [name, importPath] of mdxImports) {
-      // Self-closing: <Foo /> or <Foo/>
-      const selfClosingRe = new RegExp(`^\\s*<${name}\\s*/>\\s*$`, 'gm');
+      // Self-closing with optional props: <Foo /> or <Foo prop="x" />
+      const selfClosingRe = new RegExp(`^[ \\t]*<${name}(?:\\s[^>]*)?\\s*/>[ \\t]*$`, 'gm');
       result = result.replace(selfClosingRe, `@include ${importPath}`);
 
-      // Opening + closing with no meaningful content: <Foo></Foo>
-      const emptyBlockRe = new RegExp(`^\\s*<${name}\\s*>\\s*</${name}>\\s*$`, 'gm');
-      result = result.replace(emptyBlockRe, `@include ${importPath}`);
+      // Block form with optional props and any content (including multiline):
+      // <Foo> ... </Foo>  or  <Foo prop="x">...</Foo>
+      const blockRe = new RegExp(`^[ \\t]*<${name}(?:\\s[^>]*)?>[\\s\\S]*?</${name}>[ \\t]*$`, 'gm');
+      result = result.replace(blockRe, `@include ${importPath}`);
+    }
+
+    // Warn if any component names from MDX imports still appear in the output
+    // (means a usage pattern the regexes above didn't catch)
+    for (const [name, importPath] of mdxImports) {
+      if (new RegExp(`<${name}[\\s/>]`).test(result)) {
+        report.warnings.push(
+          `${relPath}: <${name}> usage could not be auto-converted to @include ${importPath} — convert manually`
+        );
+      }
     }
 
     changes.push(`Converted ${mdxImports.size} MDX import(s) to @include directive(s)`);
@@ -260,11 +300,24 @@ function transformContent(content, relPath) {
     report.warnings.push(`${relPath}: ${remaining.length} non-Docusaurus import(s) preserved — verify they work in Trellis`);
   }
 
+  // 8. Detect custom component usage (PascalCase JSX tags that match components
+  //    found in the Docusaurus project's src/components or src/theme directories).
+  if (customComponentNames && customComponentNames.size > 0) {
+    for (const [compName, meta] of customComponentNames) {
+      if (new RegExp(`<${compName}[\\s/>]`).test(result)) {
+        if (!report.customComponentsUsed.has(compName)) {
+          report.customComponentsUsed.set(compName, { files: [], isJs: meta.isJs, srcPath: meta.srcPath });
+        }
+        report.customComponentsUsed.get(compName).files.push(relPath);
+      }
+    }
+  }
+
   return { content: result, changes };
 }
 
 // ── Process a single markdown file ───────────────────────────────
-function processFile(srcPath, relPath, force, dryRun) {
+function processFile(srcPath, relPath, force, dryRun, customComponentNames) {
   // Path transforms
   let cleanedPath = normaliseReadme(relPath);
   cleanedPath = stripPrefixesFromPath(cleanedPath);
@@ -290,7 +343,7 @@ function processFile(srcPath, relPath, force, dryRun) {
     report.frontmatterStripped.set(field, (report.frontmatterStripped.get(field) || 0) + 1);
   }
 
-  const { content: transformedContent, changes } = transformContent(content, mdxPath);
+  const { content: transformedContent, changes } = transformContent(content, mdxPath, customComponentNames);
 
   const output = matter.stringify(transformedContent, cleaned);
 
@@ -513,6 +566,8 @@ function generateSidebarFile(items) {
     "export type SidebarItem =",
     "  | { type: 'doc'; id: string; label?: string }",
     "  | { type: 'category'; label: string; link?: string; collapsed?: boolean; items: SidebarItem[] }",
+    "  | { type: 'link'; label: string; href: string }",
+    "  | { type: 'api'; id: string; label?: string }",
     "",
     "",
   ].join('\n');
@@ -613,6 +668,51 @@ function suggestVariables() {
   return suggestions;
 }
 
+// ── Scan custom components ────────────────────────────────────────
+// Walks src/components/ in the Docusaurus project and returns
+// a Map of PascalCase component names → { srcPath, isJs } metadata.
+// isJs=true means the source is .js/.jsx and will need TypeScript type
+// annotations added before it compiles under Trellis's strict tsconfig.
+// Note: src/theme/ (Docusaurus swizzle overrides) is intentionally excluded —
+// Trellis has its own built-in equivalents for all swizzleable components.
+function scanCustomComponents(projectPath) {
+  // Map<name, { srcPath: string, isJs: boolean }>
+  const components = new Map();
+  const dirsToScan = [
+    path.join(projectPath, 'src', 'components'),
+  ];
+
+  function walk(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        // PascalCase directory name = component folder (e.g. Button/index.tsx → Button)
+        // Determine JS vs TS from the index file inside the folder.
+        if (/^[A-Z]/.test(entry.name)) {
+          const tsIndex = path.join(full, 'index.tsx');
+          const jsIndex = path.join(full, 'index.jsx');
+          const srcPath = fs.existsSync(tsIndex) ? tsIndex : fs.existsSync(jsIndex) ? jsIndex : full;
+          const isJs = srcPath.endsWith('.jsx') || srcPath.endsWith('.js');
+          if (!components.has(entry.name)) components.set(entry.name, { srcPath, isJs });
+        }
+        walk(full);
+      } else if (/\.(tsx?|jsx?)$/.test(entry.name)) {
+        const baseName = path.basename(entry.name, path.extname(entry.name));
+        const isJs = entry.name.endsWith('.jsx') || entry.name.endsWith('.js');
+        // PascalCase file name = component — index files handled by parent dir above
+        if (/^[A-Z]/.test(baseName) && baseName !== 'Index' && !components.has(baseName)) {
+          components.set(baseName, { srcPath: full, isJs });
+        }
+      }
+    }
+  }
+
+  for (const dir of dirsToScan) walk(dir);
+  return components;
+}
+
 // ── Migration report ─────────────────────────────────────────────
 function printReport() {
   console.log('\n');
@@ -657,6 +757,28 @@ function printReport() {
     console.log('\nSidebar: Generated config/sidebar.ts');
   }
 
+  if (report.customComponentsUsed.size > 0) {
+    console.log('\nCustom components detected:');
+    console.log('(Each must be ported to components/ or replaced with a Trellis built-in.)');
+    const tsComps = [...report.customComponentsUsed].filter(([, m]) => !m.isJs).sort();
+    const jsComps = [...report.customComponentsUsed].filter(([, m]) => m.isJs).sort();
+    if (tsComps.length > 0) {
+      console.log('\n  TypeScript components (copy source to components/, check for API differences):');
+      for (const [compName, meta] of tsComps) {
+        console.log(`    <${compName}> — ${meta.files.length} file(s), source: ${meta.srcPath}`);
+        for (const f of meta.files) console.log(`      ${f}`);
+      }
+    }
+    if (jsComps.length > 0) {
+      console.log('\n  JavaScript components (rename .jsx→.tsx / .js→.ts, then add TypeScript types):');
+      console.log('  Note: Trellis tsconfig uses strict:true — type annotations are required.');
+      for (const [compName, meta] of jsComps) {
+        console.log(`    <${compName}> — ${meta.files.length} file(s), source: ${meta.srcPath}`);
+        for (const f of meta.files) console.log(`      ${f}`);
+      }
+    }
+  }
+
   if (report.variableSuggestions.length > 0) {
     console.log('\nSuggested variables for config/variables.ts:');
     console.log('(These repeated values could be replaced with {vars.xxx})');
@@ -684,8 +806,18 @@ function printReport() {
   console.log('  2. Review generated config/sidebar.ts');
   console.log('  3. Run "npm run build" to verify the build succeeds');
   console.log('  4. Check any warnings above and fix manually if needed');
+  if (report.customComponentsUsed.size > 0) {
+    const hasJs = [...report.customComponentsUsed.values()].some((m) => m.isJs);
+    console.log('  5. Port custom components listed above to your Trellis components/ directory');
+    console.log('     or replace them with Trellis built-ins (Callout, Tabs, etc.)');
+    if (hasJs) {
+      console.log('     JavaScript components: rename .jsx → .tsx (or .js → .ts) and add');
+      console.log('     TypeScript type annotations — Trellis tsconfig enforces strict mode.');
+    }
+  }
   if (report.variableSuggestions.length > 0) {
-    console.log('  5. Consider adding suggested variables to config/variables.ts');
+    const n = report.customComponentsUsed.size > 0 ? '6' : '5';
+    console.log(`  ${n}. Consider adding suggested variables to config/variables.ts`);
   }
 }
 
@@ -700,6 +832,24 @@ function main() {
   if (force) console.log('Mode: --force (overwriting existing files)');
   if (dryRun) console.log('Mode: --dry-run (no files will be written)');
   console.log('');
+
+  // ── Phase 0: Scan custom components ─────────────────────────
+  console.log('Phase 0: Scanning for custom components...');
+  const customComponentNames = scanCustomComponents(docusaurusPath);
+  if (customComponentNames.size > 0) {
+    const jsCount = [...customComponentNames.values()].filter((m) => m.isJs).length;
+    const tsCount = customComponentNames.size - jsCount;
+    const parts = [];
+    if (tsCount > 0) parts.push(`${tsCount} TypeScript`);
+    if (jsCount > 0) parts.push(`${jsCount} JavaScript`);
+    console.log(`  Found ${customComponentNames.size} custom component(s) (${parts.join(', ')}): ${[...customComponentNames.keys()].sort().join(', ')}`);
+    if (jsCount > 0) {
+      console.log('  Note: JavaScript components must be renamed to .tsx/.ts and typed before they');
+      console.log('  compile under Trellis (strict TypeScript). See report for source file paths.');
+    }
+  } else {
+    console.log('  No custom components found in src/components/');
+  }
 
   // ── Phase 1: Content files ──────────────────────────────────
   const docsDir = findDocsDir(docusaurusPath);
@@ -727,7 +877,7 @@ function main() {
 
   for (const file of mdFiles) {
     try {
-      processFile(file.absPath, file.relPath, force, dryRun);
+      processFile(file.absPath, file.relPath, force, dryRun, customComponentNames);
     } catch (err) {
       report.errors.push({ file: file.relPath, error: err.message });
       console.error(`  Error: ${file.relPath}: ${err.message}`);

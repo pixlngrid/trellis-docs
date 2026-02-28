@@ -3,7 +3,7 @@ title: Migrating from Docusaurus
 description: Move your docs, sidebar, and assets from a Docusaurus project to Trellis with the automated migration script.
 keywords: [migration, docusaurus, import, convert, sidebar]
 last_update:
-  date: 02/26/2026
+  date: 02/28/2026
   author: Trellis
 ---
 
@@ -44,7 +44,15 @@ node scripts/migrate-docusaurus.js ../my-docusaurus-site
 
 ## What the script does
 
-The migration runs in three phases.
+The migration runs in four phases.
+
+### Phase 0: Custom component scan
+
+Before touching any files, the script walks the Docusaurus project's `src/components/` directory to build a list of custom React components. During content processing it checks each migrated MDX file for references to those components and reports them so you know exactly what needs to be ported.
+
+`src/theme/` (Docusaurus swizzle overrides) is intentionally excluded — Trellis has its own built-in equivalents for Navbar, Footer, and other swizzleable components, so those overrides don't need to be ported.
+
+The script distinguishes between TypeScript (`.ts`/`.tsx`) and JavaScript (`.js`/`.jsx`) source files because they require different porting steps — see [Custom components](#2-port-custom-components) below.
 
 ### Phase 1: Content files
 
@@ -93,8 +101,13 @@ If your Docusaurus `sidebars.js` references docs by custom `id` values and the m
 | `@theme` imports removed | `import Tabs from '@theme/Tabs'` — Trellis provides these automatically |
 | `@site` imports removed | Warns you to verify no custom components are missing |
 | HTML comments converted | `<!-- comment -->` → `{/* comment */}` (MDX syntax) |
+| `require()` image paths converted | `require('@site/static/img/foo.png').default` → `'/img/foo.png'` |
 | MDX partial imports converted | `import Foo from './_foo.mdx'; <Foo />` → `@include ./_foo.mdx` |
 | Excessive blank lines cleaned | Three or more blank lines reduced to two |
+
+The MDX partial conversion handles self-closing tags with or without props (`<Foo />`, `<Foo prop="x" />`), and block forms including multiline content (`<Foo>...</Foo>`). Any usage pattern that can't be auto-converted is flagged as a warning.
+
+`require()` paths under `@site/static/` and relative `/static/` paths are converted to root-relative URLs. Any `require()` call that can't be resolved automatically is flagged because `next-mdx-remote` blocks all `require()` calls for security.
 
 The script warns about `<CodeBlock>` components and non-Docusaurus imports that need manual review.
 
@@ -147,6 +160,20 @@ Numbered prefixes stripped: 22
 
 Sidebar: Generated config/sidebar.ts
 
+Custom components detected:
+(Each must be ported to components/ or replaced with a Trellis built-in.)
+
+  TypeScript components (copy source to components/, check for API differences):
+    <BrowserWindow> — 3 file(s), source: /path/to/src/components/BrowserWindow.tsx
+      guides/quickstart.mdx
+      guides/advanced.mdx
+      reference/api.mdx
+
+  JavaScript components (rename .jsx→.tsx / .js→.ts, then add TypeScript types):
+  Note: Trellis tsconfig uses strict:true — type annotations are required.
+    <InfoBox> — 1 file(s), source: /path/to/src/components/InfoBox.jsx
+      overview/intro.mdx
+
 Suggested variables for config/variables.ts:
   acme_platform: 'Acme Platform' (found 28 times)
   v2_1_0: 'v2.1.0' (found 8 times)
@@ -161,7 +188,9 @@ Next steps:
   2. Review generated config/sidebar.ts
   3. Run "npm run build" to verify the build succeeds
   4. Check any warnings above and fix manually if needed
-  5. Consider adding suggested variables to config/variables.ts
+  5. Port custom components listed above to your Trellis components/ directory
+     or replace them with Trellis built-ins (Callout, Tabs, etc.)
+  6. Consider adding suggested variables to config/variables.ts
 ```
 
 ## After migration
@@ -176,7 +205,40 @@ Open `config/sidebar.ts` and verify the structure matches your expectations. You
 
 See [Configuring the sidebar](/guides/content-authoring/#configuring-the-sidebar) for the full sidebar API.
 
-### 2. Run the build
+### 2. Port custom components
+
+If the migration report listed custom components, each one needs to be ported to your Trellis project's `components/` directory or replaced with a Trellis built-in.
+
+**TypeScript components** (`.tsx` / `.ts` source):
+
+Copy the source file into `components/` and verify it compiles. React and Next.js API differences between Docusaurus and Trellis are usually minor, but check for any Docusaurus-specific imports (`@docusaurus/*`, `@theme/*`) that need to be removed or replaced.
+
+**JavaScript components** (`.jsx` / `.js` source):
+
+Trellis uses `strict: true` TypeScript and its `tsconfig.json` only includes `*.ts` and `*.tsx` files. Plain JavaScript components won't compile as-is. For each JS component:
+
+1. Copy the source file into `components/`
+2. Rename the extension: `.jsx` → `.tsx` or `.js` → `.ts`
+3. Add TypeScript type annotations (at minimum, type the props interface and the return type)
+
+```tsx title="components/InfoBox.tsx"
+interface InfoBoxProps {
+  children: React.ReactNode
+  type?: 'info' | 'warning'
+}
+
+export function InfoBox({ children, type = 'info' }: InfoBoxProps) {
+  // ... original component body
+}
+```
+
+Once ported, register the component globally if your MDX pages use it without importing it — see [MDX components](/guides/content-authoring/) for how to add global components.
+
+:::tip
+Many Docusaurus custom components can be replaced entirely with Trellis built-ins: `<BrowserWindow>` → `<Callout>`, `<CodeBlock>` → fenced code blocks, info boxes → `:::note` admonitions. Check what the component actually does before porting.
+:::
+
+### 3. Run the build
 
 ```bash
 npm run build
@@ -187,14 +249,17 @@ Fix any MDX compilation errors. Common issues:
 | Error | Fix |
 |-------|-----|
 | JSX expression expected | HTML comments missed by the converter — change `<!-- -->` to `{/* */}` |
+| `Security: require() calls are not allowed` | A `require()` call the script couldn't auto-convert — rewrite as a static image path (`/img/foo.png`) or Next.js `<Image>` import |
+| `Expected component X to be defined` | A custom component whose import was stripped but the JSX tag remains — port the component or remove the tag |
 | Unknown component | A Docusaurus component (`<CodeBlock>`, `<BrowserWindow>`) that needs to be removed or replaced |
+| Type error: comparison has no overlap | The `SidebarItem` type in `config/sidebar.ts` is missing the `link` or `api` variants — add them (see [Sidebar type](#phase-2-sidebar-conversion)) |
 | Expression expected | Bare `<` or `>` characters in text — wrap in backticks or escape as `&lt;` / `&gt;` |
 
-### 3. Update site configuration
+### 5. Update site configuration
 
 Edit `config/site.ts` with your branding, logo, and URLs. See [Site Configuration](/guides/site-configuration/) for all options.
 
-### 4. Add variables
+### 6. Add variables
 
 If the migration report suggested variables, add them to `config/variables.ts` and replace hardcoded values in your content with `{vars.key}`:
 
@@ -205,11 +270,11 @@ export const docVariables: Record<string, string> = {
 }
 ```
 
-### 5. Set up navigation
+### 7. Set up navigation
 
 Edit `config/navigation.ts` to configure your top navbar and footer. See [Navigation](/guides/site-configuration/#navigation).
 
-### 6. Add redirects
+### 8. Add redirects
 
 If your Docusaurus site used custom slugs or numbered prefixes, URLs will have changed. Add entries to `redirects.json` so old links still work:
 
@@ -229,6 +294,7 @@ See the [Redirects plugin](/plugins/redirects/) for details.
 | Blog posts | Different directory structure | Copy from `blog/` to `content/blog/` manually |
 | Custom pages | Docusaurus uses React pages in `src/pages/` | Recreate in `app/` as Next.js pages |
 | Custom CSS | Docusaurus uses `src/css/custom.css` | Map to [design tokens](/design-tokens/customizing/) |
+| Custom components | Source files are not copied, only detected and reported | Port each component to `components/` — see [Custom components](#2-port-custom-components) |
 | Plugins | Docusaurus plugins have no Trellis equivalent | Use built-in features or build custom components |
 | Versioned docs | Different snapshot format | Re-snapshot with `npm run version:snapshot` after migration |
 | i18n translations | Different directory structure | Copy translated content into `content/i18n/<locale>/docs/` |
@@ -246,7 +312,8 @@ Most Docusaurus markdown syntax works in {vars.productName} without changes:
 | Frontmatter | YAML | YAML | Works — Docusaurus fields stripped |
 | MDX comments | `{/* comment */}` | `{/* comment */}` | Works as-is |
 | HTML comments | `<!-- comment -->` | Not supported | Auto-converted by script |
-| Partials (import) | `import Foo from './_foo.mdx'` | `@include ./_foo.mdx` | Auto-converted by script |
+| `require()` image paths | `require('@site/static/img/foo.png').default` | `'/img/foo.png'` | Auto-converted by script |
+| Partials (import) | `import Foo from './_foo.mdx'; <Foo />` | `@include ./_foo.mdx` | Auto-converted by script (handles props and block form) |
 | `<DocCardList />` | `<DocCardList />` | `<DocCardList category="..." />` | Same name — pass `category` prop |
 | Image width | Not supported | `![alt](/img/pic.png "50%")` | New — set width via title attribute |
 | Variables | Not supported | `{vars.key}` | New feature |
