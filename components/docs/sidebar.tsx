@@ -113,7 +113,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {/* Sidebar content */}
       <aside
         className={cn(
-          'border-r overflow-y-auto sticky transition-[width] duration-200 ease-in-out',
+          'border-r overflow-y-auto overflow-x-hidden sticky transition-[width] duration-200 ease-in-out',
           collapsed ? 'w-0 overflow-hidden border-r-0' : ''
         )}
         style={{
@@ -122,7 +122,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           height: 'calc(100vh - var(--navbar-height))',
         }}
       >
-        <nav className="p-4 whitespace-nowrap" style={{ width: 'var(--sidebar-width)' }}>
+        <nav className="p-4" style={{ width: 'var(--sidebar-width)' }}>
           <ul className="space-y-0.5">
             {sidebarItems.map((item) => (
               <SidebarItem key={item.href || item.label} item={item} />
