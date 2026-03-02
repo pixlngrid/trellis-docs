@@ -13,6 +13,7 @@ export const mainSidebar: SidebarItem[] = [
     items: [
       { type: 'doc', id: 'overview/trellis-vs-nextjs' },
       { type: 'doc', id: 'overview/architecture' },
+      { type: 'doc', id: 'overview/roadmap' },
     ],
   },
   {

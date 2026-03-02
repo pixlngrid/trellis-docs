@@ -3,6 +3,7 @@ import { siteConfig } from './site'
 const resourceItems = [
   ...((siteConfig as any).releaseNotes?.enabled ? [{ label: 'Release Notes', href: '/release-notes/' }] : []),
   ...((siteConfig as any).blog?.enabled ? [{ label: 'Blog', href: '/blog/' }] : []),
+  { label: 'Roadmap', href: '/overview/roadmap/' },
   { label: 'FAQs', href: '/faq/' },
   { label: 'Glossary', href: '/components/glossary/' },
 ]
