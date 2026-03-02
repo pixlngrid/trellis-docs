@@ -1,0 +1,152 @@
+---
+title: Build Errors
+description: Fix errors that occur during npm run build or static export, including prerender failures, missing static params, and Shiki language errors.
+keywords:
+  - build errors
+  - prerender error
+  - static params
+  - generateStaticParams
+  - shiki
+  - 500 error
+last_update:
+  date: 03/02/2026
+  author: Trellis
+---
+
+## Page is missing param in `generateStaticParams()`
+
+**Full error:**
+```
+Error: Page "/(docs)/[...slug]/page" is missing param "/[...slug]"
+in "generateStaticParams()", which is required with "output: export" config.
+```
+
+**Cause:** A page is reachable (via a sidebar link or direct URL) but was not included in the static build because its source file is marked `draft: true`.
+
+Trellis excludes draft files from routing. If a sidebar category or doc item points to a file with `draft: true` in its frontmatter, that route is never generated — causing a 500 when navigated to.
+
+**Fix:** Either remove `draft: true` from the frontmatter, or remove the entry from the sidebar.
+
+```yaml
+# ❌ File is linked in the sidebar but excluded from the build
+---
+title: My Page
+draft: true   # remove this line to publish
+---
+```
+
+```yaml
+# ✅ Published
+---
+title: My Page
+---
+```
+
+:::tip
+Run a quick audit to find all draft files that are also referenced in `config/sidebar.ts`:
+
+```bash
+grep -rl "draft: true" content/docs/
+```
+
+Cross-check the output against your sidebar config.
+:::
+
+---
+
+## `Language 'X' is not included in this bundle`
+
+**Full error:**
+```
+Error [ShikiError]: Language `CSS` is not included in this bundle.
+You may want to load it from external source.
+```
+
+**Cause:** The language identifier in a fenced code block uses the wrong case. Shiki language identifiers are **lowercase only**. Writing ` ```CSS ` instead of ` ```css ` causes this error.
+
+**Fix:** Lowercase all language identifiers in code fences.
+
+````md
+{/* ❌ Uppercase — Shiki won't recognize it */}
+```CSS
+.example { color: red; }
+```
+
+{/* ✅ Lowercase */}
+```css
+.example { color: red; }
+```
+````
+
+Common casing mistakes:
+
+| Wrong | Correct |
+|-------|---------|
+| `CSS` | `css` |
+| `HTML` | `html` |
+| `JavaScript` | `javascript` or `js` |
+| `TypeScript` | `typescript` or `ts` |
+| `JSON` | `json` |
+| `YAML` | `yaml` |
+| `Bash` | `bash` |
+| `SQL` | `sql` |
+
+---
+
+## `Export encountered an error on /(docs)/[...slug]/page`
+
+**Full error:**
+```
+Export encountered an error on /(docs)/[...slug]/page: /some-path, exiting the build.
+```
+
+**Cause:** This is a wrapper error — it means prerendering the page at `/some-path` failed. The actual cause appears in the error above this line. Common underlying causes:
+
+- The file has `draft: true` and is linked in the sidebar (see [Page is missing param](#page-is-missing-param-in-generatestaticparams))
+- A code block uses an unrecognized language identifier (see [Language not included](#language-x-is-not-included-in-this-bundle))
+- An `@include` directive points to a file that doesn't exist
+- An MDX component is used that hasn't been registered in `components/docs/mdx/index.tsx`
+
+**Fix:** Read the full error output above this line to identify the root cause, then apply the appropriate fix.
+
+---
+
+## `@include` file not found
+
+**Full error:**
+```
+Error: Include target not found: ../includes/_my-partial.mdx
+```
+
+**Cause:** An `@include` directive in an MDX file references a partial that doesn't exist at the specified path, or the path is wrong.
+
+**Fix:** Verify the path is correct relative to the file containing the `@include`. Partial files must be prefixed with `_` and placed inside an `includes` directory.
+
+```md
+{/* ❌ Wrong path */}
+@include includes/_my-partial.mdx
+
+{/* ✅ Relative path from the current file */}
+@include ../_includes/_my-partial.mdx
+
+{/* ✅ Root-relative path (from content/docs/) */}
+@include /_includes/_my-partial.mdx
+```
+
+:::note
+Partial files prefixed with `_` are automatically excluded from routing and search indexing.
+:::
+
+---
+
+## TypeScript errors in `config/site.ts` or `config/sidebar.ts`
+
+**Cause:** A misconfigured field in your site configuration (wrong type, missing required field, or an invalid value for an enum field).
+
+**Common examples:**
+
+- `defaultMode` set to a value other than `'light'`, `'dark'`, or `'system'`
+- A sidebar item with `type: 'doc'` missing the `id` field
+- A category `link` pointing to an `id` that doesn't match any content file
+
+**Fix:** Check the TypeScript type definitions at the top of each config file and ensure all values match the expected types. Your editor's type-checking will underline invalid values.

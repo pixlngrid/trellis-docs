@@ -286,3 +286,51 @@ graph LR
   - Images
 
 </details>
+
+## Raw HTML in MDX
+
+MDX compiles to JSX, not plain HTML. That means any raw HTML you write inside an `.mdx` file must follow JSX rules — not HTML rules. The most common mistake is using HTML attribute names that React doesn't recognize.
+
+### Use `className`, not `class`
+
+HTML's `class` attribute becomes `className` in JSX. Using `class` causes a runtime error:
+
+```mdx
+{/* ❌ Breaks at runtime */}
+<div class="my-layout">...</div>
+
+{/* ✅ Correct */}
+<div className="my-layout">...</div>
+```
+
+:::danger
+Using `class=` in MDX produces an **"Invalid DOM property `class`. Did you mean `className`?"** console error and may break the page render.
+:::
+
+### Other HTML → JSX attribute changes
+
+| HTML attribute | JSX equivalent | Notes |
+|----------------|---------------|-------|
+| `class` | `className` | Most common mistake |
+| `for` | `htmlFor` | Used on `<label>` elements |
+| `style="color:red"` | `style={{ color: 'red' }}` | Inline styles must be objects |
+| `<br>` | `<br />` | All void elements must be self-closing |
+| `tabindex` | `tabIndex` | React uses camelCase for most attributes |
+
+### Avoid Docusaurus-specific markup
+
+If you're migrating content from Docusaurus, watch for Infima CSS classes (`col--6`, `card__header`, `container-fluid`, etc.). These classes don't exist in Trellis — replace them with Tailwind equivalents using `className`:
+
+```mdx
+{/* ❌ Docusaurus Infima — won't work in Trellis */}
+<div class="row">
+  <div class="col col--6">...</div>
+</div>
+
+{/* ✅ Tailwind equivalent */}
+<div className="grid grid-cols-2 gap-6">
+  <div>...</div>
+</div>
+```
+
+See the [Migrating from Docusaurus](/guides/migrating-from-docusaurus/) guide for a full reference.

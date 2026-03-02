@@ -79,6 +79,16 @@ export const mainSidebar: SidebarItem[] = [
   },
   {
     type: 'category',
+    label: 'Troubleshooting',
+    link: 'troubleshooting/index',
+    collapsed: true,
+    items: [
+      { type: 'doc', id: 'troubleshooting/build-errors', label: 'Build Errors' },
+      { type: 'doc', id: 'troubleshooting/content-errors', label: 'Content & Rendering Errors' },
+    ],
+  },
+  {
+    type: 'category',
     label: 'API Reference',
     collapsed: false,
     items: [

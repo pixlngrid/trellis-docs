@@ -1,0 +1,210 @@
+---
+title: Content & Rendering Errors
+description: Fix errors caused by MDX syntax, raw HTML in MDX files, admonition formatting, broken includes, and Docusaurus markup that doesn't work in Trellis.
+keywords:
+  - MDX errors
+  - className
+  - class attribute
+  - JSX
+  - rendering errors
+  - admonition
+  - docusaurus migration
+last_update:
+  date: 03/02/2026
+  author: Trellis
+---
+
+## `Invalid DOM property 'class'. Did you mean 'className'?`
+
+**Cause:** MDX compiles to JSX, not HTML. The HTML `class` attribute is not valid in JSX — React requires `className` instead. Any raw HTML inside an `.mdx` file must use JSX attribute names.
+
+**Fix:** Replace every `class=` with `className=` in your MDX files.
+
+```mdx
+{/* ❌ Causes a runtime error */}
+<div class="my-grid">...</div>
+
+{/* ✅ Correct JSX */}
+<div className="my-grid">...</div>
+```
+
+Other HTML attributes that have JSX equivalents:
+
+| HTML | JSX | Example |
+|------|-----|---------|
+| `class` | `className` | `<div className="wrapper">` |
+| `for` | `htmlFor` | `<label htmlFor="email">` |
+| `tabindex` | `tabIndex` | `<div tabIndex={0}>` |
+| `style="color:red"` | `style={{ color: 'red' }}` | Inline styles must be objects |
+| `<br>` | `<br />` | All void elements must self-close |
+| `<img src="...">` | `<img src="..." />` | Self-closing required |
+| `<input>` | `<input />` | Self-closing required |
+
+---
+
+## Docusaurus Infima classes don't apply
+
+**Cause:** Content migrated from Docusaurus may use [Infima CSS](https://infima.dev/) utility classes like `col--6`, `card__header`, `container-fluid`, or `margin-top--sm`. These classes are part of Docusaurus's built-in CSS framework and don't exist in Trellis.
+
+**Fix:** Replace Infima classes with Tailwind equivalents and change `class=` to `className=`.
+
+Common conversions:
+
+| Infima class | Tailwind equivalent |
+|---|---|
+| `class="row"` | `className="grid grid-cols-1 md:grid-cols-2 gap-6"` |
+| `class="col col--6"` | `className="col-span-1"` (inside a grid) |
+| `class="col col--4"` | `className=""` (inside a 3-col grid) |
+| `class="card"` | `className="rounded-lg border border-(--border) bg-(--card) overflow-hidden"` |
+| `class="card__header"` | `className="px-5 py-4 bg-(--muted) border-b border-(--border)"` |
+| `class="card__body"` | `className="px-5 py-4 text-sm"` |
+| `class="margin-top--sm"` | `className="mt-2"` |
+| `class="margin-bottom--sm"` | `className="mb-2"` |
+| `class="container"` | `className="max-w-5xl mx-auto px-6"` |
+
+:::tip
+When converting, also add `not-prose` to the outermost wrapper to prevent Trellis's `.prose` styles from interfering with your layout.
+
+```mdx
+<div className="not-prose grid grid-cols-2 gap-6 my-6">
+  ...
+</div>
+```
+:::
+
+---
+
+## Admonition doesn't render
+
+**Cause:** Admonition syntax is not formatted correctly. Common mistakes include missing blank lines between the fence and content, using the wrong type name, or including a title without brackets.
+
+**Fix:** Ensure the admonition type is lowercase and separated from content by blank lines. If adding a title, use bracket notation.
+
+```md
+{/* ❌ Missing blank lines */}
+:::tip
+Content here.
+:::
+
+{/* ✅ Blank lines before and after content */}
+:::tip
+
+Content here.
+
+:::
+```
+
+```md
+{/* ❌ Title without brackets — won't parse correctly */}
+:::tip Pro tip
+Content here.
+:::
+
+{/* ✅ Title in brackets */}
+:::tip[Pro tip]
+
+Content here.
+
+:::
+```
+
+Valid admonition types: `note`, `tip`, `info`, `caution`, `danger`.
+
+---
+
+## Code block content appears as plain text
+
+**Cause:** The opening fence uses fewer than three backticks, or the language identifier is on a separate line from the opening fence.
+
+**Fix:** Ensure the language tag immediately follows the opening triple backticks with no space before it, and that the closing fence uses the same number of backticks.
+
+````md
+{/* ❌ Language on a separate line */}
+```
+javascript
+const x = 1
+```
+
+{/* ✅ Language on the same line as the opening fence */}
+```javascript
+const x = 1
+```
+````
+
+---
+
+## Inline `@include` outputs nothing or shows raw text
+
+**Cause:** The `@include` directive requires a path relative to the current file (or root-relative from `content/docs/`). If the path is wrong, the include is silently skipped or renders as literal text.
+
+**Fix:**
+
+1. Confirm the partial file exists and is prefixed with `_`.
+2. Use either a relative path (`../`) or a root-relative path starting with `/`.
+
+```md
+{/* Relative — from the current file's directory */}
+@include ../includes/_shared-warning.mdx
+
+{/* Root-relative — from content/docs/ */}
+@include /_includes/_shared-warning.mdx
+```
+
+---
+
+## Images don't display
+
+**Cause:** One of the following:
+
+- The image path is wrong or the file doesn't exist in `public/`
+- The image is referenced with a relative path that doesn't resolve from the compiled output
+- An `<img>` tag in MDX is missing the required self-closing slash
+
+**Fix:**
+
+Place images in the `public/` directory and reference them with an absolute path from the root:
+
+```md
+{/* ❌ Relative path — may not resolve after build */}
+![Screenshot](../images/screenshot.png)
+
+{/* ✅ Absolute path from public/ */}
+![Screenshot](/images/screenshot.png)
+```
+
+If using a raw `<img>` tag in MDX, make sure it self-closes:
+
+```mdx
+{/* ❌ Not self-closing */}
+<img src="/images/screenshot.png" alt="Screenshot">
+
+{/* ✅ Self-closing */}
+<img src="/images/screenshot.png" alt="Screenshot" />
+```
+
+---
+
+## Search doesn't find my new page
+
+**Cause:** Several things can prevent a page from appearing in search results:
+
+- The page has `draft: true` — draft files are excluded from the search index
+- The page has no `keywords` in its frontmatter — keywords are the primary search signal
+- The search index hasn't been rebuilt — run `npm run build` to regenerate it
+- The page path is in an excluded folder (configured in `config/site.ts` under `search.excludePaths`)
+
+**Fix:**
+
+Ensure the frontmatter has a `description` and `keywords` array:
+
+```yaml
+---
+title: My New Page
+description: A short description of what this page covers.
+keywords:
+  - relevant term
+  - another term
+---
+```
+
+Then rebuild the site to regenerate the search index.
