@@ -94,6 +94,7 @@ function SidebarLink({ item }: { item: ResolvedSidebarItem }) {
 
 function SidebarItem({ item }: { item: ResolvedSidebarItem }) {
   if (item.type === 'category') return <SidebarCategory item={item} />
+  if (item.type === 'html') return <li dangerouslySetInnerHTML={{ __html: item.html ?? '' }} />
   return <SidebarLink item={item} />
 }
 

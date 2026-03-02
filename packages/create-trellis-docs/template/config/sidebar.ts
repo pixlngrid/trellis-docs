@@ -3,6 +3,7 @@ export type SidebarItem =
   | { type: 'category'; label: string; link?: string; collapsed?: boolean; items: SidebarItem[] }
   | { type: 'link'; label: string; href: string }
   | { type: 'api'; id: string; label?: string }
+  | { type: 'html'; value: string }
 
 export const mainSidebar: SidebarItem[] = [
   {

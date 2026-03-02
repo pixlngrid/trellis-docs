@@ -3,11 +3,12 @@ import { mainSidebar, type SidebarItem } from '@/config/sidebar'
 export type { SidebarItem }
 
 export interface ResolvedSidebarItem {
-  type: 'doc' | 'category'
+  type: 'doc' | 'category' | 'html'
   label: string
   href?: string
   collapsed?: boolean
   items?: ResolvedSidebarItem[]
+  html?: string
 }
 
 function titleFromId(id: string): string {
@@ -47,6 +48,14 @@ export function resolveSidebar(
         type: 'doc',
         label: item.label,
         href: item.href,
+      }
+    }
+
+    if (item.type === 'html') {
+      return {
+        type: 'html',
+        label: '',
+        html: item.value,
       }
     }
 
