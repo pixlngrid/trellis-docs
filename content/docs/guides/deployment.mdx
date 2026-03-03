@@ -17,16 +17,45 @@ Run the full build with:
 npm run build
 ```
 
-This executes four steps in sequence:
+This executes six steps in sequence:
 
 1. **Design tokens** — `build-tokens.js` converts `design-tokens.json` into `app/tokens.css` (a `@theme` block for Tailwind CSS)
 2. **Search index** — `build-search-index.js` scans `content/docs/` and generates `public/searchIndex.json`
 3. **FAQ index** — `build-faq-index.js` extracts FAQ questions from `content/docs/faq/` into `public/faqIndex.json`
-4. **Next.js build** — compiles the app and exports static HTML to `out/`
+4. **API index** — `build-api-index.js` registers OpenAPI specs for the API documentation plugin
+5. **Next.js build** — compiles the app and exports static HTML to `out/`
+6. **Link check** — `check-links.js` crawls every HTML file in `out/` and fails the build if any internal link resolves to a missing page
 
 :::tip
 During development, only the token step runs automatically. Use `npm run dev` to start the dev server on `http://localhost:3000`.
 :::
+
+### Link checking
+
+The link check runs automatically as the final build step. If any internal link points to a missing page, the build exits with an error and lists the broken URLs:
+
+```
+Error: 2 broken link(s) found (14 occurrence(s)):
+
+  /guides/old-page/
+    in: guides/content-authoring/index.html
+    in: overview/index.html
+    ... and 12 more page(s)
+```
+
+To run the link check independently (for example, after a content-only change):
+
+```bash
+npm run check-links
+```
+
+To check without failing the build — useful in CI environments where you want to report but not block:
+
+```bash
+node scripts/check-links.js --warn-only
+```
+
+The link checker only validates internal links. External URLs (those starting with `http://` or `https://`) are not checked during the build to keep it fast. To check external links before a release, run `npm run check-links` which checks everything.
 
 ## Output structure
 
