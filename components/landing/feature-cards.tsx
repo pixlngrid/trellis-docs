@@ -142,25 +142,44 @@ const features: Feature[] = [
     ),
   },
   {
-    id: 'bundled-plugins',
-    title: 'Bundled Plugins',
+    id: 'content-audit',
+    title: 'Content Audit Export',
     description:
-      'FAQ indexer, redirects, image lightbox, Mermaid diagrams with pan/zoom, and more — configured and ready to go.',
-    link: '/plugins/',
-    imageGradient: 'from-slate-400 to-slate-600',
+      'Export your full doc inventory as a CSV — title, URL, doc type, owner, draft status, and last updated. Built for content audits no other docs framework supports.',
+    link: '/guides/content-authoring/#sidebar-export',
+    imageGradient: 'from-teal-400 to-cyan-500',
     visualElement: (
       <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="17.5" y="17.5" width="35" height="35" rx="6" fill="white" opacity="0.8" />
-        <rect x="62.5" y="17.5" width="35" height="35" rx="6" fill="white" opacity="0.7" />
-        <rect x="107.5" y="17.5" width="35" height="35" rx="6" fill="white" opacity="0.6" />
-        <rect x="17.5" y="62.5" width="35" height="35" rx="6" fill="white" opacity="0.7" />
-        <rect x="62.5" y="62.5" width="35" height="35" rx="6" fill="white" opacity="0.9" />
-        <rect x="107.5" y="62.5" width="35" height="35" rx="6" fill="white" opacity="0.5" />
-        <rect x="17.5" y="107.5" width="35" height="35" rx="6" fill="white" opacity="0.6" />
-        <rect x="62.5" y="107.5" width="35" height="35" rx="6" fill="white" opacity="0.5" />
-        <rect x="107.5" y="107.5" width="35" height="35" rx="6" fill="white" opacity="0.4" />
-        <circle cx="80" cy="80" r="8" fill="#475569" opacity="0.8" />
-        <circle cx="80" cy="80" r="4" fill="white" />
+        {/* Spreadsheet */}
+        <rect x="20" y="20" width="120" height="100" rx="6" fill="white" opacity="0.9" />
+        {/* Header row */}
+        <rect x="20" y="20" width="120" height="18" rx="6" fill="#0D9488" opacity="0.8" />
+        <rect x="20" y="32" width="120" height="6" fill="#0D9488" opacity="0.8" />
+        {/* Column dividers */}
+        <line x1="65" y1="20" x2="65" y2="120" stroke="#0D9488" strokeWidth="1" opacity="0.3" />
+        <line x1="105" y1="20" x2="105" y2="120" stroke="#0D9488" strokeWidth="1" opacity="0.3" />
+        {/* Row dividers */}
+        <line x1="20" y1="55" x2="140" y2="55" stroke="#0D9488" strokeWidth="1" opacity="0.3" />
+        <line x1="20" y1="72" x2="140" y2="72" stroke="#0D9488" strokeWidth="1" opacity="0.3" />
+        <line x1="20" y1="89" x2="140" y2="89" stroke="#0D9488" strokeWidth="1" opacity="0.3" />
+        <line x1="20" y1="106" x2="140" y2="106" stroke="#0D9488" strokeWidth="1" opacity="0.3" />
+        {/* Cell content bars */}
+        <rect x="26" y="43" width="32" height="5" rx="2" fill="#0D9488" opacity="0.5" />
+        <rect x="71" y="43" width="22" height="5" rx="2" fill="#0D9488" opacity="0.4" />
+        <rect x="111" y="43" width="18" height="5" rx="2" fill="#0D9488" opacity="0.4" />
+        <rect x="26" y="60" width="28" height="5" rx="2" fill="#0D9488" opacity="0.35" />
+        <rect x="71" y="60" width="25" height="5" rx="2" fill="#0D9488" opacity="0.3" />
+        <rect x="111" y="60" width="14" height="5" rx="2" fill="#14B8A6" opacity="0.6" />
+        <rect x="26" y="77" width="34" height="5" rx="2" fill="#0D9488" opacity="0.35" />
+        <rect x="71" y="77" width="20" height="5" rx="2" fill="#0D9488" opacity="0.3" />
+        <rect x="111" y="77" width="18" height="5" rx="2" fill="#0D9488" opacity="0.4" />
+        <rect x="26" y="94" width="26" height="5" rx="2" fill="#0D9488" opacity="0.35" />
+        <rect x="71" y="94" width="28" height="5" rx="2" fill="#0D9488" opacity="0.3" />
+        <rect x="111" y="94" width="14" height="5" rx="2" fill="#14B8A6" opacity="0.6" />
+        {/* Download arrow */}
+        <circle cx="80" cy="143" r="12" fill="white" opacity="0.9" />
+        <path d="M80 136 L80 148 M74 143 L80 150 L86 143" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M80 120 L80 130" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
       </svg>
     ),
   },

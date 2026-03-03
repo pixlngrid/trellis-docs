@@ -355,6 +355,39 @@ Categories can be nested for deeper hierarchies:
 }
 ```
 
+## Sidebar export
+
+The sidebar export generates a CSV snapshot of your documentation structure, including frontmatter metadata from every page. It's designed for content auditing in a spreadsheet.
+
+```bash
+node scripts/export-sidebar.js > sidebar.csv
+```
+
+Or via npm:
+
+```bash
+npm run export:sidebar > sidebar.csv
+```
+
+The CSV includes one row per page in sidebar order, with the following columns:
+
+| Column | Source |
+|--------|--------|
+| Doc ID | `config/sidebar.ts` item id |
+| Title | `title` frontmatter or sidebar label |
+| URL | Derived from doc id |
+| Category | Parent category path (e.g. `Guides > Deployment`) |
+| Draft | `draft: true` frontmatter → `Yes` |
+| Doc Type | `doc_type` frontmatter |
+| Role | `role` frontmatter (semicolon-separated) |
+| Last Updated | `last_update.date` frontmatter |
+| Author | `last_update.author` frontmatter |
+| Description | `description` frontmatter |
+| Keywords | `keywords` frontmatter (semicolon-separated) |
+| File Path | Relative path from project root |
+
+The export reflects the sidebar order, not alphabetical order, so the CSV rows match the reading sequence a user would follow through the docs.
+
 ## Landing page
 
 By default, the root URL (`/`) renders a landing page with a hero section and feature cards. This is defined in `app/page.tsx`.
