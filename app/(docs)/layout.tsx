@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Navbar } from '@/components/docs/navbar'
 import { Sidebar } from '@/components/docs/sidebar'
 import { Footer } from '@/components/docs/footer'
+import { BackToTop } from '@/components/docs/back-to-top'
 
 export default function DocsLayout({
   children,
@@ -22,6 +23,7 @@ export default function DocsLayout({
         </main>
       </div>
       <Footer />
+      <BackToTop />
     </div>
   )
 }

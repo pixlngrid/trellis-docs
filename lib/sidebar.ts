@@ -10,11 +10,22 @@ export interface ResolvedSidebarItem {
   items?: ResolvedSidebarItem[]
 }
 
+const WORD_MAP: Record<string, string> = {
+  ai: 'AI',
+  api: 'API',
+  apis: 'APIs',
+  faq: 'FAQ',
+  sdk: 'SDK',
+  yaml: 'YAML',
+  cosmosdb: 'CosmosDB',
+}
+
 function titleFromId(id: string): string {
   const last = id.split('/').pop() || id
-  return last === 'index'
+  const raw = last === 'index'
     ? id.split('/').slice(-2, -1)[0] || 'Index'
     : last.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  return raw.replace(/\b\w+\b/g, (word) => WORD_MAP[word.toLowerCase()] ?? word)
 }
 
 export function resolveSidebar(
