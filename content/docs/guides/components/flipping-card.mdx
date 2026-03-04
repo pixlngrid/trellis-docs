@@ -1,0 +1,214 @@
+---
+title: FlippingCard
+description: Interactive quiz cards that flip to reveal multiple-choice questions with instant feedback.
+keywords: [component, flipping card, quiz, interactive, knowledge check]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+The FlippingCard component renders a gallery of interactive cards. The front side displays informational content; clicking "Quiz Yourself" flips the card to reveal a multiple-choice question with instant correct/incorrect feedback.
+
+## Features
+
+- Responsive card grid (1 column on mobile, 2 on tablet, 3 on desktop)
+- CSS 3D flip animation with `perspective` and `backface-visibility`
+- Multiple-choice quiz on the back with radio buttons
+- Correct/incorrect feedback with per-option explanations
+- Keyboard accessible (Enter / Space to flip)
+- Dark mode support via design tokens
+- Card data can live in a JSON file for easy maintenance
+
+## Dependencies
+
+No external UI libraries required. The component uses:
+
+- React (`useState`)
+- Tailwind CSS utility classes
+- `lucide-react` for the back-arrow icon
+
+## Usage
+
+There are two ways to use FlippingCard: **inline data** for quick one-offs, or **JSON data file** for larger card sets that are easier to maintain.
+
+### Option 1: JSON data file (recommended)
+
+For anything beyond a couple of cards, store the data in a JSON file and create a thin wrapper component. This keeps your MDX clean and makes the card content easy to edit without touching markup.
+
+**1. Create the data file:**
+
+```json title="data/effective-yaml-inputs.json"
+[
+  {
+    "byline": "YAML WRITING TIPS",
+    "title": "Be Direct and Clear",
+    "description": "Direct and clear language in YAML fields enhances user understanding, reducing confusion and errors.",
+    "frontContent": [
+      "By eliminating unnecessary words, YAML becomes more user-friendly and maintainable.",
+      "This approach allows users to grasp required information quickly."
+    ],
+    "checkYourKnowledge": {
+      "question": "Which is the most direct and clear YAML input for a component name?",
+      "options": [
+        "Please provide the name of your component",
+        "Enter the component's unique identifier",
+        "The component name goes here",
+        "Component name"
+      ],
+      "correctAnswer": 1,
+      "explanations": [
+        { "text": "Too verbose and polite for a YAML field.", "isCorrect": false },
+        { "text": "Direct, clear, and specifies that it should be unique — an important aspect of component naming.", "isCorrect": true },
+        { "text": "Not clear enough about what kind of input is expected.", "isCorrect": false },
+        { "text": "Concise, but doesn't provide enough guidance.", "isCorrect": false }
+      ]
+    }
+  },
+  {
+    "byline": "YAML WRITING TIPS",
+    "title": "Use Short, Specific Descriptions",
+    "description": "Concise, specific descriptions in YAML fields balance brevity and informativeness.",
+    "frontContent": [
+      "This approach reduces cognitive load and improves scannability.",
+      "The goal is to clearly communicate requirements while avoiding information overload."
+    ],
+    "checkYourKnowledge": {
+      "question": "Which description is both short and specific for a 'system' field?",
+      "options": [
+        "The system",
+        "Enter the system name this component is part of",
+        "Specify the broader system context for dependency tracking",
+        "Please provide the name of the system that this particular component belongs to"
+      ],
+      "correctAnswer": 2,
+      "explanations": [
+        { "text": "Too vague — doesn't provide any useful information.", "isCorrect": false },
+        { "text": "More specific, but doesn't explain why this information is important.", "isCorrect": false },
+        { "text": "Concise and informative — explains what to enter and why it matters.", "isCorrect": true },
+        { "text": "Too verbose — doesn't add much beyond the simpler options.", "isCorrect": false }
+      ]
+    }
+  }
+]
+```
+
+**2. Create a wrapper component:**
+
+```tsx title="components/custom/effective-yaml-inputs.tsx"
+'use client'
+
+import { FlippingCard } from '@/components/custom/flipping-card'
+import cardData from '@/data/effective-yaml-inputs.json'
+
+export function EffectiveYamlInputs() {
+  return <FlippingCard data={cardData} />
+}
+```
+
+**3. Register in MDX components** (optional — makes it available without importing):
+
+```ts title="components/docs/mdx/index.tsx"
+import { EffectiveYamlInputs } from '@/components/custom/effective-yaml-inputs'
+
+export const mdxComponents = {
+  // ... existing components
+  EffectiveYamlInputs,
+}
+```
+
+**4. Use in MDX:**
+
+```mdx
+## Check Your Knowledge
+
+<EffectiveYamlInputs />
+```
+
+### Option 2: Inline data
+
+For a small number of cards, pass the data directly in MDX. The component is globally registered — no import needed.
+
+```mdx
+<FlippingCard data={[
+  {
+    byline: "TOPIC",
+    title: "Card Title",
+    description: "Brief description.",
+    frontContent: ["Additional detail."],
+    checkYourKnowledge: {
+      question: "Your question here?",
+      options: ["Option A", "Option B"],
+      correctAnswer: 0,
+      explanations: [
+        { text: "A is correct.", isCorrect: true },
+        { text: "B is not the best choice.", isCorrect: false }
+      ]
+    }
+  }
+]} />
+```
+
+## Props
+
+The `FlippingCard` component accepts a single prop:
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `data` | `CardData[]` | Yes | Array of card objects (see schema below) |
+
+### CardData schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `byline` | `string` | Small label at the top of the card front (e.g. category or topic) |
+| `title` | `string` | Main heading on the card front |
+| `description` | `string` | Brief description paragraph below the title |
+| `frontContent` | `string[]` | Additional content paragraphs on the card front |
+| `checkYourKnowledge` | `object` | Quiz configuration (see below) |
+
+### checkYourKnowledge schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `question` | `string` | The quiz question displayed on the card back |
+| `options` | `string[]` | Array of answer choices (rendered as radio buttons) |
+| `correctAnswer` | `number` | Zero-based index of the correct option |
+| `explanations` | `object[]` | One explanation per option (see below) |
+
+### Explanation schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `text` | `string` | Explanation text shown after the user submits their answer |
+| `isCorrect` | `boolean` | Whether this explanation corresponds to the correct answer |
+
+## How it works
+
+1. Cards render in a responsive CSS grid.
+2. Clicking a card (or pressing Enter/Space) triggers a CSS 3D flip animation.
+3. The back side shows the quiz question with radio buttons.
+4. After selecting an option and clicking **Check Your Answer**:
+   - **Correct** — shows "Correct!" with the correct explanation in green.
+   - **Incorrect** — shows "Incorrect." with the selected option's explanation in red, followed by the correct explanation in green.
+5. Clicking the card again flips it back and resets the quiz state.
+
+Only one card can be flipped at a time — flipping a new card automatically flips the previous one back.
+
+## File organization
+
+```
+data/
+└── effective-yaml-inputs.json    ← Card data (JSON)
+components/
+└── custom/
+    ├── flipping-card.tsx          ← Core component
+    └── effective-yaml-inputs.tsx  ← Wrapper (imports JSON + renders FlippingCard)
+```
+
+## Tips
+
+- **JSON data file for large sets** — storing card data in `data/*.json` keeps MDX files clean and makes content editable by non-developers.
+- The `explanations` array must have the same length as `options`, with each entry corresponding to the option at the same index.
+- Set `isCorrect: true` on exactly one explanation — the one matching `correctAnswer`.
+- Keep front content concise. The card has a minimum height of 320px but doesn't scroll.
+- The component is a client component (`'use client'`) since it uses `useState` for flip and quiz state.

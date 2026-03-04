@@ -1,0 +1,112 @@
+---
+title: Tabs
+description: Pill-style tabbed content with URL query parameter synchronization.
+keywords: [tabs, url sync, pill style, query parameters, tabitem]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+Use the `<Tabs>` and `<TabItem>` components for tabbed content. These components are globally registered — no import needed. Tab state syncs to the URL so tabs are shareable.
+
+{vars.productName} tabs use a **pill-style design** with **URL query parameter synchronization**.
+
+`````text
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+
+    ```bash
+    npm install @pixlngrid/trellis
+    ```
+
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+
+    ```bash
+    yarn add @pixlngrid/trellis
+    ```
+
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+
+    ```bash
+    pnpm add @pixlngrid/trellis
+    ```
+
+  </TabItem>
+</Tabs>
+`````
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+
+```bash
+npm install @pixlngrid/trellis
+```
+
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+
+```bash
+yarn add @pixlngrid/trellis
+```
+
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+
+```bash
+pnpm add @pixlngrid/trellis
+```
+
+  </TabItem>
+</Tabs>
+
+## URL synchronization
+
+When you select a tab, the choice is saved to the URL as a query parameter. This means:
+
+- **Shareable links** — share a URL that opens on the correct tab
+- **Bookmarkable** — browser bookmarks preserve the tab selection
+- **Back/forward** — browser history tracks tab changes
+
+For example, selecting the "yarn" tab above adds `?tabs=yarn` to the URL.
+
+### How it works
+
+The logic lives in `components/docs/Tabs/index.js`. On tab selection:
+
+1. The component reads the current URL search parameters.
+2. The component updates the `tabs` parameter (or a custom parameter name if `queryString` is set).
+3. The component pushes the new URL to the browser history.
+
+On page load, the component checks for a matching query parameter and selects that tab.
+
+### Custom query parameter names
+
+By default, the parameter is named `tabs`. You can customize it per tab group:
+
+```jsx
+<Tabs queryString="package-manager">
+  <TabItem value="npm" label="npm">...</TabItem>
+  <TabItem value="yarn" label="yarn">...</TabItem>
+</Tabs>
+```
+
+This uses `?package-manager=yarn` instead of `?tabs=yarn`.
+
+## Usage
+
+```mdx
+<Tabs>
+  <TabItem value="option-a" label="Option A" default>
+    Content for Option A
+  </TabItem>
+  <TabItem value="option-b" label="Option B">
+    Content for Option B
+  </TabItem>
+</Tabs>
+```
+
+:::tip
+Set `default` on the tab that should be selected when no query parameter is present.
+:::

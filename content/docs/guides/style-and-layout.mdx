@@ -1,0 +1,342 @@
+---
+title: Style and Layout
+description: Theme components, design tokens, and visual customization in Trellis.
+keywords: [theme, design tokens, css variables, branding, logo, colors, layout, last-updated]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+{vars.productName} includes custom theme components and a design token system that give you full control over your site's look and feel.
+
+## Theme components
+
+{vars.productName} uses fully custom theme components. This gives complete control over every aspect of rendering — from where the last-updated date appears to what icons admonitions use.
+
+### Directory structure
+
+```
+components/docs/
+├── mdx/
+│   ├── index.tsx            # MDX component registry
+│   ├── callout.tsx          # Admonitions (note, tip, info, caution, danger) with custom SVG icons
+│   ├── code-block.tsx       # Shiki syntax highlighting (server component)
+│   ├── code-block-client.tsx # Copy button + word wrap toggle (client component)
+│   ├── heading.tsx          # Heading anchors with copy-to-clipboard
+│   ├── tabs.tsx             # Pill-style tabs with URL sync
+│   ├── image-lightbox.tsx   # Click-to-zoom image modal
+│   └── mermaid.tsx          # Mermaid diagram renderer with pan/zoom
+├── search/
+│   └── search-dialog.tsx    # Cmd+K search modal (Fuse.js)
+├── navbar.tsx               # Top navbar + mobile sidebar drawer
+├── sidebar.tsx              # Desktop sidebar with collapsible categories
+├── breadcrumbs.tsx          # Breadcrumb navigation
+├── toc.tsx                  # Table of contents (right sidebar)
+└── footer.tsx               # Site footer
+```
+
+### Modifying theme components
+
+To customize a component, edit it directly in `components/docs/`.
+
+:::tip
+Before making changes, read the existing component code to understand what it does.
+:::
+
+:::caution
+Since these are custom components, they are maintained within the Trellis project. When upgrading Next.js, check for any breaking changes that might affect theme components.
+:::
+
+## Last-updated placement
+
+In many documentation frameworks, the last-updated date and "Edit this page" link appear at the **bottom** of the page, in the footer area. {vars.productName} moves them to the **top**, directly below the page title.
+
+### Why top placement?
+
+Readers want to know immediately whether the content they're reading is current. Placing the date at the top gives instant context about freshness — no scrolling required. This is especially important for documentation that changes frequently, like API references or configuration guides.
+
+### Configuration
+
+The date and author are set per-page via frontmatter:
+
+```yaml title="Any .mdx file"
+---
+last_update:
+  date: 02/20/2026
+  author: Your Name
+---
+```
+
+The `author` field is useful as a subject matter expert reference for contributors. To control whether the author name is displayed on the page, toggle `showAuthor` in `config/site.ts`:
+
+```ts title="config/site.ts"
+lastUpdated: {
+  showAuthor: false,  // true to display the author next to the date
+},
+```
+
+When `showAuthor` is `false` (the default), only the date renders. The author remains in the frontmatter for contributor reference.
+
+## Design tokens
+
+{vars.productName} uses a design token system that converts a single JSON file into CSS custom properties. This gives you a centralized place to define your brand colors, spacing, typography, and other design values.
+
+### How it works
+
+```
+design-tokens.json  →  build-tokens.js  →  app/tokens.css  →  globals.css
+```
+
+1. **`design-tokens.json`** defines tokens as nested objects with `value` and `type` properties
+2. **`scripts/build-tokens.js`** reads the JSON and generates a `:root {}` CSS block
+3. **`app/tokens.css`** is the generated output (do not edit manually)
+4. **`app/globals.css`** maps token variables to CSS variables
+
+The script runs automatically before `npm run dev` and `npm run build` (via the `prebuild` and `predev` npm scripts).
+
+### Token file structure
+
+```json title="design-tokens.json"
+{
+  "brand": {
+    "primary-600": {
+      "value": "#7c3aed",
+      "type": "color"
+    }
+  },
+  "accent": {
+    "teal-400": {
+      "value": "#2dd4bf",
+      "type": "color"
+    }
+  },
+  "spacing": {
+    "spacing-16": {
+      "value": "16px",
+      "type": "spacing"
+    }
+  }
+}
+```
+
+Each token has:
+- **`value`** — the actual CSS value
+- **`type`** — a descriptor (used for documentation; not consumed by the build script)
+
+### Generated CSS
+
+The build script converts nested keys into CSS custom property names using `--` prefix and `-` separators:
+
+```css title="app/tokens.css (generated)"
+:root {
+  --brand-primary-600-value: #7c3aed;
+  --accent-teal-400-value: #2dd4bf;
+  --spacing-spacing-16-value: 16px;
+}
+```
+
+### Token categories
+
+The default `design-tokens.json` includes these categories:
+
+| Category | Tokens | Description |
+|----------|--------|-------------|
+| `neutral` | `white`, `slate-50` through `slate-900` | Background and text colors |
+| `brand` | `primary-50` through `primary-900` | Primary brand color scale (violet) |
+| `accent` | `teal-200` through `teal-600` | Accent color scale (teal) |
+| `utility` | `green-20/100`, `red-20/100`, `yellow-20/100` | Status/feedback colors |
+| `spacing` | `spacing-8` through `spacing-120` | Spacing values in pixels |
+| `border-radius` | `border-radius-4/8/30/900` | Border radius values |
+| `border-width` | `border-width-1/2/none` | Border width values |
+| `typography` | `fontFamily` | Font family stack |
+
+### Using tokens in CSS
+
+Reference generated tokens in `globals.css` or any CSS module:
+
+```css
+.my-component {
+  color: var(--brand-primary-600-value);
+  background: var(--neutral-slate-50-value);
+  padding: var(--spacing-spacing-16-value);
+  border-radius: var(--border-radius-border-radius-8-value);
+}
+```
+
+### Mapping to theme variables
+
+`globals.css` maps tokens to theme CSS variables so the entire theme responds to token changes:
+
+```css title="app/globals.css (excerpt)"
+:root {
+  --ifm-color-primary: var(--brand-primary-600-value);
+  --ifm-color-primary-dark: var(--brand-primary-700-value);
+  --ifm-color-primary-light: var(--brand-primary-500-value);
+  --ifm-font-family-base: var(--typography-font-family-value);
+}
+```
+
+## Customizing design tokens
+
+### Changing brand colors
+
+Open `design-tokens.json` and update the `brand` section. The default uses a navy blue scale:
+
+```json title="design-tokens.json"
+{
+  "brand": {
+    "primary-50":  { "value": "#f0f5fa", "type": "color" },
+    "primary-100": { "value": "#dce8f2", "type": "color" },
+    "primary-200": { "value": "#b3cde0", "type": "color" },
+    "primary-300": { "value": "#8bb3cf", "type": "color" },
+    "primary-400": { "value": "#7ba4c4", "type": "color" },
+    "primary-500": { "value": "#4a7da8", "type": "color" },
+    "primary-600": { "value": "#2a5a82", "type": "color" },
+    "primary-700": { "value": "#1a3b5c", "type": "color" },
+    "primary-800": { "value": "#122a43", "type": "color" },
+    "primary-900": { "value": "#0b1c2e", "type": "color" }
+  }
+}
+```
+
+Replace the hex values with your brand's color scale. Use a tool like [Tailwind CSS Colors](https://tailwindcss.com/docs/colors) or [Coolors](https://coolors.co/) to generate a consistent scale.
+
+After editing, regenerate the CSS:
+
+```bash
+npm run build-tokens
+```
+
+Or restart the dev server — it runs `build-tokens` automatically:
+
+```bash
+npm run dev
+```
+
+### Changing accent colors
+
+The `accent` section controls secondary colors used for interactive elements like links and highlights in dark mode:
+
+```json
+{
+  "accent": {
+    "olive-200": { "value": "#dde896", "type": "color" },
+    "olive-300": { "value": "#c8d96e", "type": "color" },
+    "olive-400": { "value": "#b4ca4a", "type": "color" },
+    "olive-500": { "value": "#a2b53a", "type": "color" },
+    "olive-600": { "value": "#8a9a2f", "type": "color" }
+  }
+}
+```
+
+:::tip
+When choosing accent colors, ensure sufficient contrast against both light and dark backgrounds. The `400` shade is used most often.
+:::
+
+### Adding tokens
+
+Add categories or tokens by extending the JSON structure:
+
+```json title="Adding a secondary brand color"
+{
+  "brand": {
+    "primary-600": { "value": "#2a5a82", "type": "color" },
+    "secondary-600": { "value": "#2563eb", "type": "color" }
+  }
+}
+```
+
+The build script generates:
+
+```css
+--color-brand-secondary-600: #2563eb;
+```
+
+You can then use it in `app/globals.css` or any component:
+
+```css
+.my-element {
+  color: var(--color-brand-secondary-600);
+}
+```
+
+### Changing typography
+
+Update the font family in the `typography` section:
+
+```json
+{
+  "typography": {
+    "fontFamily": {
+      "name": "font-family",
+      "value": "'Inter', 'Segoe UI', system-ui, sans-serif"
+    }
+  }
+}
+```
+
+If using a web font, add the import in `app/globals.css`:
+
+```css title="app/globals.css"
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+```
+
+## Replacing the logo
+
+Trellis ships with built-in SVG logo components. To use your own logo:
+
+### Option A: Image files (simplest)
+
+1. Place your logo images in `public/img/`:
+   - **Navbar logo** — small mark, ~32px tall (e.g. `my-logo-small.svg`)
+   - **Hero logo** — larger version for the landing page (e.g. `my-logo-hero.svg`)
+
+2. Update `config/site.ts`:
+
+```ts title="config/site.ts"
+logo: {
+  navbar: '/img/my-logo-small.svg',
+  hero: '/img/my-logo-hero.svg',
+  alt: 'My Company Logo',
+  useBuiltIn: false,  // Use image files instead of built-in SVG components
+},
+```
+
+### Option B: React components (advanced)
+
+For full control, replace the built-in components in `components/brand/trellis-logo.tsx` with your own SVG React components. The built-in components are:
+
+| Component | Used in | Description |
+|-----------|---------|-------------|
+| `TrellisIcon` | Navbar | Small circular mark |
+| `TrellisStacked` | Landing page hero | Icon + text stacked vertically |
+| `TrellisHorizontal` | — | Icon + text side by side |
+| `TrellisWordmark` | — | Text only, no icon |
+| `TrellisFavicon` | — | Simplified 32x32 mark |
+
+Keep `useBuiltIn: true` in `config/site.ts` to use these components.
+
+:::tip
+Logo text elements use `fill="currentColor"` so they automatically adapt to light and dark mode. Follow this pattern for your own SVG components.
+:::
+
+## Full rebranding checklist
+
+1. **Colors** — Update `brand` and `accent` sections in `design-tokens.json`.
+2. **Typography** — Update `typography.fontFamily` (add web font import if needed).
+3. **Logo** — Replace images in `public/img/` or update components in `components/brand/`.
+4. **Config** — Update `title`, `tagline`, `url`, `repoUrl`, and `logo` in `config/site.ts`.
+5. **Navigation** — Update links in `config/navigation.ts` and copyright in `footerConfig`.
+6. **Regenerate** — Run `npm run build-tokens`.
+7. **Verify** — Run `npm run build` and check for errors, then `npm run dev` for visual review.
+
+## Token naming conventions
+
+Follow these conventions for consistency:
+
+- **Colors**: `{category}-{shade}` → `primary-600`, `olive-400`
+- **Spacing**: `spacing-{pixels}` → `spacing-16`, `spacing-24`
+- **Border radius**: `border-radius-{pixels}` → `border-radius-8`
+- **Border width**: `border-width-{pixels}` → `border-width-1`
+
+The build script converts these to CSS variables by joining the full path with hyphens: `--color-brand-primary-600`, `--spacing-spacing-16`.

@@ -1,9 +1,9 @@
 ---
 title: Deployment
 description: Build and deploy your Trellis docs site to any static hosting provider.
-keywords: [deployment, build, export, hosting, static]
+keywords: [deployment, build, export, hosting, static, redirects]
 last_update:
-  date: 02/22/2026
+  date: 03/04/2026
   author: Trellis
 ---
 
@@ -147,6 +147,82 @@ aws cloudfront create-invalidation --distribution-id YOUR_DIST_ID --paths "/*"
 ### Any static host
 
 The `out/` folder is self-contained. Upload it to any web server or CDN that can serve static files — Apache, Nginx, Cloudflare Pages, Firebase Hosting, etc.
+
+## Redirects
+
+{vars.productName} includes a redirects plugin that generates HTML pages with meta-refresh redirects at build time. This is useful when you rename or move pages and want old URLs to point to the new location.
+
+### Redirect file format
+
+Create a `redirects.json` file at the project root:
+
+```json title="redirects.json"
+[
+  {
+    "from": "/old-getting-started/",
+    "to": "/getting-started/"
+  },
+  {
+    "from": "/docs/setup/",
+    "to": "/getting-started/",
+    "type": 301
+  },
+  {
+    "from": "/external-redirect/",
+    "to": "https://example.com/new-location"
+  }
+]
+```
+
+| Field | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `from` | Yes | — | The old URL path to redirect from |
+| `to` | Yes | — | The destination URL (relative path or absolute URL) |
+| `type` | No | `301` | HTTP redirect type (used for documentation; the actual redirect uses meta-refresh) |
+
+### How it works
+
+1. **Reads** redirect definitions from `redirects.json` (or a file specified in config).
+2. **Generates** an HTML file for each redirect source at build time.
+3. **Embeds** a `<meta http-equiv="refresh">` tag and a JavaScript fallback in each HTML file.
+4. **Creates** both `path.html` and `path/index.html` to handle trailing slash variations.
+
+### Plugin configuration
+
+```ts title="config/site.ts"
+['redirects-plugin', {
+  redirectsFile: 'redirects.json',  // Path to the redirects file
+}]
+```
+
+You can also define inline redirects in the config:
+
+```ts
+['redirects-plugin', {
+  redirectsFile: 'redirects.json',
+  redirects: [
+    { from: '/old-page/', to: '/new-page/' },
+  ],
+}]
+```
+
+### Trailing slash handling
+
+The plugin respects the `trailingSlash` setting in `config/site.ts`:
+
+- **`trailingSlash: true`** — ensures `to` URLs end with `/`
+- **`trailingSlash: false`** — strips trailing slashes from `to` URLs
+- **`trailingSlash: undefined`** — uses `to` URLs as-is
+
+### Auto-detection
+
+If `redirectsFile` is not specified, the plugin automatically checks these locations:
+
+1. `redirects.json` (project root)
+2. `config/redirects.json`
+3. `src/redirects.json`
+
+The first valid file found is used.
 
 ## Configuration reference
 

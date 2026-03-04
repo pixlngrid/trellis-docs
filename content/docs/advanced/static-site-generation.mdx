@@ -1,0 +1,77 @@
+---
+title: Static Site Generation
+description: How Trellis generates a static site using Next.js output export.
+keywords: [static, export, build, output, ssg, next.js]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+{vars.productName} generates a fully static site — no Node.js server required at runtime. This is configured via `output: 'export'` in `next.config.mjs`.
+
+## Build pipeline
+
+The full build runs these steps in order:
+
+```bash
+npm run build
+```
+
+1. **`build-tokens.js`** — Converts `design-tokens.json` into `app/tokens.css`
+2. **`build-search-index.js`** — Indexes all docs, generates `public/searchIndex.json`
+3. **`build-faq-index.js`** — Scans FAQ pages for questions, generates `public/faqIndex.json`
+4. **`build-api-index.js`** — Processes OpenAPI specs, generates `public/api-specs/`
+5. **`next build`** — Compiles all pages into static HTML in the `out/` directory
+6. **`check-links.js`** — Validates internal links in the generated HTML
+
+Steps 1–4 run as pre-build scripts. Step 6 runs post-build and fails the build if broken links are found.
+
+## The `out/` directory
+
+After a successful build, the `out/` directory contains:
+
+```
+out/
+├── index.html                    # Landing page
+├── getting-started/
+│   └── index.html                # /getting-started/
+├── guides/
+│   ├── docs/
+│   │   └── index.html            # /guides/docs/
+│   └── markdown/
+│       ├── index.html            # /guides/markdown/
+│       └── code-blocks/
+│           └── index.html        # /guides/markdown/code-blocks/
+├── _next/
+│   └── static/                   # JS, CSS, and other assets
+├── img/                          # Static images from public/img/
+├── searchIndex.json              # Search index for Fuse.js
+├── faqIndex.json                 # FAQ question index
+└── api-specs/                    # Processed OpenAPI specs
+```
+
+Every page becomes a `{path}/index.html` file, which web servers serve at the trailing-slash URL.
+
+## Deployment
+
+The `out/` directory can be deployed to any static hosting provider:
+
+- **GitHub Pages** — push `out/` or use a GitHub Action
+- **Netlify** — set build command to `npm run build` and publish directory to `out`
+- **Vercel** — works automatically with Next.js static export
+- **AWS S3 + CloudFront** — upload `out/` to an S3 bucket
+- **Any web server** — serve the `out/` directory as static files
+
+See [Deployment](/guides/deployment/) for hosting-specific instructions.
+
+## Limitations of static export
+
+Because {vars.productName} uses `output: 'export'`, some Next.js features are not available:
+
+- **No server-side rendering (SSR)** — all pages are pre-rendered at build time
+- **No API routes** — `app/api/` routes are not supported
+- **No middleware** — Next.js middleware requires a server
+- **No ISR** — Incremental Static Regeneration requires a server
+- **`useSearchParams()`** — must be wrapped in `<Suspense>` for static export
+
+These limitations are trade-offs for the simplicity of static hosting — no server to manage, no cold starts, and deployment to any CDN.

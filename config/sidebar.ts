@@ -3,80 +3,68 @@ export type SidebarItem =
   | { type: 'category'; label: string; link?: string; collapsed?: boolean; items: SidebarItem[] }
   | { type: 'api'; id: string; label?: string }
 
+
 export const mainSidebar: SidebarItem[] = [
+  { type: 'doc', id: 'introduction', label: 'Introduction' },
   { type: 'doc', id: 'getting-started' },
   {
     type: 'category',
-    label: 'Overview',
-    link: 'overview/index',
+    label: 'Guides',
     collapsed: false,
     items: [
-      { type: 'doc', id: 'overview/trellis-vs-nextjs' },
-      { type: 'doc', id: 'overview/architecture' },
-      { type: 'doc', id: 'overview/roadmap' },
-    ],
-  },
-  {
-    type: 'category',
-    label: 'Theme',
-    link: 'theme/index',
-    collapsed: true,
-    items: [
-      { type: 'doc', id: 'theme/last-updated' },
-      { type: 'doc', id: 'theme/heading-anchors' },
-      { type: 'doc', id: 'theme/tabs' },
-      { type: 'doc', id: 'theme/admonitions' },
-    ],
-  },
-  {
-    type: 'category',
-    label: 'Plugins',
-    link: 'plugins/index',
-    collapsed: true,
-    items: [
-      { type: 'doc', id: 'plugins/smart-search' },
-      { type: 'doc', id: 'plugins/faq-index' },
-      { type: 'doc', id: 'plugins/api-docs', label: 'API Documentation' },
-      { type: 'doc', id: 'plugins/redirects' },
-    ],
-  },
-  {
-    type: 'category',
-    label: 'Design Tokens',
-    link: 'design-tokens/index',
-    collapsed: true,
-    items: [
-      { type: 'doc', id: 'design-tokens/customizing' },
-    ],
-  },
-  {
-    type: 'category',
-    label: 'Components',
-    link: 'components/index',
-    collapsed: true,
-    items: [
-      { type: 'doc', id: 'components/doc-card-list' },
-      { type: 'doc', id: 'components/glossary' },
-      { type: 'doc', id: 'components/feedback' },
-      { type: 'doc', id: 'components/flipping-card' },
-    ],
-  },
-  {
-    type: 'category',
-    label: 'Guides',
-    collapsed: true,
-    items: [
+      { type: 'doc', id: 'guides/docs', label: 'Docs' },
+      { type: 'doc', id: 'guides/blog', label: 'Blog' },
+      {
+        type: 'category',
+        label: 'Markdown Features',
+        link: 'guides/markdown/index',
+        collapsed: true,
+        items: [
+          { type: 'doc', id: 'guides/markdown/mdx-and-react', label: 'MDX and React' },
+          { type: 'doc', id: 'guides/markdown/tabs', label: 'Tabs' },
+          { type: 'doc', id: 'guides/markdown/code-blocks', label: 'Code Blocks' },
+          { type: 'doc', id: 'guides/markdown/admonitions', label: 'Admonitions' },
+          { type: 'doc', id: 'guides/markdown/headings', label: 'Headings' },
+          { type: 'doc', id: 'guides/markdown/links', label: 'Links' },
+          { type: 'doc', id: 'guides/markdown/head-metadata', label: 'Head Metadata' },
+        ],
+      },
+      {
+        type: 'category',
+        label: 'Components',
+        link: 'guides/components/index',
+        collapsed: true,
+        items: [
+          { type: 'doc', id: 'guides/components/doc-card-list', label: 'DocCardList' },
+          { type: 'doc', id: 'guides/components/glossary', label: 'Glossary' },
+          { type: 'doc', id: 'guides/components/feedback', label: 'Feedback' },
+          { type: 'doc', id: 'guides/components/flipping-card', label: 'FlippingCard' },
+        ],
+      },
+      { type: 'doc', id: 'guides/style-and-layout', label: 'Style and Layout' },
+      { type: 'doc', id: 'guides/search', label: 'Search' },
       { type: 'doc', id: 'guides/site-configuration', label: 'Site Configuration' },
-      { type: 'doc', id: 'guides/content-authoring' },
-      { type: 'doc', id: 'guides/writing-docs' },
-      { type: 'doc', id: 'guides/using-components' },
-      { type: 'doc', id: 'guides/i18n' },
-      { type: 'doc', id: 'guides/versioning' },
-      { type: 'doc', id: 'guides/deployment' },
-      { type: 'doc', id: 'guides/migrating-from-docusaurus', label: 'Migrating from Docusaurus' },
-      { type: 'doc', id: 'guides/upgrading' },
+      { type: 'doc', id: 'guides/deployment', label: 'Deployment' },
+      { type: 'doc', id: 'guides/i18n', label: 'Internationalization' },
+      { type: 'doc', id: 'guides/whats-next', label: "What's Next?" },
     ],
   },
+  {
+    type: 'category',
+    label: 'Advanced Guides',
+    link: 'advanced/index',
+    collapsed: true,
+    items: [
+      { type: 'doc', id: 'advanced/architecture', label: 'Architecture' },
+      { type: 'doc', id: 'advanced/routing', label: 'Routing' },
+      { type: 'doc', id: 'advanced/static-site-generation', label: 'Static Site Generation' },
+      { type: 'doc', id: 'advanced/client-architecture', label: 'Client Architecture' },
+      { type: 'doc', id: 'advanced/api-docs', label: 'API Documentation' },
+      { type: 'doc', id: 'advanced/versioning', label: 'Versioning' },
+    ],
+  },
+  { type: 'doc', id: 'upgrading' },
+  { type: 'doc', id: 'migrating-from-docusaurus', label: 'Migrating from Docusaurus' },
   {
     type: 'category',
     label: 'Troubleshooting',
@@ -90,10 +78,10 @@ export const mainSidebar: SidebarItem[] = [
   {
     type: 'category',
     label: 'API Reference',
-    collapsed: false,
+    collapsed: true,
     items: [
       { type: 'api', id: 'petstore', label: 'Petstore API' },
-       { type: 'api', id: 'auth', label: 'Movie API' },
+      { type: 'api', id: 'auth', label: 'Movie API' },
     ],
   },
 ]

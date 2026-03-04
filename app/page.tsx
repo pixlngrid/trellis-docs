@@ -40,7 +40,7 @@ export default function Home() {
               Get Started
             </Link>
             <Link
-              href="/overview/"
+              href="/introduction/"
               className="px-6 py-3 rounded-lg border font-medium hover:bg-[var(--muted)] no-underline text-[var(--foreground)]"
             >
               Learn More

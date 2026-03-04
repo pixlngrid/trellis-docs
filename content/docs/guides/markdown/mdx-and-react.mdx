@@ -1,0 +1,170 @@
+---
+title: MDX and React
+description: Using JSX, React components, and custom elements in MDX documentation files.
+keywords: [mdx, react, jsx, components, custom, global, client, server]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+MDX lets you use JSX directly in your markdown files. This means you can import and render React components alongside standard markdown content, enabling interactive documentation, custom layouts, and reusable UI elements.
+
+## Details/Collapsible
+
+<details>
+  <summary>Select to expand</summary>
+
+  This content is hidden by default and shown when you select the summary.
+
+  You can include any markdown content here, including:
+  - Lists
+  - Code blocks
+  - Images
+
+</details>
+
+## Raw HTML in MDX
+
+MDX compiles to JSX, not plain HTML. That means any raw HTML you write inside an `.mdx` file must follow JSX rules — not HTML rules. The most common mistake is using HTML attribute names that React doesn't recognize.
+
+### Use `className`, not `class`
+
+HTML's `class` attribute becomes `className` in JSX. Using `class` causes a runtime error:
+
+```mdx
+{/* ❌ Breaks at runtime */}
+<div class="my-layout">...</div>
+
+{/* ✅ Correct */}
+<div className="my-layout">...</div>
+```
+
+:::danger
+Using `class=` in MDX produces an **"Invalid DOM property `class`. Did you mean `className`?"** console error and may break the page render.
+:::
+
+### Other HTML → JSX attribute changes
+
+| HTML attribute | JSX equivalent | Notes |
+|----------------|---------------|-------|
+| `class` | `className` | Most common mistake |
+| `for` | `htmlFor` | Used on `<label>` elements |
+| `style="color:red"` | `style={{ color: 'red' }}` | Inline styles must be objects |
+| `<br>` | `<br />` | All void elements must be self-closing |
+| `tabindex` | `tabIndex` | React uses camelCase for most attributes |
+
+### Avoid Docusaurus-specific markup
+
+If you're migrating content from Docusaurus, watch for Infima CSS classes (`col--6`, `card__header`, `container-fluid`, etc.). These classes don't exist in Trellis — replace them with Tailwind equivalents using `className`:
+
+```mdx
+{/* ❌ Docusaurus Infima — won't work in Trellis */}
+<div class="row">
+  <div class="col col--6">...</div>
+</div>
+
+{/* ✅ Tailwind equivalent */}
+<div className="grid grid-cols-2 gap-6">
+  <div>...</div>
+</div>
+```
+
+See the [Migrating from Docusaurus](/migrating-from-docusaurus/) guide for a full reference.
+
+## Tooltip
+
+Add hover tooltips to define terms inline. The `Tooltip` component is globally registered — no import needed.
+
+```mdx
+The team agreed on new <Tooltip content="A target or goal for the performance or quality of a service.">SLOs</Tooltip> for the quarter.
+```
+
+See the [Components Overview](/guides/components/) for full props and usage.
+
+## Creating custom components
+
+You can add your own React components and make them available in MDX — either via explicit `import` or as **global components** that are available on every page without importing.
+
+### 1. Create the component
+
+Add a new file under `components/custom/`:
+
+```tsx title="components/custom/status-badge.tsx"
+'use client'
+
+interface StatusBadgeProps {
+  status: 'stable' | 'beta' | 'deprecated'
+}
+
+const colors = {
+  stable: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  beta: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  deprecated: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+}
+
+export function StatusBadge({ status }: StatusBadgeProps) {
+  return (
+    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${colors[status]}`}>
+      {status}
+    </span>
+  )
+}
+```
+
+:::tip
+Add `'use client'` at the top if the component uses hooks, event handlers, or browser APIs. Pure display components that only accept props can remain server components.
+:::
+
+### 2. Use via import (per-page)
+
+Import it directly in any MDX file:
+
+```mdx
+import { StatusBadge } from '@/components/custom/status-badge';
+
+This feature is <StatusBadge status="beta" />.
+```
+
+This works immediately — no registration needed.
+
+### 3. Register as a global component (optional)
+
+To make a component available on **every page** without importing, add it to `components/docs/mdx/index.tsx`:
+
+```ts title="components/docs/mdx/index.tsx"
+import { StatusBadge } from '@/components/custom/status-badge'
+
+export const mdxComponents: Record<string, React.ComponentType<any>> = {
+  // ... existing components
+  StatusBadge,
+}
+```
+
+You can then use it in any MDX file without an import:
+
+```mdx
+This feature is <StatusBadge status="stable" />.
+```
+
+### Server vs. client components
+
+| Component type | When to use | Directive |
+|----------------|-------------|-----------|
+| **Server** (default) | Static display, no interactivity | None needed |
+| **Client** | Hooks, state, event handlers, browser APIs | `'use client'` at top of file |
+
+All globally registered components in `mdxComponents` are rendered inside a server component (`MDXRemote`), but client components work fine — React handles the boundary automatically.
+
+### File organization
+
+```
+components/
+├── custom/              ← Your custom components
+│   ├── glossary.tsx
+│   ├── feedback.tsx
+│   ├── status-badge.tsx ← New component
+│   └── ...
+└── docs/
+    └── mdx/
+        └── index.tsx    ← Global registration
+```

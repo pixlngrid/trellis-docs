@@ -1,0 +1,68 @@
+---
+title: Client Architecture
+description: How server and client components work together in Trellis.
+keywords: [client, server, components, hydration, mdx, rendering]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+{vars.productName} uses Next.js App Router with a mix of server and client components. Understanding the boundary helps when building custom components or debugging hydration issues.
+
+## Server vs. client components
+
+| Type | Directive | When to use |
+|------|-----------|-------------|
+| **Server** (default) | None needed | Static content, data fetching, no interactivity |
+| **Client** | `'use client'` at top of file | Hooks, state, event handlers, browser APIs |
+
+### What runs on the server
+
+- **Page component** (`app/(docs)/[...slug]/page.tsx`) — loads MDX content, extracts metadata, generates the page
+- **MDX compilation** — `next-mdx-remote` compiles MDX to React components on the server
+- **Code highlighting** — Shiki processes syntax highlighting at build time (server component)
+- **Content loading** — `lib/content.ts` reads files from the filesystem
+
+### What runs on the client
+
+- **Layout** (`app/(docs)/layout.tsx`) — manages sidebar collapse state
+- **Sidebar** — collapsible categories, active link tracking
+- **Search** — Fuse.js search runs entirely in the browser
+- **Tabs** — URL sync and tab selection state
+- **Image lightbox** — click-to-zoom modal
+- **Mermaid diagrams** — rendered client-side via the Mermaid library
+- **Code block controls** — copy button and word wrap toggle
+- **Back-to-top button** — scroll detection and smooth scroll
+
+## MDX rendering pipeline
+
+Documentation pages go through this pipeline:
+
+1. **File loading** — `getDocBySlug()` reads the MDX file and parses frontmatter with `gray-matter`
+2. **Include resolution** — `@include` directives are expanded inline
+3. **Admonition preprocessing** — `:::type Title` syntax is converted to `:::type[Title]` for `remark-directive`
+4. **MDX compilation** — `MDXRemote` from `next-mdx-remote` compiles the content with:
+   - `remarkGfm` — GitHub Flavored Markdown (tables, strikethrough, task lists)
+   - `remarkDirective` + `remarkCallout` — admonition syntax
+   - `rehypeSlug` — auto-generates heading IDs
+   - `rehypeCodeMeta` — processes code block meta strings (title, line highlighting)
+5. **Component mapping** — custom components from `components/docs/mdx/index.tsx` replace default HTML elements
+6. **Rendering** — React renders the component tree to static HTML at build time
+
+## Hydration
+
+Since the site is statically exported, React hydrates the pre-rendered HTML on the client. This means:
+
+- The server-rendered HTML is visible immediately (no blank page flash)
+- Client components become interactive after JavaScript loads
+- The HTML structure must match between server and client renders
+
+### Common hydration issues
+
+- **`<div>` inside `<p>`** — MDX wraps standalone elements in `<p>` tags. If a component renders a `<div>`, it creates invalid nesting. Use `createPortal` for overlay elements.
+- **Date/time mismatches** — avoid rendering `new Date()` directly, as it differs between server and client.
+- **Browser-only APIs** — wrap `window`, `document`, or `localStorage` access in `useEffect` or check `typeof window !== 'undefined'`.
+
+## Content variables
+
+Variables defined in `config/variables.ts` are passed to MDX via `scope: { vars: docVariables }` in the `MDXRemote` options. This lets you use `{vars.productName}` in any MDX file without importing anything.

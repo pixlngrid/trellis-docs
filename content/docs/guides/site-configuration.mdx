@@ -65,7 +65,7 @@ The built-in search indexes all documentation pages at build time. You can tune 
 | `search.excludedFolders` | Folders to skip (default `['includes', '_includes']`) |
 | `search.excludedPrefixes` | File prefixes to skip (default `['_']`) |
 
-See [Smart Search](/plugins/smart-search/) for more details.
+See [Smart Search](/guides/search/) for more details.
 
 ### Blog
 
@@ -138,7 +138,7 @@ Several features can be toggled with an `enabled` property. Blog and release not
 
 #### API documentation
 
-Render OpenAPI/Swagger specs as interactive API reference pages. Place your spec files (YAML or JSON) in the `specDir` directory. See the [API Documentation](/plugins/api-docs/) guide.
+Render OpenAPI/Swagger specs as interactive API reference pages. Place your spec files (YAML or JSON) in the `specDir` directory. See the [API Documentation](/advanced/api-docs/) guide.
 
 ```ts title="config/site.ts"
 apiDocs: {
@@ -167,7 +167,7 @@ i18n: {
 
 #### Versioning
 
-Snapshot your docs at a release so users can browse previous versions. See the [Versioning](/guides/versioning/) guide.
+Snapshot your docs at a release so users can browse previous versions. See the [Versioning](/advanced/versioning/) guide.
 
 ```ts title="config/site.ts"
 versioning: {
@@ -270,7 +270,7 @@ export const siteConfig = {
 ```ts title="config/navigation.ts"
 export const navItems = [
   // Flat link
-  { label: 'Overview', href: '/overview/' },
+  { label: 'Introduction', href: '/introduction/' },
 
   // Dropdown group
   {
@@ -311,7 +311,7 @@ export const footerConfig = {
 | `doc` | `id`, `label?` | A documentation page. `id` is the file path under `content/docs/` without the extension. |
 | `category` | `label`, `items`, `link?`, `collapsed?` | A collapsible group of items. Set `link` to make the label clickable. |
 | `link` | `label`, `href` | An external or arbitrary link in the sidebar. |
-| `api` | `id`, `label?` | An OpenAPI spec page (requires [API Documentation](/plugins/api-docs/) enabled). |
+| `api` | `id`, `label?` | An OpenAPI spec page (requires [API Documentation](/advanced/api-docs/) enabled). |
 
 ### Example
 
@@ -341,7 +341,7 @@ export const mainSidebar: SidebarItem[] = [
 ```
 
 :::note
-The `id` field maps to a file path under `content/docs/`. For example, `id: 'guides/writing-docs'` resolves to `content/docs/guides/writing-docs.mdx` (or `.md`).
+The `id` field maps to a file path under `content/docs/`. For example, `id: 'guides/docs'` resolves to `content/docs/guides/docs.mdx` (or `.md`).
 :::
 
 ## Content variables

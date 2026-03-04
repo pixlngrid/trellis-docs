@@ -16,27 +16,27 @@ Edit `design-tokens.json` at the project root. The build process converts this J
 
 ### Can I migrate from Docusaurus?
 
-Yes. {vars.productName} includes a migration script that copies your content, converts your sidebar, transforms frontmatter, and converts MDX partial imports to `@include` directives. Run `node scripts/migrate-docusaurus.js <path>` to migrate. See the [Migrating from Docusaurus](/guides/migrating-from-docusaurus/) guide for details.
+Yes. {vars.productName} includes a migration script that copies your content, converts your sidebar, transforms frontmatter, and converts MDX partial imports to `@include` directives. Run `node scripts/migrate-docusaurus.js <path>` to migrate. See the [Migrating from Docusaurus](/migrating-from-docusaurus/) guide for details.
 
 ### How does the search work?
 
-The smart search plugin indexes all documentation at build time, generating a `searchIndex.json` file. The plugin performs search client-side using Fuse.js for fast, fuzzy matching. Configure field weights in `config/site.ts`. See the [Smart Search](/plugins/smart-search/) docs for details.
+The smart search plugin indexes all documentation at build time, generating a `searchIndex.json` file. The plugin performs search client-side using Fuse.js for fast, fuzzy matching. Configure field weights in `config/site.ts`. See the [Smart Search](/guides/search/) docs for details.
 
 ### How do I add redirects when I move a page?
 
-Add an entry to `redirects.json` at the project root. For example: `{ "from": "/old-path/", "to": "/new-path/" }`. The redirects plugin generates HTML files with meta-refresh tags at build time. See the [Redirects plugin](/plugins/redirects/) docs.
+Add an entry to `redirects.json` at the project root. For example: `{ "from": "/old-path/", "to": "/new-path/" }`. The redirects plugin generates HTML files with meta-refresh tags at build time. See the [Redirects plugin](/guides/deployment/) docs.
 
 ### What are design tokens?
 
-Design tokens are named values (colors, spacing, border radii, and so on) defined in a single JSON file (`design-tokens.json`). A build script converts them into CSS custom properties that the entire theme consumes. This gives you one place to manage your brand values. See [Design Tokens](/design-tokens/).
+Design tokens are named values (colors, spacing, border radii, and so on) defined in a single JSON file (`design-tokens.json`). A build script converts them into CSS custom properties that the entire theme consumes. This gives you one place to manage your brand values. See [Design Tokens](/guides/style-and-layout/).
 
 ### How do I add a new FAQ page?
 
-Create a new `.mdx` file in the `content/docs/faq/` directory. Use `###` headings for each question. The FAQ index plugin automatically picks up the file and adds its questions to the FAQ table of contents. See [FAQ Index](/plugins/faq-index/).
+Create a new `.mdx` file in the `content/docs/faq/` directory. Use `###` headings for each question. The FAQ index plugin automatically picks up the file and adds its questions to the FAQ table of contents. See [FAQ Index](/guides/search/).
 
 ### How many theme components are ejected?
 
-{vars.productName} includes custom theme components. The major customizations are in `DocItem/Content` (last-updated placement), `Tabs` (URL sync), and `Admonition/Icon` (custom SVGs). See [Theme Overview](/theme/).
+{vars.productName} includes custom theme components. The major customizations are in `DocItem/Content` (last-updated placement), `Tabs` (URL sync), and `Admonition/Icon` (custom SVGs). See [Theme Overview](/guides/style-and-layout/).
 
 ### How do I deploy the site?
 

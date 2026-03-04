@@ -1,0 +1,71 @@
+---
+title: Glossary
+description: How to use the Glossary component to render a searchable term list from JSON data.
+keywords: [glossary, component, terms, definitions]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+The Glossary component renders an alphabetically sorted definition list from a JSON data file.
+
+## Usage
+
+```mdx title="Any .mdx file"
+import { Glossary } from '@/components/custom/glossary';
+
+<Glossary />
+```
+
+The component reads from `src/data/glossary.json` and renders a `<dl>` (definition list) with terms sorted A-Z.
+
+## Data format
+
+```json title="src/data/glossary.json"
+[
+  {
+    "term": "Admonition",
+    "definition": "A callout block used to highlight notes, tips, warnings, and other important information."
+  },
+  {
+    "term": "Design Token",
+    "definition": "A named value (color, spacing, etc.) defined in JSON and converted to a CSS custom property."
+  }
+]
+```
+
+Each entry has:
+- **`term`** — the word or phrase being defined
+- **`definition`** — the definition text
+
+## Adding terms
+
+Edit `src/data/glossary.json` to add, remove, or update terms. The component automatically sorts entries alphabetically — no need to maintain order in the file.
+
+## Rendered output
+
+The component generates HTML like:
+
+```html
+<dl>
+  <dt>Admonition</dt>
+  <dd>A callout block used to highlight notes, tips, warnings...</dd>
+  <dt>Design Token</dt>
+  <dd>A named value (color, spacing, etc.) defined in JSON...</dd>
+</dl>
+```
+
+## Customization
+
+The component uses Infima CSS classes for styling. To customize the appearance, override styles in `src/css/custom.css`:
+
+```css
+dl dt {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
+dl dd {
+  margin-bottom: 1rem;
+}
+```

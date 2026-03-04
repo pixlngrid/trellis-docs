@@ -16,7 +16,10 @@ public/api-specs/
 Thumbs.db
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/trellis.code-snippets
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo

@@ -1,0 +1,358 @@
+{
+  // ─── Frontmatter scaffolds ────────────────────────────────────────────
+
+  "Trellis: Doc frontmatter": {
+    "scope": "mdx,markdown",
+    "prefix": "t-front-doc",
+    "description": "Full doc page frontmatter with all available fields",
+    "body": [
+      "---",
+      "title: ${1:Page Title}",
+      "description: ${2:A short description for search and SEO.}",
+      "keywords: [${3:keyword}]",
+      "last_update:",
+      "  date: $CURRENT_MONTH/$CURRENT_DATE/$CURRENT_YEAR",
+      "  author: ${4:Trellis}",
+      "hide_title: ${5|false,true|}",
+      "hide_table_of_contents: ${6|false,true|}",
+      "doc_type: ${7|how-to,concept,reference,tutorial|}",
+      "role: [${8:Developer}]",
+      "draft: ${9|false,true|}",
+      "---",
+      "",
+      "$0"
+    ]
+  },
+
+  "Trellis: Blog frontmatter": {
+    "scope": "mdx,markdown",
+    "prefix": "t-front-blog",
+    "description": "Blog post frontmatter",
+    "body": [
+      "---",
+      "title: ${1:Blog Post Title}",
+      "description: ${2:A short summary of the post.}",
+      "slug: ${3:post-slug}",
+      "date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
+      "authors:",
+      "  - name: ${4:Author Name}",
+      "    role: ${5:Role}",
+      "category: ${6|Announcement,Tutorial,Update|}",
+      "featured: ${7|false,true|}",
+      "---",
+      "",
+      "$0"
+    ]
+  },
+
+  "Trellis: Release note frontmatter": {
+    "scope": "mdx,markdown",
+    "prefix": "t-front-release",
+    "description": "Release note frontmatter with changelog sections",
+    "body": [
+      "---",
+      "title: v${1:1.0.0}",
+      "version: ${1:1.0.0}",
+      "date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
+      "description: ${2:Release description}",
+      "---",
+      "",
+      "## Added",
+      "",
+      "- $0",
+      "",
+      "## Changed",
+      "",
+      "## Fixed",
+      ""
+    ]
+  },
+
+  // ─── Admonitions ──────────────────────────────────────────────────────
+
+  "Trellis: Note admonition": {
+    "scope": "mdx,markdown",
+    "prefix": "t-note",
+    "description": ":::note admonition block",
+    "body": [
+      ":::note${1: ${2:Optional Title}}",
+      "$0",
+      ":::"
+    ]
+  },
+
+  "Trellis: Tip admonition": {
+    "scope": "mdx,markdown",
+    "prefix": "t-tip",
+    "description": ":::tip admonition block",
+    "body": [
+      ":::tip${1: ${2:Optional Title}}",
+      "$0",
+      ":::"
+    ]
+  },
+
+  "Trellis: Info admonition": {
+    "scope": "mdx,markdown",
+    "prefix": "t-info",
+    "description": ":::info admonition block",
+    "body": [
+      ":::info${1: ${2:Optional Title}}",
+      "$0",
+      ":::"
+    ]
+  },
+
+  "Trellis: Caution admonition": {
+    "scope": "mdx,markdown",
+    "prefix": "t-caution",
+    "description": ":::caution admonition block",
+    "body": [
+      ":::caution${1: ${2:Optional Title}}",
+      "$0",
+      ":::"
+    ]
+  },
+
+  "Trellis: Danger admonition": {
+    "scope": "mdx,markdown",
+    "prefix": "t-danger",
+    "description": ":::danger admonition block",
+    "body": [
+      ":::danger${1: ${2:Optional Title}}",
+      "$0",
+      ":::"
+    ]
+  },
+
+  "Trellis: Warning admonition": {
+    "scope": "mdx,markdown",
+    "prefix": "t-warning",
+    "description": ":::warning admonition block",
+    "body": [
+      ":::warning${1: ${2:Optional Title}}",
+      "$0",
+      ":::"
+    ]
+  },
+
+  // ─── Components ───────────────────────────────────────────────────────
+
+  "Trellis: Tabs": {
+    "scope": "mdx",
+    "prefix": "t-tabs",
+    "description": "Tabs container with two tab items",
+    "body": [
+      "<Tabs${1: queryString=\"${2:tab}\"}${3: defaultValue=\"${4:first}\"}>",
+      "  <TabItem value=\"${4:first}\" label=\"${5:First Tab}\">",
+      "",
+      "  ${6:Content for first tab.}",
+      "",
+      "  </TabItem>",
+      "  <TabItem value=\"${7:second}\" label=\"${8:Second Tab}\">",
+      "",
+      "  ${9:Content for second tab.}",
+      "",
+      "  </TabItem>",
+      "</Tabs>"
+    ]
+  },
+
+  "Trellis: TabItem": {
+    "scope": "mdx",
+    "prefix": "t-tab",
+    "description": "Single TabItem to add inside an existing Tabs block",
+    "body": [
+      "<TabItem value=\"${1:value}\" label=\"${2:Label}\">",
+      "",
+      "$0",
+      "",
+      "</TabItem>"
+    ]
+  },
+
+  "Trellis: Tooltip": {
+    "scope": "mdx",
+    "prefix": "t-tooltip",
+    "description": "Inline hover tooltip wrapping a term",
+    "body": [
+      "<Tooltip content=\"${2:Tooltip text}\">${1:Term}</Tooltip>"
+    ]
+  },
+
+  "Trellis: DocCard": {
+    "scope": "mdx",
+    "prefix": "t-doccard",
+    "description": "Single doc card linking to a page",
+    "body": [
+      "<DocCard title=\"${1:Title}\" href=\"${2:/path/}\" description=\"${3:Description}\" />"
+    ]
+  },
+
+  "Trellis: DocCardList": {
+    "scope": "mdx",
+    "prefix": "t-doccardlist",
+    "description": "Auto-generated grid of child doc cards",
+    "body": ["<DocCardList />"]
+  },
+
+  "Trellis: Check icon": {
+    "scope": "mdx",
+    "prefix": "t-check",
+    "description": "Green checkmark icon for comparison tables",
+    "body": ["<Check />"]
+  },
+
+  "Trellis: Cross icon": {
+    "scope": "mdx",
+    "prefix": "t-cross",
+    "description": "Red cross icon for comparison tables",
+    "body": ["<Cross />"]
+  },
+
+  "Trellis: Partial icon": {
+    "scope": "mdx",
+    "prefix": "t-partial",
+    "description": "Yellow partial icon for comparison tables",
+    "body": ["<Partial />"]
+  },
+
+  "Trellis: Feedback widget": {
+    "scope": "mdx",
+    "prefix": "t-feedback",
+    "description": "Page-level feedback/rating component",
+    "body": ["<Feedback />"]
+  },
+
+  "Trellis: Flipping card": {
+    "scope": "mdx",
+    "prefix": "t-flip",
+    "description": "Interactive flip card with front and back content",
+    "body": ["<FlippingCard front=\"${1:Front text}\" back=\"${2:Back text}\" />"]
+  },
+
+  "Trellis: Glossary": {
+    "scope": "mdx",
+    "prefix": "t-glossary",
+    "description": "Searchable glossary rendered from glossary.json",
+    "body": ["<Glossary />"]
+  },
+
+  "Trellis: FAQ Table of Contents": {
+    "scope": "mdx",
+    "prefix": "t-faqtoc",
+    "description": "Auto-generated FAQ table of contents from headings",
+    "body": ["<FaqTableOfContents />"]
+  },
+
+  // ─── Content features ─────────────────────────────────────────────────
+
+  "Trellis: Include partial": {
+    "scope": "mdx,markdown",
+    "prefix": "t-include",
+    "description": "@include directive for reusable MDX partials",
+    "body": ["@include ${1|./,/_includes/|}${2:_partial.mdx}"]
+  },
+
+  "Trellis: Code block": {
+    "scope": "mdx,markdown",
+    "prefix": "t-codeblock",
+    "description": "Fenced code block with language selector",
+    "body": [
+      "```${1|ts,js,jsx,tsx,bash,yaml,json,css,html,python,go,sql,mdx|}",
+      "$0",
+      "```"
+    ]
+  },
+
+  "Trellis: Code block with title": {
+    "scope": "mdx,markdown",
+    "prefix": "t-codetitle",
+    "description": "Fenced code block with title bar and optional line highlighting",
+    "body": [
+      "```${1|ts,js,jsx,tsx,bash,yaml,json,css,html|} title=\"${2:filename.ts}\"",
+      "$0",
+      "```"
+    ]
+  },
+
+  "Trellis: Code annotation": {
+    "scope": "mdx,markdown,typescript,javascript",
+    "prefix": "t-codeannotation",
+    "description": "Inline code annotation comment (highlight, diff, focus)",
+    "body": ["// [!code ${1|highlight,++,--,focus|}]"]
+  },
+
+  "Trellis: Content variable": {
+    "scope": "mdx",
+    "prefix": "t-var",
+    "description": "Content variable reference from config/variables.ts",
+    "body": ["{vars.${1|productName,frameworkName|}}"]
+  },
+
+  "Trellis: MDX comment": {
+    "scope": "mdx",
+    "prefix": "t-comment",
+    "description": "JSX-style comment (the only comment syntax that works in MDX)",
+    "body": ["{/* ${1:comment} */}"]
+  },
+
+  "Trellis: Truncate marker": {
+    "scope": "mdx",
+    "prefix": "t-truncate",
+    "description": "Blog post excerpt fold marker",
+    "body": ["{/* truncate */}"]
+  },
+
+  "Trellis: Mermaid diagram": {
+    "scope": "mdx,markdown",
+    "prefix": "t-mermaid",
+    "description": "Mermaid diagram code block with type selector",
+    "body": [
+      "```mermaid",
+      "${1|graph TD,graph LR,sequenceDiagram,flowchart TD,classDiagram,stateDiagram-v2|}",
+      "  ${0:A --> B}",
+      "```"
+    ]
+  },
+
+  "Trellis: Image with width": {
+    "scope": "mdx,markdown",
+    "prefix": "t-img",
+    "description": "Image with optional width attribute for sizing",
+    "body": ["![${1:alt text}](/img/${2:filename.png} \"width=${3:50%}\")"]
+  },
+
+  // ─── Standard markdown ────────────────────────────────────────────────
+
+  "Trellis: Table": {
+    "scope": "mdx,markdown",
+    "prefix": "t-table",
+    "description": "Markdown table scaffold with header row",
+    "body": [
+      "| ${1:Header 1} | ${2:Header 2} | ${3:Header 3} |",
+      "|---|---|---|",
+      "| ${4:Cell} | ${5:Cell} | ${6:Cell} |",
+      "$0"
+    ]
+  },
+
+  "Trellis: Task list": {
+    "scope": "mdx,markdown",
+    "prefix": "t-tasklist",
+    "description": "Checkbox task list",
+    "body": [
+      "- [ ] ${1:Task one}",
+      "- [ ] ${2:Task two}",
+      "- [ ] ${3:Task three}",
+      "$0"
+    ]
+  },
+
+  "Trellis: Link": {
+    "scope": "mdx,markdown",
+    "prefix": "t-link",
+    "description": "Markdown link",
+    "body": ["[${1:link text}](${2:url})"]
+  }
+}

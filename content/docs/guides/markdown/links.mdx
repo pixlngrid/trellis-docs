@@ -1,0 +1,72 @@
+---
+title: Links
+description: Internal links, external links, and anchor links in Trellis documentation.
+keywords: [links, internal, external, anchor, markdown, navigation]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+## Internal links
+
+Link to other documentation pages using their URL path:
+
+```markdown
+See the [Getting Started](/getting-started/) guide.
+```
+
+URLs correspond to the file path under `content/docs/` — for example, `content/docs/guides/docs.mdx` becomes `/guides/docs/`.
+
+:::tip
+Always include a trailing slash on internal links (e.g. `/guides/docs/` not `/guides/docs`). This ensures consistent behavior with the static export.
+:::
+
+### Linking to sections
+
+Combine a page path with an anchor to link directly to a heading:
+
+```markdown
+See [Search weights](/guides/search/#search-weights) for details.
+```
+
+Anchor IDs are generated automatically from the heading text. See [Headings](/guides/markdown/headings/) for anchor ID conventions.
+
+## External links
+
+Standard markdown links work for external URLs:
+
+```markdown
+Built on [Next.js](https://nextjs.org/) and [Tailwind CSS](https://tailwindcss.com/).
+```
+
+External links open in the same tab by default. To open in a new tab, use an HTML anchor with `target`:
+
+```mdx
+<a href="https://nextjs.org/" target="_blank" rel="noopener noreferrer">Next.js</a>
+```
+
+## Anchor links
+
+Link to a heading on the same page using the `#` prefix:
+
+```markdown
+See the [configuration section](#configuration) below.
+```
+
+## Image links
+
+Wrap an image in a link to make it clickable:
+
+```markdown
+[![Logo](/img/logo.png)](https://example.com)
+```
+
+## Checking for broken links
+
+{vars.productName} includes a post-build link checker that scans all generated HTML for broken internal links. It runs automatically at the end of `npm run build`, or standalone:
+
+```bash
+node scripts/check-links.js
+```
+
+See [Deployment](/guides/deployment/#link-checking) for details.

@@ -1,0 +1,47 @@
+---
+title: Headings
+description: Heading anchors with copy-to-clipboard and automatic ID generation.
+keywords: [headings, anchors, copy, clipboard, id, linking]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+Use standard markdown headings (`##`, `###`, `####`). Each heading automatically gets an anchor link with a copy-to-clipboard button on hover.
+
+Every heading in {vars.productName} documentation (`##`, `###`, `####`) automatically gets an anchor link. Hover over any heading to see a link icon — select it to copy the anchor URL to your clipboard.
+
+## How it works
+
+An `id` attribute is generated for each heading based on its text content. {vars.productName} enhances this with:
+
+1. **Visible link icon** — appears on hover to the left of the heading text
+2. **Copy to clipboard** — selecting the icon copies the full URL (including the `#anchor` fragment) to your clipboard
+3. **Keyboard accessible** — the anchor link is focusable and activates on Enter
+
+## Anchor ID generation
+
+Heading IDs follow standard conventions:
+
+| Heading | Generated ID |
+|---------|-------------|
+| `## Getting Started` | `#getting-started` |
+| `## How It Works` | `#how-it-works` |
+| `### API Reference (v2)` | `#api-reference-v2` |
+
+You can also set a custom ID:
+
+```markdown
+## My Heading {#custom-id}
+```
+
+## Linking to headings
+
+Use the generated anchor in markdown links:
+
+```markdown
+See the [configuration section](#configuration) below.
+
+Or link to another page's heading:
+[Smart Search weights](/guides/search/#configuration)
+```

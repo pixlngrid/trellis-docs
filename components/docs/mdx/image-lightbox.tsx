@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 interface ImageLightboxProps extends React.ImgHTMLAttributes<HTMLImageElement> {
@@ -46,7 +47,7 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
         onClick={() => setOpen(true)}
       />
 
-      {open && (
+      {open && createPortal(
         <div
           className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 cursor-zoom-out"
           onClick={() => setOpen(false)}
@@ -65,7 +66,8 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
             className="max-h-[90vh] max-w-[90vw] object-contain border-none rounded-none"
             onClick={(e) => e.stopPropagation()}
           />
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

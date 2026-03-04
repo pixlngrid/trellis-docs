@@ -1,0 +1,69 @@
+---
+title: Head Metadata
+description: How Trellis maps frontmatter to HTML meta tags for SEO and social sharing.
+keywords: [metadata, seo, meta tags, title, description, open graph, head]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+{vars.productName} automatically generates HTML `<head>` metadata from your frontmatter fields. This controls how pages appear in search engines and social media previews.
+
+## Title and description
+
+The `title` and `description` frontmatter fields map directly to `<title>` and `<meta name="description">`:
+
+```yaml
+---
+title: Getting Started
+description: Set up a new Trellis documentation project in minutes.
+---
+```
+
+Generates:
+
+```html
+<title>Getting Started | My Docs</title>
+<meta name="description" content="Set up a new Trellis documentation project in minutes." />
+```
+
+The site name (configured in `config/site.ts` as `title`) is appended to the page title automatically.
+
+## Keywords
+
+The `keywords` frontmatter array is used by the [search index](/guides/search/) for relevance weighting but is not rendered as a `<meta name="keywords">` tag, as modern search engines ignore it.
+
+```yaml
+---
+keywords: [setup, installation, quickstart]
+---
+```
+
+## Canonical URL
+
+{vars.productName} generates a canonical URL for each page based on the `url` field in `config/site.ts` and the page's path:
+
+```html
+<link rel="canonical" href="https://example.com/guides/docs/" />
+```
+
+## Customizing metadata
+
+To add custom meta tags (Open Graph, Twitter cards, etc.), edit the `generateMetadata` function in `app/(docs)/[...slug]/page.tsx`. The function receives the page's frontmatter and can return any Next.js metadata fields:
+
+```ts title="app/(docs)/[...slug]/page.tsx"
+export async function generateMetadata({ params }) {
+  const doc = await getDocBySlug(params.slug)
+  return {
+    title: doc.meta.title,
+    description: doc.meta.description,
+    openGraph: {
+      title: doc.meta.title,
+      description: doc.meta.description,
+      type: 'article',
+    },
+  }
+}
+```
+
+See the [Next.js Metadata docs](https://nextjs.org/docs/app/building-your-application/optimizing/metadata) for the full list of supported fields.

@@ -1,0 +1,89 @@
+---
+title: Blog
+description: Create blog posts and release notes in the Trellis docs framework.
+keywords: [blog, posts, release-notes, authors, excerpts]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+This guide covers creating blog posts and release notes in {vars.productName}. For documentation pages, see [Docs](/guides/docs/).
+
+## Blog posts
+
+Blog posts live in `content/blog/`. Name files with a date prefix:
+
+```
+content/blog/2026-02-20-welcome.md
+```
+
+### Blog frontmatter
+
+```yaml
+---
+title: Welcome to Trellis
+description: Introducing the Trellis docs framework.
+slug: welcome
+authors:
+  - name: Trellis Team
+---
+```
+
+| Field | Description |
+|-------|-------------|
+| `title` | Post title |
+| `description` | Short description |
+| `slug` | URL slug (defaults to the filename slug) |
+| `authors` | Array of `{ name }` objects |
+
+Trellis parses the date from the filename. Posts are listed at `/blog/`, newest first.
+
+### Excerpt truncation
+
+Use an MDX comment to mark where the excerpt ends on the blog index page:
+
+```mdx
+This intro paragraph appears on the index page.
+
+{/* truncate */}
+
+This content only appears on the full post page.
+```
+
+## Release notes
+
+Release notes live in `content/release-notes/`. Name files after the version:
+
+```
+content/release-notes/v1.0.0.md
+```
+
+### Release notes frontmatter
+
+```yaml
+---
+title: v1.0.0
+version: 1.0.0
+date: 2026-02-20
+description: Initial release of Trellis on Next.js.
+---
+
+## Added
+- Smart search with configurable weights
+- Design token pipeline
+
+## Changed
+- Migrated from Docusaurus to Next.js
+
+## Removed
+- Legacy search plugin
+```
+
+| Field | Description |
+|-------|-------------|
+| `title` | Display title |
+| `version` | Semantic version for sorting |
+| `date` | Release date (YYYY-MM-DD) |
+| `description` | Short summary |
+
+Release notes are listed at `/release-notes/`, sorted by version (newest first).

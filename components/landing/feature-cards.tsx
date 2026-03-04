@@ -19,7 +19,7 @@ const features: Feature[] = [
     title: 'MDX Variables',
     description:
       "Define product names, versions, and terms once in a config file. Use them across every page — something Docusaurus can't do.",
-    link: '/guides/content-authoring/',
+    link: '/guides/docs/',
     imageGradient: 'from-purple-400 to-indigo-500',
     visualElement: (
       <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -44,7 +44,7 @@ const features: Feature[] = [
     title: 'Smart Search',
     description:
       'Build-time indexing with Fuse.js for fast, client-side fuzzy search. No Algolia or external service needed.',
-    link: '/plugins/smart-search/',
+    link: '/guides/search/',
     imageGradient: 'from-blue-400 to-cyan-500',
     visualElement: (
       <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -63,7 +63,7 @@ const features: Feature[] = [
     title: 'Custom Components',
     description:
       'Drop in your own React components — use them per-page or register globally. Glossary, feedback, and flip cards included.',
-    link: '/guides/using-components/',
+    link: '/guides/components/',
     imageGradient: 'from-green-400 to-emerald-500',
     visualElement: (
       <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -96,7 +96,7 @@ const features: Feature[] = [
     title: 'Design Tokens',
     description:
       'JSON-to-CSS pipeline. Define your brand colors and spacing in one file, regenerate all variables automatically.',
-    link: '/design-tokens/',
+    link: '/guides/style-and-layout/',
     imageGradient: 'from-pink-400 to-rose-500',
     visualElement: (
       <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -146,7 +146,7 @@ const features: Feature[] = [
     title: 'Content Audit Export',
     description:
       'Export your full doc inventory as a CSV — title, URL, doc type, owner, draft status, and last updated. Built for content audits no other docs framework supports.',
-    link: '/guides/content-authoring/#sidebar-export',
+    link: '/guides/docs/#sidebar-export',
     imageGradient: 'from-teal-400 to-cyan-500',
     visualElement: (
       <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">

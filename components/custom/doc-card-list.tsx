@@ -38,18 +38,20 @@ function resolveCards(
 
   for (const item of sidebarItems) {
     if (item.type === 'doc') {
-      const meta = allMeta.find((m) => m.slug === '/' + item.id)
+      const slug = item.id.replace(/\/index$/, '')
+      const meta = allMeta.find((m) => m.slug === '/' + slug)
       cards.push({
-        title: item.label || meta?.title || item.id.split('/').pop() || item.id,
+        title: item.label || meta?.title || slug.split('/').pop() || slug,
         description: meta?.description,
-        href: '/' + item.id + '/',
+        href: '/' + slug + '/',
       })
     } else if (item.type === 'category' && item.link) {
-      const meta = allMeta.find((m) => m.slug === '/' + item.link)
+      const slug = item.link.replace(/\/index$/, '')
+      const meta = allMeta.find((m) => m.slug === '/' + slug)
       cards.push({
-        title: item.label || meta?.title || item.link,
+        title: item.label || meta?.title || item.label,
         description: meta?.description,
-        href: '/' + item.link + '/',
+        href: '/' + slug + '/',
       })
     }
   }

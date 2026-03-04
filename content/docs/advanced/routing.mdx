@@ -1,0 +1,63 @@
+---
+title: Routing
+description: How Trellis maps file paths to URLs using Next.js file-based routing.
+keywords: [routing, urls, file-based, paths, trailing slash, static export]
+last_update:
+  date: 03/04/2026
+  author: Trellis
+---
+
+{vars.productName} uses file-based routing — the file path under `content/docs/` determines the page URL.
+
+## File-to-URL mapping
+
+| File path | URL |
+|-----------|-----|
+| `content/docs/getting-started.mdx` | `/getting-started/` |
+| `content/docs/guides/deployment.mdx` | `/guides/deployment/` |
+| `content/docs/theme/index.mdx` | `/theme/` |
+| `content/docs/faq/general.mdx` | `/faq/general/` |
+
+The rules:
+- The `content/docs/` prefix is stripped
+- The `.mdx` or `.md` extension is removed
+- `index.mdx` files map to the directory path (e.g. `guides/index.mdx` → `/guides/`)
+
+## Dynamic route
+
+Documentation pages are rendered by a single dynamic route at `app/(docs)/[...slug]/page.tsx`. This catch-all route:
+
+1. Receives the URL slug as an array (e.g. `['guides', 'deployment']`)
+2. Calls `getDocBySlug()` to find and load the matching MDX file
+3. Compiles the MDX content with `next-mdx-remote`
+4. Renders the page with the docs layout (sidebar, navbar, TOC)
+
+## Static export
+
+{vars.productName} uses `output: 'export'` in `next.config.mjs`, which generates static HTML at build time. The `generateStaticParams()` function in the catch-all route returns all valid slugs so Next.js knows which pages to pre-render.
+
+See [Static Site Generation](/advanced/static-site-generation/) for details on the build output.
+
+## Trailing slashes
+
+{vars.productName} uses trailing slashes by default (`trailingSlash: true` in `next.config.mjs`). This means:
+
+- `/getting-started/` works (canonical)
+- `/getting-started` redirects to `/getting-started/`
+
+The static export generates `out/getting-started/index.html` for each page, which web servers serve at the trailing-slash URL.
+
+## Blog and release notes routes
+
+Blog posts and release notes use separate route handlers:
+
+| Content type | File location | URL pattern |
+|---|---|---|
+| Docs | `content/docs/` | `/{slug}/` |
+| Blog | `content/blog/` | `/blog/{slug}/` |
+| Release notes | `content/release-notes/` | `/release-notes/{slug}/` |
+| API docs | `content/api/` | `/api/{slug}/` |
+
+## Hidden files
+
+Files and folders starting with `_` are excluded from routing. See [Docs](/guides/docs/#partial-files) for details on the partial file convention.

@@ -1,0 +1,16 @@
+{
+  "files.associations": {
+    "*.mdx": "mdx"
+  },
+  "[mdx]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+      "comments": "off",
+      "strings": "off"
+    },
+    "editor.snippetSuggestions": "top"
+  },
+  "[markdown]": {
+    "editor.snippetSuggestions": "top"
+  }
+}
