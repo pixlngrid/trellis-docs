@@ -59,8 +59,8 @@ function SidebarCategory({ item }: { item: ResolvedSidebarItem }) {
       </div>
       {open && item.items && (
         <ul className="ml-3 pl-3 border-l border-[var(--border)]">
-          {item.items.map((child) => (
-            <SidebarItem key={child.href || child.label} item={child} />
+          {item.items.map((child, index) => (
+            <SidebarItem key={child.href || child.label || `html-${index}`} item={child} />
           ))}
         </ul>
       )}
@@ -125,8 +125,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       >
         <nav className="p-4 whitespace-nowrap" style={{ width: 'var(--sidebar-width)' }}>
           <ul className="space-y-0.5">
-            {sidebarItems.map((item) => (
-              <SidebarItem key={item.href || item.label} item={item} />
+            {sidebarItems.map((item, index) => (
+              <SidebarItem key={item.href || item.label || `html-${index}`} item={item} />
             ))}
           </ul>
         </nav>
