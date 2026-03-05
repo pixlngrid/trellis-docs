@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useCallback, useEffect, createContext, useContext } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { resolveSidebar, type ResolvedSidebarItem } from '@/lib/sidebar'
@@ -10,53 +10,41 @@ import { useDocContext } from '@/lib/doc-context'
 
 const defaultSidebarItems = resolveSidebar()
 
+// Accordion context — only one top-level category open at a time
+const AccordionContext = createContext<{
+  openId: string | null
+  toggle: (id: string) => void
+}>({ openId: null, toggle: () => {} })
+
 function SidebarCategory({ item }: { item: ResolvedSidebarItem }) {
   const pathname = usePathname()
+  const { openId, toggle } = useContext(AccordionContext)
   const isSelfActive = item.href && pathname === item.href
-  const isChildActive = item.items?.some(
-    (child) => child.href && pathname === child.href
-  )
-  const [open, setOpen] = useState(!item.collapsed || !!isChildActive || !!isSelfActive)
+  const categoryId = item.href || item.label
+  const open = openId === categoryId
+
+  const handleToggle = useCallback(() => {
+    toggle(categoryId)
+  }, [categoryId, toggle])
 
   return (
     <div className="mb-0.5">
-      <div className="flex items-center">
-        {item.href ? (
-          <Link
-            href={item.href}
-            className={cn(
-              'flex-1 px-3 py-1.5 text-sm font-semibold rounded-md no-underline',
-              'tracking-wide',
-              isSelfActive
-                ? 'text-[var(--foreground)]'
-                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-            )}
-          >
-            {item.label}
-          </Link>
-        ) : (
-          <button
-            onClick={() => setOpen(!open)}
-            className={cn(
-              'flex-1 text-left px-3 py-1.5 text-sm font-semibold rounded-md',
-              'text-[var(--muted-foreground)] hover:text-[var(--foreground)]',
-              'tracking-wide'
-            )}
-          >
-            {item.label}
-          </button>
+      <button
+        onClick={handleToggle}
+        className={cn(
+          'flex items-center w-full text-left px-3 py-1.5 text-sm font-semibold rounded-md',
+          'tracking-wide cursor-pointer',
+          isSelfActive
+            ? 'text-[var(--foreground)]'
+            : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
         )}
-        <button
-          onClick={() => setOpen(!open)}
-          className="p-1.5 rounded-md text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-          aria-label={open ? 'Collapse' : 'Expand'}
-        >
-          <ChevronDown
-            size={14}
-            className={cn('transition-transform', open ? '' : '-rotate-90')}
-          />
-        </button>
-      </div>
+      >
+        <span className="flex-1">{item.label}</span>
+        <ChevronDown
+          size={14}
+          className={cn('transition-transform shrink-0 ml-1', open ? '' : '-rotate-90')}
+        />
+      </button>
       {open && item.items && (
         <ul className="ml-3 pl-3 border-l border-[var(--border)]">
           {item.items.map((child) => (
@@ -102,13 +90,52 @@ interface SidebarProps {
   onToggle: () => void
 }
 
+/** Find which top-level category (by id) contains the current pathname. */
+function findActiveCategory(
+  items: ResolvedSidebarItem[],
+  pathname: string
+): string | null {
+  for (const item of items) {
+    if (item.type !== 'category') continue
+    const id = item.href || item.label
+    if (item.href && pathname === item.href) return id
+    if (
+      item.items?.some(
+        (child) =>
+          (child.href && pathname === child.href) ||
+          (child.type === 'category' &&
+            child.items?.some((gc) => gc.href && pathname === gc.href))
+      )
+    )
+      return id
+  }
+  return null
+}
+
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { urlPrefix } = useDocContext()
+  const pathname = usePathname()
   const sidebarItems = urlPrefix
     ? resolveSidebar(undefined, urlPrefix)
     : defaultSidebarItems
 
+  const activeCategory = findActiveCategory(sidebarItems, pathname)
+  const [openId, setOpenId] = useState<string | null>(activeCategory)
+
+  // Sync open category when user navigates to a page in a different category
+  useEffect(() => {
+    if (activeCategory && activeCategory !== openId) {
+      setOpenId(activeCategory)
+    }
+  }, [activeCategory]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const toggle = useCallback(
+    (id: string) => setOpenId((prev) => (prev === id ? null : id)),
+    []
+  )
+
   return (
+    <AccordionContext.Provider value={{ openId, toggle }}>
     <div className="hidden lg:flex relative shrink-0">
       {/* Sidebar content */}
       <aside
@@ -180,5 +207,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </div>
       )}
     </div>
+    </AccordionContext.Provider>
   )
 }

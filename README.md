@@ -47,6 +47,14 @@ Options:
 --package-manager <pm>      npm | yarn | pnpm (default: npm)
 ```
 
+### Upgrade an Existing Project
+
+```bash
+npx create-trellis-docs@latest upgrade
+```
+
+Updates framework files using an allow-list — your content, config, and customizations are never touched. Use `--dry-run` to preview changes first.
+
 ### Develop from this Repository
 
 ```bash

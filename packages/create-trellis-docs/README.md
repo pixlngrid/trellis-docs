@@ -32,6 +32,25 @@ Options:
 - **Design token system** — define your brand in JSON, get CSS and Tailwind utilities
 - Starter documentation content to get you going
 
+## Upgrading an Existing Project
+
+```bash
+npx create-trellis-docs@latest upgrade
+```
+
+Updates framework files (components, lib, scripts, app routes, build config) using an allow-list. Your content, config, landing page, sidebar, design tokens, and branding are never touched.
+
+Use `--dry-run` to preview changes without writing files.
+
+```bash
+npx create-trellis-docs@latest upgrade --dry-run
+```
+
+Options:
+- `--dry-run` — preview changes without writing files
+- `-s, --skip-install` — skip dependency installation after upgrade
+- `-p, --package-manager <pm>` — npm | yarn | pnpm (default: npm)
+
 ## Migrating from Docusaurus
 
 New projects include a migration script that converts Docusaurus content, sidebar, and MDX imports into Trellis format:

@@ -7,14 +7,76 @@ last_update:
   author: Trellis
 ---
 
-To upgrade an existing {vars.productName} project to the latest version:
+{vars.productName} includes a CLI upgrade command that updates framework files in an existing project while leaving your content, config, and customizations untouched.
+
+## Upgrade with the CLI
+
+Run from your project root:
+
+```bash title="Terminal"
+npx create-trellis-docs@latest upgrade
+```
+
+Preview what would change without modifying anything:
+
+```bash title="Terminal"
+npx create-trellis-docs@latest upgrade --dry-run
+```
+
+### What gets updated
+
+The upgrade command uses an **allow-list** — only framework files are touched:
+
+- **App routes** — `app/(docs)/`, `app/blog/`, `app/release-notes/`, `app/feedback-dashboard/`, `app/layout.tsx`, `app/globals.css`
+- **Components** — `components/docs/`, `components/custom/`, `components/blog/`, `components/release-notes/`, `components/shared/`, `components/theme-provider.tsx`
+- **Lib and scripts** — `lib/`, `scripts/`
+- **Build config** — `next.config.mjs`, `postcss.config.mjs`, `tsconfig.json`
+- **Dependencies** — new packages are added, existing versions are bumped, new scripts are merged into `package.json`
+
+### What is never touched
+
+Your project-specific files are always preserved:
+
+- `content/`, `public/`, `data/` — your docs, images, and data
+- `config/site.ts`, `config/sidebar.ts`, `config/variables.ts`, `config/navigation.ts` — your site config
+- `design-tokens.json` — your brand colors and typography
+- `redirects.json` — your URL redirects
+- `app/page.tsx` — your landing page
+- `components/brand/` — your logo
+- `README.md`, `.gitignore`, `.vscode/` — your project files
+
+### Options
+
+```
+npx create-trellis-docs@latest upgrade [options]
+
+  --dry-run              Preview changes without writing files
+  -s, --skip-install     Skip dependency installation after upgrade
+  -p, --package-manager  npm | yarn | pnpm (default: npm)
+```
+
+### After upgrading
+
+Review the diff, install dependencies (if not done automatically), and verify the build:
+
+```bash title="Terminal"
+git diff
+npm install
+npm run build
+```
+
+---
+
+## Manual upgrade
+
+If you prefer to upgrade manually:
 
 1. **Check the release notes** — Read the [release notes](/release-notes/) for all versions between your current version and the target.
 2. **Compare with the latest template** — Scaffold a fresh project in a temporary directory and diff it against yours.
 3. **Install and build** — Run `npm install` then `npm run build` to verify everything works.
 
 :::tip
-To see the full latest template, scaffold a fresh project in a temporary directory with `npx create-trellis-docs@latest temp-docs` and diff it against your project. This is a reference copy for comparison — don't run the scaffolder inside your existing project.
+To see the full latest template, scaffold a fresh project in a temporary directory with `npx create-trellis-docs@latest temp-docs` and diff it against your project.
 :::
 
 ---
