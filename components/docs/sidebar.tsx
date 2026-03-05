@@ -16,24 +16,41 @@ const AccordionContext = createContext<{
   toggle: (id: string) => void
 }>({ openId: null, toggle: () => {} })
 
-function SidebarCategory({ item }: { item: ResolvedSidebarItem }) {
+function SidebarCategory({ item, depth = 0 }: { item: ResolvedSidebarItem; depth?: number }) {
   const pathname = usePathname()
   const { openId, toggle } = useContext(AccordionContext)
   const isSelfActive = item.href && pathname === item.href
   const categoryId = item.href || item.label
-  const open = openId === categoryId
+
+  // Top-level categories use accordion (only one open at a time).
+  // Sub-categories use local state (independent toggle).
+  const isChildActive = item.items?.some(
+    (child) =>
+      (child.href && pathname === child.href) ||
+      (child.type === 'category' &&
+        child.items?.some((gc) => gc.href && pathname === gc.href))
+  )
+  const [localOpen, setLocalOpen] = useState(!!isChildActive || !!isSelfActive)
+
+  const isTopLevel = depth === 0
+  const open = isTopLevel ? openId === categoryId : localOpen
 
   const handleToggle = useCallback(() => {
-    toggle(categoryId)
-  }, [categoryId, toggle])
+    if (isTopLevel) {
+      toggle(categoryId)
+    } else {
+      setLocalOpen((prev) => !prev)
+    }
+  }, [isTopLevel, categoryId, toggle])
 
   return (
     <div className="mb-0.5">
       <button
         onClick={handleToggle}
         className={cn(
-          'flex items-center w-full text-left px-3 py-1.5 text-sm font-semibold rounded-md',
+          'flex items-center w-full text-left px-3 py-1.5 text-sm rounded-md',
           'tracking-wide cursor-pointer',
+          isTopLevel ? 'font-semibold' : 'font-medium',
           isSelfActive
             ? 'text-[var(--foreground)]'
             : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
@@ -48,7 +65,7 @@ function SidebarCategory({ item }: { item: ResolvedSidebarItem }) {
       {open && item.items && (
         <ul className="ml-3 pl-3 border-l border-[var(--border)]">
           {item.items.map((child) => (
-            <SidebarItem key={child.href || child.label} item={child} />
+            <SidebarItem key={child.href || child.label} item={child} depth={depth + 1} />
           ))}
         </ul>
       )}
@@ -80,8 +97,8 @@ function SidebarLink({ item }: { item: ResolvedSidebarItem }) {
   )
 }
 
-function SidebarItem({ item }: { item: ResolvedSidebarItem }) {
-  if (item.type === 'category') return <SidebarCategory item={item} />
+function SidebarItem({ item, depth = 0 }: { item: ResolvedSidebarItem; depth?: number }) {
+  if (item.type === 'category') return <SidebarCategory item={item} depth={depth} />
   return <SidebarLink item={item} />
 }
 
