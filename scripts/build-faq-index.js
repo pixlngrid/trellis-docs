@@ -16,6 +16,21 @@ try {
   for (const m of varMatches) docVars[m[1]] = m[2];
 } catch { /* variables file is optional */ }
 
+const SMALL_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'if',
+  'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'vs', 'yet',
+]);
+
+function titleCase(str) {
+  return str
+    .replace(/-/g, ' ')
+    .replace(/\b\w+/g, (word, index) =>
+      index === 0 || !SMALL_WORDS.has(word.toLowerCase())
+        ? word.charAt(0).toUpperCase() + word.slice(1)
+        : word.toLowerCase()
+    );
+}
+
 function resolveVars(text) {
   return text.replace(/\{vars\.(\w+)\}/g, (_, key) => docVars[key] ?? '');
 }
@@ -91,7 +106,7 @@ function indexFaqDir(faqDir, urlPrefix) {
     const slug = file.replace(/\.mdx?$/, '');
     const title =
       frontmatter.title ||
-      slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      titleCase(slug);
 
     // Extract ### headings as questions
     const h3Regex = /^###\s+(.+)$/gm;

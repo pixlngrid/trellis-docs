@@ -25,7 +25,7 @@ export function extractToc(content: string): TocItem[] {
   }
   const stripped = filtered.join('\n')
 
-  const headingRegex = /^(#{2,4})\s+(.+)$/gm
+  const headingRegex = /^(#{2,3})\s+(.+)$/gm
   const items: TocItem[] = []
   let match
 

@@ -33,6 +33,7 @@ export interface DocMeta {
   description?: string
   keywords?: string[]
   last_update?: { date: string; author: string }
+  hide_title?: boolean
   hide_table_of_contents?: boolean
   doc_type?: string
   role?: string[]
@@ -137,6 +138,7 @@ async function loadDoc(
       description: data.description,
       keywords: data.keywords,
       last_update: data.last_update,
+      hide_title: data.hide_title === true,
       hide_table_of_contents: data.hide_table_of_contents,
       doc_type: data.doc_type,
       role: data.role,

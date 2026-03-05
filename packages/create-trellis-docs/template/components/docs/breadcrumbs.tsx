@@ -6,13 +6,28 @@ interface BreadcrumbsProps {
   title: string
 }
 
+const SMALL_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'if',
+  'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'vs', 'yet',
+])
+
+function titleCase(str: string): string {
+  return str
+    .replace(/-/g, ' ')
+    .replace(/\b\w+/g, (word, index) =>
+      index === 0 || !SMALL_WORDS.has(word.toLowerCase())
+        ? word.charAt(0).toUpperCase() + word.slice(1)
+        : word.toLowerCase()
+    )
+}
+
 export function Breadcrumbs({ slug, title }: BreadcrumbsProps) {
   const crumbs = slug.map((segment, i) => {
     const href = '/' + slug.slice(0, i + 1).join('/') + '/'
     const isLast = i === slug.length - 1
     const label = isLast
       ? title
-      : segment.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+      : titleCase(segment)
 
     return { href, label, isLast }
   })

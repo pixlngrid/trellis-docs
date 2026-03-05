@@ -21,11 +21,21 @@ const WORD_MAP: Record<string, string> = {
   cosmosdb: 'CosmosDB',
 }
 
+const SMALL_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'if',
+  'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'vs', 'yet',
+])
+
 function titleFromId(id: string): string {
   const last = id.split('/').pop() || id
-  const raw = last === 'index'
+  const segment = last === 'index'
     ? id.split('/').slice(-2, -1)[0] || 'Index'
-    : last.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : last
+  const raw = segment.replace(/-/g, ' ').replace(/\b\w+/g, (word, index) =>
+    index === 0 || !SMALL_WORDS.has(word.toLowerCase())
+      ? word.charAt(0).toUpperCase() + word.slice(1)
+      : word.toLowerCase()
+  )
   return raw.replace(/\b\w+\b/g, (word) => WORD_MAP[word.toLowerCase()] ?? word)
 }
 

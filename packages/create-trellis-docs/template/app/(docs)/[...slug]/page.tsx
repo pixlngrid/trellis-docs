@@ -92,9 +92,11 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
 
           {doc.isFallback && <FallbackBanner locale={ctx.locale} />}
 
-          <h1 className="text-3xl font-bold tracking-tight mb-2">{doc.meta.title}</h1>
+          {!doc.meta.hide_title && (
+            <h1 className="text-3xl font-bold tracking-tight mb-2">{doc.meta.title}</h1>
+          )}
 
-          {(doc.meta.last_update || siteConfig.editBaseUrl) && (
+          {!doc.meta.hide_title && (doc.meta.last_update || siteConfig.editBaseUrl) && (
             <div className="flex items-center flex-wrap gap-x-4 text-sm text-[var(--muted-foreground)] mb-4">
               {doc.meta.last_update && (
                 <span>
