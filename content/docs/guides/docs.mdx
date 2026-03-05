@@ -429,7 +429,23 @@ Place images in `public/img/` and reference them with an absolute path:
 ![Architecture diagram](/img/architecture.png)
 ```
 
-All images automatically support **select-to-zoom** via the built-in lightbox — no extra markup needed. Select any image to open it in a modal overlay.
+All images automatically support **click-to-zoom** via the built-in lightbox — no extra markup needed. Click any image to open it in a full-screen modal overlay.
+
+### Disabling zoom on specific images
+
+To prevent an image from being zoomable, add `nozoom` in the title position:
+
+```md
+![Small icon](/img/icon.png "nozoom")
+```
+
+The image renders normally but without the zoom cursor or lightbox behavior.
+
+You can combine `nozoom` with a width value:
+
+```md
+![Badge](/img/badge.png "nozoom 120px")
+```
 
 ### Image sizing
 
@@ -448,8 +464,10 @@ Supported formats:
 | Percentage | `"50%"` | 50% of the content width |
 | Pixels | `"400px"` | Fixed 400px width |
 | `width=` prefix | `"width=75%"` | Same as `"75%"` — explicit prefix is optional |
+| `nozoom` | `"nozoom"` | Disables the lightbox for this image |
+| Combined | `"nozoom 50%"` | No zoom + custom width |
 
-When a custom width is set, it replaces the default 60% max-width. The width parser consumes the image title attribute, so it does not appear as a tooltip.
+When a custom width is set, it replaces the default 60% max-width. Directives like `nozoom` and width values are parsed from the title and do not appear as tooltips. Any remaining text in the title is preserved as the tooltip.
 
 ## Variables
 

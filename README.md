@@ -118,10 +118,12 @@ trellis/
 
 Once the dev server is running, the built-in docs cover everything you need to get productive:
 
-- [Content Authoring](/guides/content-authoring/) — create pages, configure the sidebar, add blog posts and release notes
-- [Writing Docs](/guides/writing-docs/) — markdown features (code blocks, admonitions, tabs, Mermaid)
-- [Using Components](/guides/using-components/) — interactive React components available in MDX
-- [Design Tokens](/design-tokens/customizing/) — customize colors and branding
+- [Introduction](/introduction/) — what Trellis is and how it compares to other frameworks
+- [Getting Started](/getting-started/) — install, configure, and run your first docs site
+- [Writing Docs](/guides/docs/) — create pages, configure the sidebar, add blog posts and release notes
+- [Markdown Features](/guides/markdown/) — code blocks, admonitions, tabs, Mermaid, and more
+- [Components](/guides/components/) — interactive React components available in MDX
+- [Style and Layout](/guides/style-and-layout/) — design tokens, dark mode, and theme customization
 - [Deployment](/guides/deployment/) — build pipeline and hosting options
 
 ## Tech Stack

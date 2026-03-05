@@ -1,0 +1,109 @@
+---
+title: Features
+description: Everything Trellis Docs gives you out of the box — and why it matters.
+keywords: [features, overview, comparison, docs framework, capabilities]
+last_update:
+  date: 03/05/2026
+  author: Trellis
+---
+
+{vars.productName} is a docs-as-code framework built on Next.js 15 that ships with features most documentation platforms charge for or don't support at all. Every feature below works out of the box with zero external services.
+
+---
+
+## Content authoring
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Reusable content variables** | Define product names, versions, and URLs once in `config/variables.ts`. Use `{vars.productName}` in any MDX page. | Docusaurus, MkDocs, and Starlight have no equivalent. Renaming a product means find-and-replace across every file. |
+| **Include directives** | Pull shared content into any page with `@include path/to/_partial.mdx`. Supports nesting up to 5 levels. | Eliminates copy-paste of shared warnings, setup steps, and boilerplate across dozens of pages. |
+| **Frontmatter metadata** | Title, description, keywords, last updated, draft flag, doc type, audience role tags — all from YAML frontmatter. | Structured metadata powers search ranking, content audits, and conditional rendering without external tooling. |
+| **Audience role tagging** | Tag pages with `role: ['developer', 'admin']` to show colored role chips. | Other frameworks have no concept of audience segmentation in docs — you're left to convention or custom code. |
+| **Draft pages** | Set `draft: true` to exclude a page from search, FAQ index, and navigation while keeping it in source control. | Docusaurus drafts still appear in the sidebar. Trellis drafts are invisible everywhere. |
+| **Hide title** | Set `hide_title: true` to suppress the `<h1>`, last-updated date, and "Edit this page" link while keeping the title for browser tabs and search. | Useful for custom landing pages or pages with their own hero section. |
+
+## Markdown and MDX
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Tabs with URL sync** | Tabbed content panels that sync selection to URL query parameters (e.g., `?tabs=python`). Shareable via link. | Docusaurus persists tab state in localStorage only — you can't share a link that opens a specific tab. |
+| **Code blocks** | Syntax highlighting (Shiki, dual light/dark themes), line highlighting (`{4,7-9}`), diff markers (`// [!code ++]`), focus markers, title bar, and copy button. | Covers every code annotation pattern in one component — no plugins to install or configure. |
+| **Admonitions** | Six types (note, tip, info, caution, warning, danger) with custom SVG icons and branded colors. Supports custom titles. | Migrating from Docusaurus? The `:::tip Title` syntax works as-is — no rewriting needed. |
+| **Mermaid diagrams** | Render diagrams from fenced code blocks with built-in pan and zoom. Respects dark/light mode. | Most frameworks render Mermaid as a static image. Trellis lets readers explore large diagrams interactively. |
+| **Image lightbox** | Click any image to open a full-screen modal. Supports width sizing via `![alt](src "50%")`. Add `"nozoom"` to disable zoom on specific images. | Zero markup — every image gets lightbox behavior by default, with per-image opt-out. |
+| **Heading anchors** | Hover any heading to copy its anchor URL to clipboard. | Readers can share deep links to specific sections without hunting through the URL bar. |
+| **MDX and React** | Import and use React components directly in Markdown. Register components globally or per-page. | Full React power in your docs — interactive demos, live data, custom widgets. |
+
+## Search and discovery
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Smart search** | Full-text fuzzy search powered by Fuse.js. Build-time indexing, client-side execution. `Cmd+K` to open. | No Algolia account, no external API, no monthly bill. Works offline after the page loads. |
+| **Configurable search weights** | Tune field weights (title: 1.0, keywords: 0.8, description: 0.6, content: 0.4) in `config/site.ts`. | Most frameworks give you search but no control over ranking. Trellis lets you prioritize what matters. |
+| **FAQ auto-indexing** | Add `###` headings to FAQ pages and get a searchable FAQ table of contents automatically. | Zero-config — no manual curation of FAQ lists. The build script reads your content and generates the index. |
+
+## Theme and layout
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Design token pipeline** | Define colors, spacing, and typography in `design-tokens.json`. A build script generates CSS custom properties for the entire theme. | One file controls your entire brand. No hunting through CSS files to change a color. |
+| **Dark mode** | Ships with dark mode as default. Respects system preference. Toggle in the navbar. | Not an afterthought — dark mode is the primary design target with full token support. |
+| **Last-updated at top** | Shows "Last updated" date and author below the title, not buried at the bottom. | Readers see freshness immediately. Docusaurus hides this at the bottom of the page. Other frameworks skip it entirely. |
+| **Table of contents** | Sticky right sidebar with scroll-spy highlighting. Collapses to an accordion on mobile. | Desktop and mobile get the right UX for their form factor — no one-size-fits-all compromise. |
+| **Back-to-top button** | Floating button appears after scrolling 300px. Smooth-scrolls to the top. | Long reference pages stay navigable without the reader having to scroll manually. |
+| **Breadcrumbs** | Auto-generated from the URL path. Non-routable segments render as plain text (not broken links). | Readers always know where they are in the hierarchy. |
+
+## Components
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Glossary** | Searchable, alphabetically sorted glossary rendered from a JSON data file. | No manual sorting or HTML tables — add terms to JSON and the component handles the rest. |
+| **Feedback widget** | "Was this helpful?" form with structured options, freetext input, and optional API backend. | Built-in feedback collection without third-party services. Ships with a dashboard to view results. |
+| **Flipping cards** | Interactive 3D flip cards with quiz functionality, multiple choice, and answer explanations. | Engage readers with self-assessment — useful for training docs, onboarding, and certification prep. |
+| **DocCardList** | Grid of doc-link cards auto-generated from sidebar categories, or defined explicitly. | One line of MDX replaces a manually maintained list of links that goes stale. |
+
+## API documentation
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **OpenAPI rendering** | Drop a YAML or JSON spec in `content/api/` and get a full API reference page powered by ReDoc. | No separate API docs tool — your API reference lives alongside your guides in one site. |
+| **Multi-spec support** | Multiple specs, each with its own sidebar entry and URL. | Large products with multiple APIs don't need separate sites or awkward workarounds. |
+| **Theme integration** | API docs automatically adapt to light/dark mode and your design tokens. | Consistent branding across guides and API reference without custom CSS overrides. |
+
+## Blog and release notes
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Blog** | Chronological post listing with categories, read time, author, and related posts. Toggle on/off in config. | Ship a blog alongside your docs — no separate CMS or static site generator needed. |
+| **Release notes** | Version history with "modern" or "changelog" layout. Toggle on/off in config. | Customers find release info where they already read your docs, not on a separate page they'll never visit. |
+
+## Build and deployment
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Static export** | Generates a plain `out/` directory — HTML, CSS, JS. Deploy anywhere. No Node.js server required. | No vendor lock-in. Works on Vercel, Netlify, GitHub Pages, S3, CloudFront, Apache, Nginx, or any static host. |
+| **Link checker** | The build fails if any internal link points to a missing page. Runs automatically as the final build step. | Broken links don't ship to production. Period. |
+| **Redirects plugin** | Define URL redirects in `redirects.json`. The build generates HTML meta-refresh pages. | Rename or move pages without breaking bookmarks and external links. |
+| **Content audit export** | Export your entire doc inventory as a CSV — title, URL, doc type, owner, draft status, last updated. | No other docs framework ships this. Content managers get a spreadsheet without writing scripts. |
+
+## Internationalization and versioning
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **i18n** | Locale-prefixed routes, content mirroring, fallback to default locale, navbar language switcher. | Ship docs in multiple languages from one codebase with one build. |
+| **Versioning** | Snapshot-based version freezing. Version-prefixed URLs, sidebar per version, search partitioned by version. | Readers on v1 see v1 docs. Readers on v2 see v2 docs. No confusion. |
+
+## Developer experience
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **CLI scaffolder** | `npx create-trellis-docs my-docs` — interactive prompts, automatic platform detection, dependency installation. | Go from zero to running docs site in under a minute. |
+| **VS Code snippets** | 35+ workspace snippets prefixed `t-` for admonitions, components, frontmatter, code blocks, and more. | Type `t-note` and get a complete admonition block. No memorizing syntax. |
+| **Docusaurus migration** | Automated migration script that copies content, converts sidebar config, and suggests variable extraction. | Switch frameworks without a multi-week rewrite. |
+| **TypeScript config** | Sidebar, navigation, and site config are TypeScript files with exported types. | Typos and invalid values are caught at build time, not after deployment. |
+
+## Framework comparison
+
+How {vars.productName} compares to other docs-as-code frameworks:
+
+@include /docs/_includes/_framework-comparison.mdx

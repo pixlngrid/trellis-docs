@@ -16,8 +16,8 @@ last_update:
 - **Variables in content** — Define product names, versions, and terms once. Use them on every page. Rename a product? Change one file.
 - **Your components, your way** — Drop in React components per-page or register them globally. No swizzling, no ejecting, no magic.
 - **Own your output** — Static HTML export. Deploy to any host. No vendor lock-in, no runtime server, no SaaS subscription.
-- **Content audit built in** — Export your entire doc inventory as a CSV — title, URL, doc type, owner, draft status, last updated. The only docs framework with this built in.
-- **Built by a writer, not a framework team** — Every default reflects 30 years of documentation experience. Last-updated dates at the top, not buried. Heading anchors that copy on click. Search that works without Algolia.
+- **Content audit built in** — Export your entire doc inventory as a CSV — title, URL, doc type, author, draft status, last updated. The only docs framework with this built in.
+- **Built by a technical content manager, not a framework team** — Every default reflects 30 years of documentation experience. Last-updated dates at the top, not buried. Heading anchors that copy on click. Search that works without Algolia.
 
 ## What's included
 
@@ -79,26 +79,7 @@ last_update:
 
 How {vars.productName} stacks up against the most popular docs-as-code frameworks.
 
-| Feature | Trellis | Docusaurus | Nextra | Starlight | GitBook |
-|---------|:-------:|:----------:|:------:|:---------:|:-------:|
-| Static export | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
-| MDX support | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
-| Reusable variables in content | <Check /> | <Cross /> | <Cross /> | <Cross /> | <Check /> |
-| Custom components in content | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
-| Built-in search (no Algolia) | <Check /> | <Cross /> | <Check /> | <Check /> | <Check /> |
-| Design token pipeline | <Check /> | <Cross /> | <Cross /> | <Partial /> | <Cross /> |
-| Dark mode out of the box | <Check /> | <Check /> | <Check /> | <Check /> | <Check /> |
-| Self-hosted / deploy anywhere | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
-| CLI scaffolding | <Check /> | <Check /> | <Partial /> | <Check /> | <Cross /> |
-| TypeScript config | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
-| Blog support | <Check /> | <Check /> | <Check /> | <Partial /> | <Cross /> |
-| i18n / localization | <Check /> | <Check /> | <Partial /> | <Check /> | <Partial /> |
-| Documentation versioning | <Check /> | <Check /> | <Cross /> | <Partial /> | <Partial /> |
-| Audience role tagging | <Check /> | <Cross /> | <Cross /> | <Cross /> | <Cross /> |
-| Content audit export | <Check /> | <Cross /> | <Cross /> | <Cross /> | <Partial /> |
-| Free & open source | <Check /> | <Check /> | <Check /> | <Check /> | <Cross /> |
-
-<Check /> = included &nbsp; <Partial /> = partial / plugin required &nbsp; <Cross /> = not available
+@include /docs/_includes/_framework-comparison.mdx
 
 ## Tech stack
 

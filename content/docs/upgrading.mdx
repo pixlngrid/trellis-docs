@@ -7,47 +7,10 @@ last_update:
   author: Trellis
 ---
 
-Starting with v1.6.2, {vars.productName} includes a CLI upgrade command that updates framework files and dependencies in an existing project. For older versions, follow the manual steps below.
-
-## Upgrade with the CLI
-
-Run from your project root:
-
-```bash title="Terminal"
-npx create-trellis-docs@latest upgrade
-```
-
-This command:
-- Copies updated framework files (components, lib, scripts, app routes)
-- Merges new dependencies and scripts into your `package.json`
-- Skips your user files (`config/`, `content/`, `public/`, `components/brand/`)
-
-Preview what changes without modifying anything:
-
-```bash title="Terminal"
-npx create-trellis-docs@latest upgrade --dry-run
-```
-
-After upgrading, review the diff, install, and build:
-
-```bash title="Terminal"
-git diff
-npm install
-npm run build
-```
-
-:::tip
-The CLI upgrade does not modify your `config/site.ts`. Check the version-specific sections below for any new config options you should add manually.
-:::
-
----
-
-## Manual upgrade steps
-
-If you prefer to upgrade manually, or are upgrading from a version older than v1.6.2:
+To upgrade an existing {vars.productName} project to the latest version:
 
 1. **Check the release notes** — Read the [release notes](/release-notes/) for all versions between your current version and the target.
-2. **Follow the version-specific steps below** — Each section lists the exact files and dependencies to update.
+2. **Compare with the latest template** — Scaffold a fresh project in a temporary directory and diff it against yours.
 3. **Install and build** — Run `npm install` then `npm run build` to verify everything works.
 
 :::tip

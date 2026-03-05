@@ -1,6 +1,6 @@
 ---
 title: Build Errors
-description: Fix errors that occur during npm run build or static export, including prerender failures, missing static params, and Shiki language errors.
+description: Fix errors that occur during npm run build or static export, including prerender failures, missing static params, Shiki language errors, and unregistered components.
 keywords:
   - build errors
   - prerender error
@@ -8,6 +8,9 @@ keywords:
   - generateStaticParams
   - shiki
   - 500 error
+  - expected component to be defined
+  - mdx component not found
+  - unregistered component
 last_update:
   date: 03/02/2026
   author: Trellis
@@ -105,7 +108,7 @@ Export encountered an error on /(docs)/[...slug]/page: /some-path, exiting the b
 - The file has `draft: true` and is linked in the sidebar (see [Page is missing param](#page-is-missing-param-in-generatestaticparams))
 - A code block uses an unrecognized language identifier (see [Language not included](#language-x-is-not-included-in-this-bundle))
 - An `@include` directive points to a file that doesn't exist
-- An MDX component is used that hasn't been registered in `components/docs/mdx/index.tsx`
+- An MDX component is used that hasn't been registered (see [Expected component to be defined](#expected-component-x-to-be-defined))
 
 **Fix:** Read the full error output above this line to identify the root cause, then apply the appropriate fix.
 
@@ -135,6 +138,58 @@ Error: Include target not found: ../includes/_my-partial.mdx
 
 :::note
 Partial files prefixed with `_` are automatically excluded from routing and search indexing.
+:::
+
+---
+
+## `Expected component 'X' to be defined`
+
+**Full error:**
+```
+Error occurred prerendering page "/some-path". Read more: https://nextjs.org/docs/messages/prerender-error
+[Error: Expected component `MyComponent` to be defined: you likely forgot to import, pass, or provide it.] {
+  digest: '4264812099'
+}
+Export encountered an error on /(docs)/[...slug]/page: /some-path, exiting the build.
+```
+
+**Cause:** An MDX page uses a component (`<MyComponent />`) that hasn't been registered in the global MDX components map. Trellis renders MDX at build time — every custom component used in content must be explicitly listed in the component registry.
+
+**Fix:** Register the component in `components/docs/mdx/index.tsx`:
+
+1. Import your component:
+
+```tsx
+import { MyComponent } from '@/components/custom/my-component'
+```
+
+2. Add it to the `mdxComponents` object:
+
+```tsx
+export const mdxComponents: Record<string, React.ComponentType<any>> = {
+  // ... existing components
+  MyComponent,
+}
+```
+
+The key name in `mdxComponents` must match the tag name used in MDX exactly (case-sensitive). For example, if your MDX uses `<UxSidebarRedesign />`, the registry entry must be `UxSidebarRedesign`.
+
+**Currently registered components:**
+
+| Component | Source |
+|-----------|--------|
+| `Callout` | Admonition blocks |
+| `Tabs` / `TabItem` | Tabbed content |
+| `Glossary` | Searchable glossary |
+| `Feedback` | Feedback widget |
+| `FlippingCard` | Interactive flip cards |
+| `FaqTableOfContents` | FAQ auto-index |
+| `Tooltip` | Hover tooltips |
+| `DocCard` / `DocCardList` | Doc link cards |
+| `Check` / `Cross` / `Partial` | Comparison table symbols |
+
+:::tip
+If your component is only used on a single page, you can still register it globally — there's no per-page import mechanism in `next-mdx-remote`. The component bundle is only loaded when the tag appears in rendered content.
 :::
 
 ---

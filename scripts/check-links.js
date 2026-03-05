@@ -19,6 +19,16 @@ const path = require('path');
 const OUT_DIR  = path.join(__dirname, '..', 'out');
 const WARN_ONLY = process.argv.includes('--warn-only');
 
+// ── ANSI colors ──────────────────────────────────────────────────
+const useColor = process.stdout.isTTY !== false;
+const c = {
+  yellow:  (s) => useColor ? `\x1b[33m${s}\x1b[0m` : s,
+  red:     (s) => useColor ? `\x1b[31m${s}\x1b[0m` : s,
+  green:   (s) => useColor ? `\x1b[32m${s}\x1b[0m` : s,
+  dim:     (s) => useColor ? `\x1b[2m${s}\x1b[0m`  : s,
+  bold:    (s) => useColor ? `\x1b[1m${s}\x1b[0m`  : s,
+};
+
 // ── Walk out/ and return all .html files ─────────────────────────
 function walkHtml(dir) {
   const results = [];
@@ -100,19 +110,19 @@ function main() {
   }
 
   if (broken.size === 0) {
-    console.log('  No broken links found.');
+    console.log(c.green('  No broken links found.'));
     process.exit(0);
   }
 
   const total = [...broken.values()].reduce((n, pages) => n + pages.length, 0);
-  const label = WARN_ONLY ? 'Warning' : 'Error';
-  console.log(`\n${label}: ${broken.size} broken link(s) found (${total} occurrence(s)):\n`);
+  const label = WARN_ONLY ? c.yellow('Warning') : c.red('Error');
+  console.log(`\n${label}: ${c.bold(`${broken.size} broken link(s)`)} found (${total} occurrence(s)):\n`);
 
   for (const [href, pages] of [...broken].sort(([a], [b]) => a.localeCompare(b))) {
-    console.log(`  ${href}`);
+    console.log(`  ${c.yellow(href)}`);
     const shown = pages.slice(0, 3);
-    for (const p of shown) console.log(`    in: ${p}`);
-    if (pages.length > 3) console.log(`    ... and ${pages.length - 3} more page(s)`);
+    for (const p of shown) console.log(`    ${c.dim('in:')} ${p}`);
+    if (pages.length > 3) console.log(`    ${c.dim(`... and ${pages.length - 3} more page(s)`)}`);
   }
 
   console.log('');

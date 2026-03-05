@@ -6,6 +6,7 @@ export type SidebarItem =
 
 export const mainSidebar: SidebarItem[] = [
   { type: 'doc', id: 'introduction', label: 'Introduction' },
+  { type: 'doc', id: 'features', label: 'Features' },
   { type: 'doc', id: 'getting-started' },
   {
     type: 'category',

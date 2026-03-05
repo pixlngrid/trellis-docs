@@ -41,7 +41,7 @@ cd my-docs
 node scripts/migrate-docusaurus.js /path/to/docusaurus-project
 ```
 
-Run with `--dry-run` to preview changes without writing files, or `--force` to overwrite existing content. See the [Content Authoring guide](https://pixlngrid.github.io/trellis-docs/guides/content-authoring/) for details on `@include` partials and other features.
+Run with `--dry-run` to preview changes without writing files, or `--force` to overwrite existing content. See the [Docs guide](https://pixlngrid.github.io/trellis-docs/guides/docs/) for details on `@include` partials and other features.
 
 ## Requirements
 
