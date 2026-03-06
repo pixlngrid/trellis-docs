@@ -238,6 +238,13 @@
     "body": ["<Glossary />"]
   },
 
+  "Trellis: Chip": {
+    "scope": "mdx",
+    "prefix": "t-chip",
+    "description": "Inline colored chip/badge (green, red, yellow, blue, neutral)",
+    "body": ["<Chip color=\"${1|green,red,yellow,blue,neutral|}\">${2:Label}</Chip>"]
+  },
+
   "Trellis: FAQ Table of Contents": {
     "scope": "mdx",
     "prefix": "t-faqtoc",

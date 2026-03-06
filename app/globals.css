@@ -169,6 +169,19 @@
     font-size: 90%;
   }
 
+  .prose :not(pre) > code {
+    background-color: var(--color-neutral-slate-100);
+    color: var(--color-neutral-slate-700);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .dark .prose :not(pre) > code {
+    background-color: var(--color-neutral-slate-800);
+    color: var(--color-neutral-slate-200);
+  }
+
   .prose img {
     border: 1px solid var(--border);
     border-radius: 5px;

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import type { BlogEntry } from '@/lib/content'
 import { getPostVisuals, formatBlogDate, estimateReadTime } from '@/lib/blog-utils'
@@ -26,7 +27,7 @@ export function RelatedPosts({ currentSlug, currentCategory, allPosts }: Related
       <h3 className="text-2xl font-bold text-[var(--foreground)] mb-6">Related Articles</h3>
       <div className="grid md:grid-cols-2 gap-4">
         {related.map((post) => {
-          const { gradient, badgeClass } = getPostVisuals(post.meta)
+          const visuals = getPostVisuals(post.meta)
           const readTime = estimateReadTime(post.content)
           return (
             <Link
@@ -34,12 +35,22 @@ export function RelatedPosts({ currentSlug, currentCategory, allPosts }: Related
               href={`/blog/${post.meta.slug}/`}
               className="block bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden hover:shadow-lg transition-shadow no-underline group"
             >
-              <div className={`relative h-32 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-                <BlogCardPattern />
-              </div>
+              {visuals.coverImage ? (
+                <div className="relative h-32">
+                  <Image src={visuals.coverImage} alt="" fill className="object-cover" />
+                </div>
+              ) : visuals.coverColor ? (
+                <div className="relative h-32 flex items-center justify-center" style={{ backgroundColor: visuals.coverColor }}>
+                  <BlogCardPattern />
+                </div>
+              ) : (
+                <div className={`relative h-32 bg-gradient-to-br ${visuals.gradient} flex items-center justify-center`}>
+                  <BlogCardPattern />
+                </div>
+              )}
               <div className="p-4">
                 {post.meta.category && (
-                  <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded mb-2 ${badgeClass}`}>
+                  <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded mb-2 ${visuals.badgeClass}`}>
                     {post.meta.category}
                   </span>
                 )}

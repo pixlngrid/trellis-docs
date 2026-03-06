@@ -2,6 +2,8 @@ import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
 import { siteConfig } from '@/config/site'
+import { authors as authorProfiles } from '@/config/authors'
+import type { AuthorProfile } from '@/config/authors'
 import { resolveIncludes } from './resolve-includes'
 import { preprocessAdmonitions } from './remark-callout'
 
@@ -212,15 +214,54 @@ export async function getAllDocsMeta(
 
 // Blog content loading
 
+export interface BlogAuthor {
+  name: string
+  role?: string
+  bio?: string
+  img?: string
+  url?: string
+}
+
 export interface BlogMeta {
   title: string
   description?: string
   slug: string
   date: string
-  authors?: Array<{ name: string; role?: string }>
+  authors?: BlogAuthor[]
   category?: string
   featured?: boolean
-  image?: string
+  coverImage?: string
+  coverColor?: string
+}
+
+/**
+ * Resolve an author entry from frontmatter.
+ * - String → look up from config/authors.ts
+ * - Object → merge with config profile (inline overrides config)
+ */
+function resolveAuthor(entry: unknown): BlogAuthor | null {
+  if (typeof entry === 'string') {
+    const profile = authorProfiles[entry]
+    return profile ? { ...profile } : null
+  }
+  if (entry && typeof entry === 'object') {
+    const obj = entry as Record<string, unknown>
+    // If it has a name, check if there's a matching config profile to merge
+    const name = obj.name as string | undefined
+    if (!name) return null
+    // Find matching profile by key or by name
+    const profileKey = Object.keys(authorProfiles).find(
+      (k) => authorProfiles[k].name === name
+    )
+    const base: AuthorProfile = profileKey ? authorProfiles[profileKey] : { name }
+    return {
+      ...base,
+      ...Object.fromEntries(
+        Object.entries(obj).filter(([, v]) => v != null && v !== '')
+      ),
+    } as BlogAuthor
+  }
+  return null
 }
 
 export interface BlogEntry {
@@ -263,10 +304,13 @@ export async function getAllBlogPosts(): Promise<BlogEntry[]> {
         description: data.description,
         slug: data.slug || fileSlug,
         date,
-        authors: data.authors,
+        authors: Array.isArray(data.authors)
+          ? data.authors.map(resolveAuthor).filter((a): a is BlogAuthor => a !== null)
+          : undefined,
         category: data.category,
         featured: data.featured === true,
-        image: data.image,
+        coverImage: data.coverImage,
+        coverColor: data.coverColor,
       },
       content: processedContent,
       excerpt,

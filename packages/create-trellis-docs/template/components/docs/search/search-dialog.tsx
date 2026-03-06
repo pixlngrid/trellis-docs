@@ -175,6 +175,11 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
             {results.length} result{results.length === 1 ? '' : 's'}
           </div>
         )}
+
+        {/* Footer */}
+        <div className="px-4 py-2 border-t text-xs text-[var(--muted-foreground)] text-right">
+          Powered by Trellis Docs
+        </div>
       </div>
     </div>
   )

@@ -1,0 +1,83 @@
+---
+title: Content Audit
+description: Export your doc inventory as a CSV for content audits, gap analysis, and stakeholder reporting.
+keywords: [content audit, CSV export, inventory, sidebar export, doc type, role, draft, last updated]
+last_update:
+  date: 03/06/2026
+  author: Trellis
+---
+
+{vars.productName} includes a built-in script that exports your entire documentation inventory as a CSV file. No external tools or plugins required.
+
+## Running the export
+
+```bash
+# Print to terminal
+node scripts/export-sidebar.js
+
+# Save to a file
+node scripts/export-sidebar.js > sidebar.csv
+```
+
+The script reads your `config/sidebar.ts` and every doc's frontmatter, then outputs a single CSV with one row per page.
+
+## Output columns
+
+| Column | Source | Description |
+|--------|--------|-------------|
+| Doc ID | Sidebar config | The sidebar item `id` (e.g., `guides/docs`) |
+| Title | Frontmatter `title` or sidebar `label` | Display title of the page |
+| URL | Derived from ID | Published URL path (e.g., `/guides/docs/`) |
+| Category | Sidebar structure | Parent category chain (e.g., `Guides > Markdown`) |
+| Draft | Frontmatter `draft` | `Yes` if the page is marked as a draft |
+| Doc Type | Frontmatter `doc_type` | `how-to`, `concept`, `reference`, or `tutorial` |
+| Role | Frontmatter `role` | Target audience tags (e.g., `Developer; Admin`) |
+| Last Updated | Frontmatter `last_update.date` | Date the page was last revised |
+| Author | Frontmatter `last_update.author` | Who last updated the page |
+| Description | Frontmatter `description` | Short description used in search and SEO |
+| Keywords | Frontmatter `keywords` | Search keywords, semicolon-separated |
+| File Path | Filesystem | Relative path to the source file |
+
+## Example output
+
+```csv
+Doc ID,Title,URL,Category,Draft,Doc Type,Role,Last Updated,Author,Description,Keywords,File Path
+introduction,Introduction,/introduction/,,,,,,Overview of Trellis Docs.,trellis; docs; introduction,content/docs/introduction.mdx
+guides/docs,Docs,/guides/docs/,Guides,,,Developer,03/04/2026,Trellis,Create doc pages and configure frontmatter.,docs; frontmatter; sidebar,content/docs/guides/docs.mdx
+```
+
+## Use cases
+
+### Content gap analysis
+
+Filter the CSV by `Doc Type` to see if your docs cover all four types — how-to, concept, reference, and tutorial. A product with only reference docs is missing onboarding material.
+
+### Stale content review
+
+Sort by `Last Updated` to find pages that haven't been revised recently. Pages without a `last_update` date show up as blank — those are your first candidates.
+
+### Draft tracking
+
+Filter `Draft = Yes` to see pages that exist in source control but are excluded from search, navigation, and the FAQ index.
+
+### Audience coverage
+
+Group by `Role` to check whether your docs address all target audiences. If every page is tagged `Developer` but none say `Admin`, administrators are underserved.
+
+### Stakeholder reporting
+
+Open the CSV in Excel or Google Sheets and share it with content managers, product owners, or compliance teams who need a full inventory without access to the codebase.
+
+## How it works
+
+The script:
+
+1. Parses `config/sidebar.ts` to get the full sidebar tree
+2. For each sidebar item, finds the corresponding `.mdx` or `.md` file in `content/docs/`
+3. Reads the YAML frontmatter with `gray-matter`
+4. Flattens the sidebar hierarchy into rows, preserving the category chain
+5. Outputs RFC 4180-compliant CSV to stdout
+
+Categories in the sidebar create a breadcrumb-style chain in the Category column (e.g., `Guides > Markdown > Code Blocks`). If a category links to its own page, that page gets its own row.
+
+Pages referenced in the sidebar but missing from the filesystem show `(not found)` in the File Path column — useful for catching broken sidebar references.

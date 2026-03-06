@@ -25,6 +25,10 @@ const CATEGORY_GRADIENTS: Record<string, { gradient: string; badge: string }> = 
     gradient: 'from-indigo-500 to-blue-600',
     badge: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
   },
+  Feature: {
+    gradient: 'from-sky-500 to-blue-600',
+    badge: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+  },
 }
 
 const FALLBACK_GRADIENTS = [
@@ -34,22 +38,41 @@ const FALLBACK_GRADIENTS = [
   'from-fuchsia-500 to-purple-600',
 ]
 
-export function getPostVisuals(meta: BlogMeta): { gradient: string; badgeClass: string } {
-  if (meta.category && CATEGORY_GRADIENTS[meta.category]) {
-    return {
-      gradient: CATEGORY_GRADIENTS[meta.category].gradient,
-      badgeClass: CATEGORY_GRADIENTS[meta.category].badge,
-    }
-  }
-  const hash = meta.slug.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+export interface PostVisuals {
+  gradient: string
+  badgeClass: string
+  coverImage?: string
+  coverColor?: string
+}
+
+export function getPostVisuals(meta: BlogMeta): PostVisuals {
+  const base = meta.category && CATEGORY_GRADIENTS[meta.category]
+    ? {
+        gradient: CATEGORY_GRADIENTS[meta.category].gradient,
+        badgeClass: CATEGORY_GRADIENTS[meta.category].badge,
+      }
+    : {
+        gradient: FALLBACK_GRADIENTS[
+          meta.slug.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % FALLBACK_GRADIENTS.length
+        ],
+        badgeClass: 'bg-[var(--muted)] text-[var(--muted-foreground)]',
+      }
+
   return {
-    gradient: FALLBACK_GRADIENTS[hash % FALLBACK_GRADIENTS.length],
-    badgeClass: 'bg-[var(--muted)] text-[var(--muted-foreground)]',
+    ...base,
+    coverImage: meta.coverImage,
+    coverColor: meta.coverColor,
   }
 }
 
 export function estimateReadTime(content: string): number {
-  const words = content.trim().split(/\s+/).length
+  const stripped = content
+    .replace(/```[\s\S]*?```/g, '')              // remove fenced code blocks
+    .replace(/<[^>]+>/g, ' ')                    // remove HTML/JSX tags
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')        // remove images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')     // keep link text only
+    .replace(/[|:~`#*>\-]/g, ' ')                // remove markdown symbols
+  const words = stripped.trim().split(/\s+/).filter(Boolean).length
   return Math.max(1, Math.round(words / 230))
 }
 

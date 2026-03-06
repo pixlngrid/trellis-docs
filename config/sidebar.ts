@@ -47,6 +47,7 @@ export const mainSidebar: SidebarItem[] = [
       { type: 'doc', id: 'guides/style-and-layout', label: 'Style and Layout' },
       { type: 'doc', id: 'guides/search', label: 'Search' },
       { type: 'doc', id: 'guides/site-configuration', label: 'Site Configuration' },
+      { type: 'doc', id: 'guides/content-audit', label: 'Content Audit' },
       { type: 'doc', id: 'guides/deployment', label: 'Deployment' },
       { type: 'doc', id: 'guides/i18n', label: 'Internationalization' },
       { type: 'doc', id: 'guides/whats-next', label: "What's Next?" },

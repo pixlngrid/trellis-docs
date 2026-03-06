@@ -1,9 +1,9 @@
 ---
 title: Blog
 description: Create blog posts and release notes in the Trellis docs framework.
-keywords: [blog, posts, release-notes, authors, excerpts]
+keywords: [blog, posts, release-notes, authors, excerpts, coverImage, coverColor, author profiles]
 last_update:
-  date: 03/04/2026
+  date: 03/06/2026
   author: Trellis
 ---
 
@@ -14,7 +14,7 @@ This guide covers creating blog posts and release notes in {vars.productName}. F
 Blog posts live in `content/blog/`. Name files with a date prefix:
 
 ```
-content/blog/2026-02-20-welcome.md
+content/blog/2026-02-20-welcome.mdx
 ```
 
 ### Blog frontmatter
@@ -25,18 +25,96 @@ title: Welcome to Trellis
 description: Introducing the Trellis docs framework.
 slug: welcome
 authors:
-  - name: Trellis Team
+  - patriciamcphee
+category: Announcement
+featured: true
+coverImage: /img/blog/welcome-hero.jpg
 ---
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | Post title |
+| `description` | string | Short description shown on cards and meta tags |
+| `slug` | string | URL slug (defaults to the filename slug) |
+| `authors` | array | Author IDs or inline objects (see [Authors](#authors) below) |
+| `category` | string | Category label shown as a badge on cards |
+| `featured` | boolean | When `true`, the post appears in the featured hero slot |
+| `coverImage` | string | Path to a cover image (replaces the gradient) |
+| `coverColor` | string | CSS color for the card header (e.g. `'#0078D4'`) |
+
+Trellis parses the date from the filename. Posts are listed at `/blog/`, newest first.
+
+### Cover visuals
+
+Each blog card and article hero shows a visual header. You have three options:
+
+1. **Cover image** — Set `coverImage` to a path like `/img/blog/my-post.jpg`. The image fills the card header area.
+2. **Brand color** — Set `coverColor` to any CSS color (hex, rgb, hsl). The color fills the header with a subtle pattern overlay.
+3. **Category gradient** (default) — If neither is set, Trellis picks a gradient based on the `category` field.
+
+```yaml
+# Cover image
+coverImage: /img/blog/my-post.jpg
+
+# Brand color
+coverColor: '#0078D4'
+
+# No cover fields — uses the category gradient
+```
+
+Built-in category gradients: `Engineering`, `Product`, `Design`, `Tutorial`, `Announcement`, `Writing`, `Feature`. Unrecognized categories fall back to a hash-based gradient.
+
+### Authors {#authors}
+
+Author data can be defined centrally in `config/authors.ts` and referenced by ID, or provided inline in frontmatter. Inline fields override the config profile.
+
+#### Central author profiles
+
+Define authors once in `config/authors.ts`:
+
+```ts title="config/authors.ts"
+export const authors: Record<string, AuthorProfile> = {
+  patriciamcphee: {
+    name: 'Patricia McPhee',
+    role: 'Framework Founder & Lead Technical Writer',
+    bio: 'Patricia is the creator of Trellis Docs and a technical writer with over 15 years of experience.',
+    img: '/img/authors/avatar-patriciamcphee.png',
+    url: 'https://github.com/patriciamcphee',
+  },
+}
 ```
 
 | Field | Description |
 |-------|-------------|
-| `title` | Post title |
-| `description` | Short description |
-| `slug` | URL slug (defaults to the filename slug) |
-| `authors` | Array of `{ name }` objects |
+| `name` | Display name (required) |
+| `role` | Job title or role |
+| `bio` | Short biography shown in the author card at the bottom of articles |
+| `img` | Path to avatar image |
+| `url` | Link for the author name in the bio card |
 
-Trellis parses the date from the filename. Posts are listed at `/blog/`, newest first.
+#### Referencing authors in frontmatter
+
+```yaml
+# By ID — resolves from config/authors.ts
+authors:
+  - patriciamcphee
+
+# Inline object — for guest authors or one-off posts
+authors:
+  - name: Guest Writer
+    role: Contributor
+    bio: A guest post by an external contributor.
+
+# Override — inline fields override the config profile
+authors:
+  - name: Patricia McPhee
+    role: Special Guest  # overrides the config role
+```
+
+When an inline object matches a config profile by name, the config fields are used as defaults and the inline fields take priority.
+
+The author name at the top of each article links to the bio card at the bottom of the page.
 
 ### Excerpt truncation
 

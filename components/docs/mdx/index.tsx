@@ -10,6 +10,8 @@ import { FaqTableOfContents } from '@/components/custom/faq-table-of-contents'
 import { Tooltip } from '@/components/docs/tooltip'
 import { DocCard } from '@/components/custom/doc-card'
 import { DocCardList } from '@/components/custom/doc-card-list'
+import { Chip } from '@/components/custom/chip'
+import FrameworkFlowchart from '@/components/FrameworkFlowchart'
 
 // Colored symbols for comparison tables
 function Check() {
@@ -55,4 +57,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   Check,
   Cross,
   Partial,
+  FrameworkFlowchart,
+  Chip,
 }
