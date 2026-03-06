@@ -40,6 +40,12 @@ const ALLOW_DIRS = [
   'scripts',
 ];
 
+// Files within allowed dirs that should never be overwritten (user-customized).
+const SKIP_FILES = [
+  'components/docs/mdx/index.tsx',
+  'components/custom',
+];
+
 // Individual files to sync.
 const ALLOW_FILES = [
   'app/layout.tsx',
@@ -79,11 +85,13 @@ async function collectAllowedFiles() {
 
   // Allowed directories — walk each and include all non-.tpl files
   for (const dir of ALLOW_DIRS) {
+    // Skip entire directories listed in SKIP_FILES
+    if (SKIP_FILES.includes(dir)) continue;
     const srcDir = path.join(TEMPLATE_DIR, dir);
     const dirFiles = await walkDir(srcDir);
     for (const absPath of dirFiles) {
       const rel = normalizePath(path.relative(TEMPLATE_DIR, absPath));
-      if (!rel.endsWith('.tpl')) {
+      if (!rel.endsWith('.tpl') && !SKIP_FILES.includes(rel)) {
         files.add(rel);
       }
     }
