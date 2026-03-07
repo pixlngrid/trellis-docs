@@ -4,6 +4,13 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { cn } from '@/lib/utils'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
+// Sync tabs across all instances on the same page via a custom DOM event
+const TAB_SYNC_EVENT = 'trellis:tab-sync'
+
+function emitTabSync(value: string) {
+  window.dispatchEvent(new CustomEvent(TAB_SYNC_EVENT, { detail: value }))
+}
+
 interface TabsProps {
   children: React.ReactNode
   queryString?: string | boolean
@@ -44,8 +51,21 @@ function TabsInner({ children, queryString, defaultValue }: TabsProps) {
     }
   }, [urlValue]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Listen for tab sync events from other Tabs instances on the same page
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const value = (e as CustomEvent<string>).detail
+      if (tabValues.some((t) => t.value === value)) {
+        setSelected(value)
+      }
+    }
+    window.addEventListener(TAB_SYNC_EVENT, handler)
+    return () => window.removeEventListener(TAB_SYNC_EVENT, handler)
+  }, [tabValues])
+
   const handleSelect = (value: string) => {
     setSelected(value)
+    emitTabSync(value)
 
     if (queryString) {
       const params = new URLSearchParams(searchParams.toString())

@@ -12,6 +12,9 @@ interface ImageLightboxProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 
 export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps) {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   if (!src) return null
 
@@ -72,7 +75,7 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
         onClick={() => setOpen(true)}
       />
 
-      {open && createPortal(
+      {open && mounted && createPortal(
         <div
           className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 cursor-zoom-out"
           onClick={() => setOpen(false)}

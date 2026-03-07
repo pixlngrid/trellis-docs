@@ -27,6 +27,23 @@ const fuseOptions = {
   ],
 }
 
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>
+  const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'))
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.trim().toLowerCase() ? (
+          <mark key={i} className="bg-[var(--primary)]/20 text-inherit rounded-sm">{part}</mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  )
+}
+
 interface SearchDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -160,10 +177,10 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
               onClick={() => navigate(item.url)}
               onMouseEnter={() => setSelectedIndex(i)}
             >
-              <div className="text-sm font-medium">{item.title}</div>
+              <div className="text-sm font-medium"><Highlight text={item.title} query={query} /></div>
               {item.description && (
                 <div className="text-xs text-[var(--muted-foreground)] mt-0.5 line-clamp-1">
-                  {item.description}
+                  <Highlight text={item.description} query={query} />
                 </div>
               )}
             </button>

@@ -11,8 +11,12 @@ keywords:
   - expected component to be defined
   - mdx component not found
   - unregistered component
+  - acorn
+  - permission denied
+  - Windows
+  - .next trace
 last_update:
-  date: 03/02/2026
+  date: 03/07/2026
   author: Trellis
 ---
 
@@ -114,6 +118,38 @@ Export encountered an error on /(docs)/[...slug]/page: /some-path, exiting the b
 
 ---
 
+## `Could not parse expression with acorn`
+
+**Full error:**
+```
+[Error: [next-mdx-remote] error compiling MDX:
+Could not parse expression with acorn
+```
+
+**Cause:** MDX treats anything inside `{ }` as a JavaScript expression. Common triggers:
+
+- **Custom heading IDs** like `### Authors {#authors}` — the `{#authors}` syntax is not supported by MDX (it requires a remark plugin like `remark-heading-id`). MDX tries to parse `#authors` as JavaScript and fails.
+- **Unescaped braces** in prose text, such as `the result is {x: 1}`.
+
+**Fix:** Remove or escape the braces:
+
+```mdx
+{/* ❌ Custom heading ID — MDX can't parse this */}
+### Authors {#authors}
+
+{/* ✅ Remove the ID — rehype-slug auto-generates it from the heading text */}
+### Authors
+
+{/* ✅ Or escape the braces */}
+### Authors \{#authors\}
+```
+
+:::note
+Trellis uses `rehype-slug` which automatically generates heading IDs from the text. A heading `### Authors` gets `id="authors"` — no manual ID needed.
+:::
+
+---
+
 ## `@include` file not found
 
 **Full error:**
@@ -190,6 +226,33 @@ The key name in `mdxComponents` must match the tag name used in MDX exactly (cas
 
 :::tip
 If your component is only used on a single page, you can still register it globally — there's no per-page import mechanism in `next-mdx-remote`. The component bundle is only loaded when the tag appears in rendered content.
+:::
+
+---
+
+## `rm: cannot remove '.next/trace': Permission denied` (Windows)
+
+**Full error:**
+```
+rm: cannot remove '.next/trace': Permission denied
+```
+
+**Cause:** On Windows, the `.next/trace` file is locked by a running Node process (usually the dev server or a stalled build). Unlike macOS/Linux, Windows doesn't allow deleting files that are open by another process.
+
+**Fix:** Kill all Node processes first, then delete the folder:
+
+```bash
+# PowerShell
+Stop-Process -Name node -Force; Remove-Item -Recurse -Force .next
+
+# Git Bash / WSL
+taskkill //F //IM node.exe && rm -rf .next
+```
+
+If the file is still locked, close VS Code (which runs its own Node processes), delete the folder, then reopen.
+
+:::tip
+This commonly happens when a build stalls or a dev server doesn't shut down cleanly. If you see builds hanging with no output, check Task Manager for orphaned `node.exe` processes.
 :::
 
 ---

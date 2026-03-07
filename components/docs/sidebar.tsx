@@ -45,23 +45,32 @@ function SidebarCategory({ item, depth = 0 }: { item: ResolvedSidebarItem; depth
 
   return (
     <div className="mb-0.5">
-      <button
-        onClick={handleToggle}
+      <div
         className={cn(
           'flex items-center w-full text-left px-3 py-1.5 text-sm rounded-md',
-          'tracking-wide cursor-pointer',
+          'tracking-wide',
           isTopLevel ? 'font-semibold' : 'font-medium',
           isSelfActive
             ? 'text-[var(--foreground)]'
             : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
         )}
       >
-        <span className="flex-1">{item.label}</span>
-        <ChevronDown
-          size={14}
-          className={cn('transition-transform shrink-0 ml-1', open ? '' : '-rotate-90')}
-        />
-      </button>
+        {item.href ? (
+          <Link href={item.href} className="flex-1 no-underline text-inherit" onClick={() => { if (!open) handleToggle() }}>
+            {item.label}
+          </Link>
+        ) : (
+          <button className="flex-1 text-left cursor-pointer" onClick={handleToggle}>
+            {item.label}
+          </button>
+        )}
+        <button onClick={handleToggle} className="cursor-pointer shrink-0 ml-1 p-0.5" aria-label="Toggle section">
+          <ChevronDown
+            size={14}
+            className={cn('transition-transform', open ? '' : '-rotate-90')}
+          />
+        </button>
+      </div>
       {open && item.items && (
         <ul className="ml-3 pl-3 border-l border-[var(--border)]">
           {item.items.map((child, index) => (
@@ -99,6 +108,7 @@ function SidebarLink({ item }: { item: ResolvedSidebarItem }) {
 
 function SidebarItem({ item, depth = 0 }: { item: ResolvedSidebarItem; depth?: number }) {
   if (item.type === 'category') return <SidebarCategory item={item} depth={depth} />
+  if (item.type === 'html' && item.html) return <li className="list-none" dangerouslySetInnerHTML={{ __html: item.html }} />
   return <SidebarLink item={item} />
 }
 

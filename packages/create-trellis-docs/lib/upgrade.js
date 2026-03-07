@@ -44,6 +44,8 @@ const ALLOW_DIRS = [
 const SKIP_FILES = [
   'components/docs/mdx/index.tsx',
   'components/custom',
+  'app/globals.css',
+  'app/layout.tsx',
 ];
 
 // Individual files to sync.
@@ -100,7 +102,7 @@ async function collectAllowedFiles() {
   // Individual allowed files
   for (const file of ALLOW_FILES) {
     const srcPath = path.join(TEMPLATE_DIR, file);
-    if ((await fs.pathExists(srcPath)) && !file.endsWith('.tpl')) {
+    if ((await fs.pathExists(srcPath)) && !file.endsWith('.tpl') && !SKIP_FILES.includes(file)) {
       files.add(file);
     }
   }

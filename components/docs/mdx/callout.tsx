@@ -58,7 +58,7 @@ export function Callout({ type = 'note', title, children }: CalloutProps) {
         <span className={style.icon}>{icon}</span>
         <span className="text-sm font-semibold uppercase">{title || style.label}</span>
       </div>
-      <div className="text-sm [&>p]:my-1">{children}</div>
+      <div className="text-sm [&>p]:my-1 [&_li]:text-sm">{children}</div>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useCallback, useEffect, createContext, useContext } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { resolveSidebar, type ResolvedSidebarItem } from '@/lib/sidebar'
@@ -10,47 +10,61 @@ import { useDocContext } from '@/lib/doc-context'
 
 const defaultSidebarItems = resolveSidebar()
 
-function SidebarCategory({ item }: { item: ResolvedSidebarItem }) {
+// Accordion context — only one top-level category open at a time
+const AccordionContext = createContext<{
+  openId: string | null
+  toggle: (id: string) => void
+}>({ openId: null, toggle: () => {} })
+
+function SidebarCategory({ item, depth = 0 }: { item: ResolvedSidebarItem; depth?: number }) {
   const pathname = usePathname()
+  const { openId, toggle } = useContext(AccordionContext)
   const isSelfActive = item.href && pathname === item.href
+  const categoryId = item.href || item.label
+
+  // Top-level categories use accordion (only one open at a time).
+  // Sub-categories use local state (independent toggle).
   const isChildActive = item.items?.some(
-    (child) => child.href && pathname === child.href
+    (child) =>
+      (child.href && pathname === child.href) ||
+      (child.type === 'category' &&
+        child.items?.some((gc) => gc.href && pathname === gc.href))
   )
-  const [open, setOpen] = useState(!item.collapsed || !!isChildActive || !!isSelfActive)
+  const [localOpen, setLocalOpen] = useState(!!isChildActive || !!isSelfActive)
+
+  const isTopLevel = depth === 0
+  const open = isTopLevel ? openId === categoryId : localOpen
+
+  const handleToggle = useCallback(() => {
+    if (isTopLevel) {
+      toggle(categoryId)
+    } else {
+      setLocalOpen((prev) => !prev)
+    }
+  }, [isTopLevel, categoryId, toggle])
 
   return (
     <div className="mb-0.5">
-      <div className="flex items-center">
+      <div
+        className={cn(
+          'flex items-center w-full text-left px-3 py-1.5 text-sm rounded-md',
+          'tracking-wide',
+          isTopLevel ? 'font-semibold' : 'font-medium',
+          isSelfActive
+            ? 'text-[var(--foreground)]'
+            : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+        )}
+      >
         {item.href ? (
-          <Link
-            href={item.href}
-            className={cn(
-              'flex-1 px-3 py-1.5 text-sm font-semibold rounded-md no-underline',
-              'tracking-wide',
-              isSelfActive
-                ? 'text-[var(--foreground)]'
-                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-            )}
-          >
+          <Link href={item.href} className="flex-1 no-underline text-inherit" onClick={() => { if (!open) handleToggle() }}>
             {item.label}
           </Link>
         ) : (
-          <button
-            onClick={() => setOpen(!open)}
-            className={cn(
-              'flex-1 text-left px-3 py-1.5 text-sm font-semibold rounded-md',
-              'text-[var(--muted-foreground)] hover:text-[var(--foreground)]',
-              'tracking-wide'
-            )}
-          >
+          <button className="flex-1 text-left cursor-pointer" onClick={handleToggle}>
             {item.label}
           </button>
         )}
-        <button
-          onClick={() => setOpen(!open)}
-          className="p-1.5 rounded-md text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-          aria-label={open ? 'Collapse' : 'Expand'}
-        >
+        <button onClick={handleToggle} className="cursor-pointer shrink-0 ml-1 p-0.5" aria-label="Toggle section">
           <ChevronDown
             size={14}
             className={cn('transition-transform', open ? '' : '-rotate-90')}
@@ -60,7 +74,7 @@ function SidebarCategory({ item }: { item: ResolvedSidebarItem }) {
       {open && item.items && (
         <ul className="ml-3 pl-3 border-l border-[var(--border)]">
           {item.items.map((child, index) => (
-            <SidebarItem key={child.href || child.label || `html-${index}`} item={child} />
+            <SidebarItem key={child.href || child.label || `html-${index}`} item={child} depth={depth + 1} />
           ))}
         </ul>
       )}
@@ -92,9 +106,9 @@ function SidebarLink({ item }: { item: ResolvedSidebarItem }) {
   )
 }
 
-function SidebarItem({ item }: { item: ResolvedSidebarItem }) {
-  if (item.type === 'category') return <SidebarCategory item={item} />
-  if (item.type === 'html') return <li dangerouslySetInnerHTML={{ __html: item.html ?? '' }} />
+function SidebarItem({ item, depth = 0 }: { item: ResolvedSidebarItem; depth?: number }) {
+  if (item.type === 'category') return <SidebarCategory item={item} depth={depth} />
+  if (item.type === 'html' && item.html) return <li className="list-none" dangerouslySetInnerHTML={{ __html: item.html }} />
   return <SidebarLink item={item} />
 }
 
@@ -103,18 +117,57 @@ interface SidebarProps {
   onToggle: () => void
 }
 
+/** Find which top-level category (by id) contains the current pathname. */
+function findActiveCategory(
+  items: ResolvedSidebarItem[],
+  pathname: string
+): string | null {
+  for (const item of items) {
+    if (item.type !== 'category') continue
+    const id = item.href || item.label
+    if (item.href && pathname === item.href) return id
+    if (
+      item.items?.some(
+        (child) =>
+          (child.href && pathname === child.href) ||
+          (child.type === 'category' &&
+            child.items?.some((gc) => gc.href && pathname === gc.href))
+      )
+    )
+      return id
+  }
+  return null
+}
+
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { urlPrefix } = useDocContext()
+  const pathname = usePathname()
   const sidebarItems = urlPrefix
     ? resolveSidebar(undefined, urlPrefix)
     : defaultSidebarItems
 
+  const activeCategory = findActiveCategory(sidebarItems, pathname)
+  const [openId, setOpenId] = useState<string | null>(activeCategory)
+
+  // Sync open category when user navigates to a page in a different category
+  useEffect(() => {
+    if (activeCategory && activeCategory !== openId) {
+      setOpenId(activeCategory)
+    }
+  }, [activeCategory]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const toggle = useCallback(
+    (id: string) => setOpenId((prev) => (prev === id ? null : id)),
+    []
+  )
+
   return (
+    <AccordionContext.Provider value={{ openId, toggle }}>
     <div className="hidden lg:flex relative shrink-0">
       {/* Sidebar content */}
       <aside
         className={cn(
-          'border-r overflow-y-auto sticky transition-[width] duration-200 ease-in-out',
+          'border-r overflow-y-auto overflow-x-hidden sticky transition-[width] duration-200 ease-in-out',
           collapsed ? 'w-0 overflow-hidden border-r-0' : ''
         )}
         style={{
@@ -123,7 +176,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           height: 'calc(100vh - var(--navbar-height))',
         }}
       >
-        <nav className="p-4 whitespace-nowrap" style={{ width: 'var(--sidebar-width)' }}>
+        <nav className="p-4" style={{ width: 'var(--sidebar-width)' }}>
           <ul className="space-y-0.5">
             {sidebarItems.map((item, index) => (
               <SidebarItem key={item.href || item.label || `html-${index}`} item={item} />
@@ -181,5 +234,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </div>
       )}
     </div>
+    </AccordionContext.Provider>
   )
 }

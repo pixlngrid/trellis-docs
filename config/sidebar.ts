@@ -32,6 +32,7 @@ export const mainSidebar: SidebarItem[] = [
           { type: 'doc', id: 'guides/markdown/head-metadata', label: 'Head Metadata' },
         ],
       },
+
       {
         type: 'category',
         label: 'Components',
