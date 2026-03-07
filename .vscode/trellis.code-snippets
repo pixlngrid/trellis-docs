@@ -2,7 +2,7 @@
   // ─── Frontmatter scaffolds ────────────────────────────────────────────
 
   "Trellis: Doc frontmatter": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-front-doc",
     "description": "Full doc page frontmatter with all available fields",
     "body": [
@@ -25,7 +25,7 @@
   },
 
   "Trellis: Blog frontmatter": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-front-blog",
     "description": "Blog post frontmatter",
     "body": [
@@ -46,7 +46,7 @@
   },
 
   "Trellis: Release note frontmatter": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-front-release",
     "description": "Release note frontmatter with changelog sections",
     "body": [
@@ -71,7 +71,7 @@
   // ─── Admonitions ──────────────────────────────────────────────────────
 
   "Trellis: Note admonition": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-note",
     "description": ":::note admonition block",
     "body": [
@@ -82,7 +82,7 @@
   },
 
   "Trellis: Tip admonition": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-tip",
     "description": ":::tip admonition block",
     "body": [
@@ -93,7 +93,7 @@
   },
 
   "Trellis: Info admonition": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-info",
     "description": ":::info admonition block",
     "body": [
@@ -104,7 +104,7 @@
   },
 
   "Trellis: Caution admonition": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-caution",
     "description": ":::caution admonition block",
     "body": [
@@ -115,7 +115,7 @@
   },
 
   "Trellis: Danger admonition": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-danger",
     "description": ":::danger admonition block",
     "body": [
@@ -126,7 +126,7 @@
   },
 
   "Trellis: Warning admonition": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-warning",
     "description": ":::warning admonition block",
     "body": [
@@ -139,7 +139,7 @@
   // ─── Components ───────────────────────────────────────────────────────
 
   "Trellis: Tabs": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-tabs",
     "description": "Tabs container with two tab items",
     "body": [
@@ -159,7 +159,7 @@
   },
 
   "Trellis: TabItem": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-tab",
     "description": "Single TabItem to add inside an existing Tabs block",
     "body": [
@@ -172,7 +172,7 @@
   },
 
   "Trellis: Tooltip": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-tooltip",
     "description": "Inline hover tooltip wrapping a term",
     "body": [
@@ -181,7 +181,7 @@
   },
 
   "Trellis: DocCard": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-doccard",
     "description": "Single doc card linking to a page",
     "body": [
@@ -190,63 +190,63 @@
   },
 
   "Trellis: DocCardList": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-doccardlist",
     "description": "Auto-generated grid of child doc cards",
     "body": ["<DocCardList />"]
   },
 
   "Trellis: Check icon": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-check",
     "description": "Green checkmark icon for comparison tables",
     "body": ["<Check />"]
   },
 
   "Trellis: Cross icon": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-cross",
     "description": "Red cross icon for comparison tables",
     "body": ["<Cross />"]
   },
 
   "Trellis: Partial icon": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-partial",
     "description": "Yellow partial icon for comparison tables",
     "body": ["<Partial />"]
   },
 
   "Trellis: Feedback widget": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-feedback",
     "description": "Page-level feedback/rating component",
     "body": ["<Feedback />"]
   },
 
   "Trellis: Flipping card": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-flip",
     "description": "Interactive flip card with front and back content",
     "body": ["<FlippingCard front=\"${1:Front text}\" back=\"${2:Back text}\" />"]
   },
 
   "Trellis: Glossary": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-glossary",
     "description": "Searchable glossary rendered from glossary.json",
     "body": ["<Glossary />"]
   },
 
   "Trellis: Chip": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-chip",
     "description": "Inline colored chip/badge (green, red, yellow, blue, neutral)",
     "body": ["<Chip color=\"${1|green,red,yellow,blue,neutral|}\">${2:Label}</Chip>"]
   },
 
   "Trellis: FAQ Table of Contents": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-faqtoc",
     "description": "Auto-generated FAQ table of contents from headings",
     "body": ["<FaqTableOfContents />"]
@@ -255,14 +255,14 @@
   // ─── Content features ─────────────────────────────────────────────────
 
   "Trellis: Include partial": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-include",
     "description": "@include directive for reusable MDX partials",
     "body": ["@include ${1|./,/_includes/|}${2:_partial.mdx}"]
   },
 
   "Trellis: Code block": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-codeblock",
     "description": "Fenced code block with language selector",
     "body": [
@@ -273,7 +273,7 @@
   },
 
   "Trellis: Code block with title": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-codetitle",
     "description": "Fenced code block with title bar and optional line highlighting",
     "body": [
@@ -291,28 +291,28 @@
   },
 
   "Trellis: Content variable": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-var",
     "description": "Content variable reference from config/variables.ts",
     "body": ["{vars.${1|productName,frameworkName|}}"]
   },
 
   "Trellis: MDX comment": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-comment",
     "description": "JSX-style comment (the only comment syntax that works in MDX)",
     "body": ["{/* ${1:comment} */}"]
   },
 
   "Trellis: Truncate marker": {
-    "scope": "mdx",
+    "scope": "mdx,markdown-react",
     "prefix": "t-truncate",
     "description": "Blog post excerpt fold marker",
     "body": ["{/* truncate */}"]
   },
 
   "Trellis: Mermaid diagram": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-mermaid",
     "description": "Mermaid diagram code block with type selector",
     "body": [
@@ -324,7 +324,7 @@
   },
 
   "Trellis: Image with width": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-img",
     "description": "Image with optional width attribute for sizing",
     "body": ["![${1:alt text}](/img/${2:filename.png} \"width=${3:50%}\")"]
@@ -333,7 +333,7 @@
   // ─── Standard markdown ────────────────────────────────────────────────
 
   "Trellis: Table": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-table",
     "description": "Markdown table scaffold with header row",
     "body": [
@@ -345,7 +345,7 @@
   },
 
   "Trellis: Task list": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-tasklist",
     "description": "Checkbox task list",
     "body": [
@@ -357,7 +357,7 @@
   },
 
   "Trellis: Link": {
-    "scope": "mdx,markdown",
+    "scope": "mdx,markdown,markdown-react",
     "prefix": "t-link",
     "description": "Markdown link",
     "body": ["[${1:link text}](${2:url})"]
