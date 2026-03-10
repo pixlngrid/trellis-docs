@@ -143,7 +143,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
       <div className="absolute inset-0 bg-black/50" onClick={() => onOpenChange(false)} />
-      <div className="relative w-full max-w-lg bg-[var(--popover)] text-[var(--popover-foreground)] rounded-lg shadow-xl border overflow-hidden">
+      <div className="relative w-full max-w-lg bg-(--card) text-(--popover-foreground) rounded-lg shadow-xl border border-(--border) ring-1 ring-white/10 overflow-hidden">
         {/* Search input */}
         <div className="flex items-center gap-2 px-4 py-3 border-b">
           <Search size={18} className="text-[var(--muted-foreground)]" />
