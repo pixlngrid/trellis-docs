@@ -3,7 +3,7 @@ title: Features
 description: Everything Trellis Docs gives you out of the box — and why it matters.
 keywords: [features, overview, comparison, docs framework, capabilities]
 last_update:
-  date: 03/05/2026
+  date: 03/13/2026
   author: Trellis
 ---
 
@@ -76,6 +76,17 @@ last_update:
 |---------|----------------|-------------------|
 | **Blog** | Chronological post listing with categories, read time, author, and related posts. Toggle on/off in config. | Ship a blog alongside your docs — no separate CMS or static site generator needed. |
 | **Release notes** | Version history with "modern" or "changelog" layout. Toggle on/off in config. | Customers find release info where they already read your docs, not on a separate page they'll never visit. |
+
+## SEO and analytics
+
+| Feature | What you can do | Problem it solves |
+|---------|----------------|-------------------|
+| **Google Analytics** | Add your GA4 measurement ID in `config/site.ts` and analytics loads automatically with `afterInteractive` strategy. | Zero-code analytics setup. Toggle on/off with a config flag — no script tags to manage. |
+| **Open Graph and Twitter Cards** | Every page gets OG and Twitter meta tags (title, description, URL, image) generated from frontmatter and site config. | Social shares and link unfurlers show rich previews without any per-page markup. |
+| **JSON-LD structured data** | WebSite schema on the root layout, Article schema on every doc page with headline, description, URL, and dateModified. | Search engines understand your content structure for rich results — no manual schema authoring. |
+| **Sitemap and robots.txt** | Build-time generation of `sitemap.xml` (all docs, blog, release notes) and `robots.txt`. Respects feature flags. | Search engines discover every page. No manual XML editing or third-party sitemap plugins. |
+| **Canonical URLs** | Every page gets a `<link rel="canonical">` tag. i18n pages get `hreflang` alternates. | Prevents duplicate content penalties across locales and URL variations. |
+| **Keywords meta tag** | Frontmatter `keywords` array renders as `<meta name="keywords">` and powers search ranking. | One field serves both internal search and external SEO — no duplication. |
 
 ## Build and deployment
 

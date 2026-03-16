@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pixlngrid.github.io/trellis-docs/sitemap.xml

@@ -2,10 +2,9 @@
   "name": "{{projectSlug}}",
   "version": "0.1.0",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "dev": "node scripts/build-tokens.js && cross-env NODE_ENV=development next dev",
-    "build": "node scripts/build-tokens.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && node scripts/build-api-index.js && next build && node scripts/check-links.js",
+    "build": "node scripts/build-tokens.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && node scripts/build-api-index.js && node scripts/build-sitemap.js && next build && node scripts/check-links.js",
     "start": "next start",
     "lint": "next lint",
     "build-tokens": "node scripts/build-tokens.js",

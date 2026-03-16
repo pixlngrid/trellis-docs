@@ -1,13 +1,13 @@
 ---
 title: Head Metadata
 description: How Trellis maps frontmatter to HTML meta tags for SEO and social sharing.
-keywords: [metadata, seo, meta tags, title, description, open graph, head]
+keywords: [metadata, seo, meta tags, title, description, open graph, twitter, json-ld, head, sitemap]
 last_update:
-  date: 03/04/2026
+  date: 03/13/2026
   author: Trellis
 ---
 
-{vars.productName} automatically generates HTML `<head>` metadata from your frontmatter fields. This controls how pages appear in search engines and social media previews.
+{vars.productName} automatically generates HTML `<head>` metadata from your frontmatter fields and site configuration. This controls how pages appear in search engines, social media previews, and link unfurlers.
 
 ## Title and description
 
@@ -31,7 +31,7 @@ The site name (configured in `config/site.ts` as `title`) is appended to the pag
 
 ## Keywords
 
-The `keywords` frontmatter array is used by the [search index](/guides/search/) for relevance weighting but is not rendered as a `<meta name="keywords">` tag, as modern search engines ignore it.
+The `keywords` frontmatter array is rendered as a `<meta name="keywords">` tag and used by the [search index](/guides/search/) for relevance weighting.
 
 ```yaml
 ---
@@ -39,17 +39,93 @@ keywords: [setup, installation, quickstart]
 ---
 ```
 
+Generates:
+
+```html
+<meta name="keywords" content="setup, installation, quickstart" />
+```
+
 ## Canonical URL
 
-{vars.productName} generates a canonical URL for each page based on the `url` field in `config/site.ts` and the page's path:
+{vars.productName} generates a canonical URL for every page based on the `url` field in `config/site.ts` and the page's path:
 
 ```html
 <link rel="canonical" href="https://example.com/guides/docs/" />
 ```
 
+When [i18n](/guides/i18n/) is enabled with multiple locales, `hreflang` alternate links are also generated for each locale.
+
+## Open Graph
+
+Every page automatically includes Open Graph meta tags for rich link previews on social platforms:
+
+```html
+<meta property="og:title" content="Getting Started" />
+<meta property="og:description" content="Set up a new Trellis documentation project in minutes." />
+<meta property="og:url" content="https://example.com/getting-started/" />
+<meta property="og:type" content="article" />
+```
+
+The default Open Graph image is set via `seo.ogImage` in `config/site.ts`. Blog posts with a `coverImage` frontmatter field use that image instead.
+
+## Twitter Cards
+
+Twitter/X card meta tags are generated from the `seo` config:
+
+```html
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Getting Started" />
+<meta name="twitter:description" content="Set up a new Trellis documentation project in minutes." />
+<meta name="twitter:creator" content="@yourhandle" />
+```
+
+Configure the card type and handle in `config/site.ts`:
+
+```ts title="config/site.ts"
+seo: {
+  twitterHandle: '@yourhandle',
+  twitterCardType: 'summary_large_image',
+},
+```
+
+## JSON-LD structured data
+
+{vars.productName} injects [JSON-LD](https://json-ld.org/) structured data for search engine rich results:
+
+- **WebSite schema** — added to the root layout. Includes site name, description, URL, and publisher organization.
+- **Article schema** — added to every documentation page. Includes headline, description, URL, and `dateModified` (from the `last_update` frontmatter field).
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Getting Started",
+  "description": "Set up a new Trellis documentation project in minutes.",
+  "url": "https://example.com/getting-started/",
+  "dateModified": "2026-01-15"
+}
+</script>
+```
+
+## Sitemap and robots.txt
+
+A `sitemap.xml` and `robots.txt` are generated automatically at build time by the `build-sitemap` script. The sitemap includes all documentation pages, blog posts, and release notes with `lastmod`, `changefreq`, and `priority` values.
+
+The robots.txt allows all crawlers and points to the sitemap URL:
+
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml
+```
+
+No manual configuration is required — the build pipeline handles everything.
+
 ## Customizing metadata
 
-To add custom meta tags (Open Graph, Twitter cards, etc.), edit the `generateMetadata` function in `app/(docs)/[...slug]/page.tsx`. The function receives the page's frontmatter and can return any Next.js metadata fields:
+To add custom meta tags beyond what {vars.productName} generates, edit the `generateMetadata` function in `app/(docs)/[...slug]/page.tsx`. The function receives the page's frontmatter and can return any Next.js metadata fields:
 
 ```ts title="app/(docs)/[...slug]/page.tsx"
 export async function generateMetadata({ params }) {

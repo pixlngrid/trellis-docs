@@ -3,7 +3,7 @@ title: Site Configuration
 description: Customize your site identity, navigation, sidebar, and content variables.
 keywords: [configuration, site, settings, sidebar, navigation, variables]
 last_update:
-  date: 02/25/2026
+  date: 03/13/2026
   author: Trellis
 ---
 
@@ -132,6 +132,54 @@ roleColor: {
 
 Roles not listed in `roleColor` fall back to the theme's `--primary` color. This setting is optional — omit it entirely to use the default color for all roles.
 
+### Google Analytics
+
+Add your GA4 measurement ID to enable Google Analytics tracking across your site. The gtag script loads with `afterInteractive` strategy so it never blocks page rendering.
+
+| Setting | Description |
+|---------|-------------|
+| `analytics.enabled` | Set to `true` to load the Google Analytics script |
+| `analytics.googleAnalyticsId` | Your GA4 measurement ID (e.g., `G-XXXXXXXXXX`) |
+
+```ts title="config/site.ts"
+analytics: {
+  enabled: true,
+  googleAnalyticsId: 'G-XXXXXXXXXX',
+},
+```
+
+When `enabled` is `false` or `googleAnalyticsId` is empty, no tracking script is loaded.
+
+### SEO
+
+{vars.productName} generates Open Graph, Twitter Card, and JSON-LD structured data for every page automatically. Configure the defaults here — per-page metadata comes from frontmatter.
+
+| Setting | Description |
+|---------|-------------|
+| `seo.ogImage` | Default Open Graph image path (1200x630px recommended). Used when a page has no cover image. |
+| `seo.twitterHandle` | Your Twitter/X handle (e.g., `@yourhandle`). Adds `twitter:creator` meta tag. |
+| `seo.twitterCardType` | `'summary'` for a small image card, or `'summary_large_image'` for a full-width image card |
+
+```ts title="config/site.ts"
+seo: {
+  ogImage: '/img/og-default.png',
+  twitterHandle: '@acmedocs',
+  twitterCardType: 'summary_large_image' as 'summary' | 'summary_large_image',
+},
+```
+
+#### What is generated automatically
+
+- **Sitemap** — `public/sitemap.xml` is generated at build time with all doc, blog, and release note URLs. Includes `lastmod`, `changefreq`, and `priority` values.
+- **robots.txt** — `public/robots.txt` is generated at build time pointing to your sitemap.
+- **Canonical URLs** — every page gets a `<link rel="canonical">` tag.
+- **Open Graph tags** — title, description, URL, type, and image for every page.
+- **Twitter Cards** — card type, title, description, creator, and image.
+- **JSON-LD structured data** — `WebSite` schema on the root layout, `Article` schema on every doc page (includes headline, description, URL, and dateModified).
+- **Keywords** — the `keywords` frontmatter array is now rendered as a `<meta name="keywords">` tag in addition to being used for search indexing.
+
+See [Head Metadata](/guides/markdown/head-metadata/) for per-page metadata details.
+
 ### Feature flags
 
 Several features can be toggled with an `enabled` property. Blog and release notes are enabled by default — set `enabled: false` to turn them off. The features below are disabled by default. Each has a dedicated guide with full setup instructions.
@@ -253,6 +301,15 @@ export const siteConfig = {
     locales: [
       { code: 'en', name: 'English', dir: 'ltr' as const },
     ],
+  },
+  analytics: {
+    enabled: true,
+    googleAnalyticsId: 'G-XXXXXXXXXX',
+  },
+  seo: {
+    ogImage: '/img/og-default.png',
+    twitterHandle: '@acmedocs',
+    twitterCardType: 'summary_large_image' as 'summary' | 'summary_large_image',
   },
   versioning: {
     enabled: false,

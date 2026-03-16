@@ -73,6 +73,19 @@ export const siteConfig = {
     ],
   },
 
+  // Google Analytics — set enabled: true and add your GA4 measurement ID
+  analytics: {
+    enabled: false,
+    googleAnalyticsId: '', // e.g. 'G-XXXXXXXXXX'
+  },
+
+  // SEO defaults — used for Open Graph, Twitter Cards, and structured data
+  seo: {
+    ogImage: '/img/og-default.png', // default Open Graph image (1200x630 recommended)
+    twitterHandle: '', // e.g. '@yourhandle'
+    twitterCardType: 'summary_large_image' as 'summary' | 'summary_large_image',
+  },
+
   // Documentation versioning — set enabled: true to activate
   versioning: {
     enabled: false,

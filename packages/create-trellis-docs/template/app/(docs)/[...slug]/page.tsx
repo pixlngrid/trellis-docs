@@ -20,6 +20,7 @@ import { FallbackBanner } from '@/components/docs/fallback-banner'
 import { LocaleHtmlAttrs } from '@/components/docs/locale-html-attrs'
 import { RoleChips } from '@/components/docs/role-chips'
 import { Feedback } from '@/components/custom/feedback'
+import { JsonLd } from '@/components/seo/json-ld'
 
 export async function generateStaticParams() {
   return generateAllParams()
@@ -32,27 +33,36 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     const { meta } = await getDocBySlug(ctx.slug, ctx.locale, ctx.version)
 
+    const baseUrl = siteConfig.url
+    const docPath = ctx.slug.join('/')
+    const versionPrefix = ctx.version !== 'current' ? `/${ctx.version}` : ''
+    const canonicalUrl = `${baseUrl}${versionPrefix}/${docPath}/`
+
     const metadata: Record<string, unknown> = {
       title: meta.title,
       description: meta.description,
+      ...(meta.keywords?.length && { keywords: meta.keywords }),
+      alternates: {
+        canonical: canonicalUrl,
+      },
+      openGraph: {
+        title: meta.title,
+        description: meta.description,
+        url: canonicalUrl,
+        type: 'article',
+      },
     }
 
     // Add hreflang alternates when i18n is enabled
     if (siteConfig.i18n?.enabled && siteConfig.i18n.locales.length > 1) {
       const defaultLocale = siteConfig.i18n.defaultLocale || 'en'
-      const baseUrl = siteConfig.url
-      const docPath = ctx.slug.join('/')
-      const versionPrefix = ctx.version !== 'current' ? `/${ctx.version}` : ''
 
-      metadata.alternates = {
-        canonical: `${baseUrl}${versionPrefix}/${docPath}/`,
-        languages: Object.fromEntries(
-          siteConfig.i18n.locales.map((l: { code: string }) => {
-            const localePrefix = l.code !== defaultLocale ? `/${l.code}` : ''
-            return [l.code, `${baseUrl}${localePrefix}${versionPrefix}/${docPath}/`]
-          })
-        ),
-      }
+      ;(metadata.alternates as Record<string, unknown>).languages = Object.fromEntries(
+        siteConfig.i18n.locales.map((l: { code: string }) => {
+          const localePrefix = l.code !== defaultLocale ? `/${l.code}` : ''
+          return [l.code, `${baseUrl}${localePrefix}${versionPrefix}/${docPath}/`]
+        })
+      )
     }
 
     return metadata
@@ -85,6 +95,17 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
       versions={versions}
       locales={locales}
     >
+      <JsonLd
+        type="Article"
+        data={{
+          headline: doc.meta.title,
+          description: doc.meta.description,
+          url: `${siteConfig.url}${urlPrefix}/${ctx.slug.join('/')}/`,
+          ...(doc.meta.last_update?.date && {
+            dateModified: doc.meta.last_update.date,
+          }),
+        }}
+      />
       <LocaleHtmlAttrs />
       <div className="flex">
         <article className="flex-1 min-w-0 px-6 py-8 lg:px-12">

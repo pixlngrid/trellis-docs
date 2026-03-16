@@ -17,7 +17,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
   if (!post) return { title: 'Not Found' }
-  return { title: post.meta.title, description: post.meta.description }
+
+  const canonicalUrl = `${siteConfig.url}/blog/${slug}/`
+
+  return {
+    title: post.meta.title,
+    description: post.meta.description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title: post.meta.title,
+      description: post.meta.description,
+      url: canonicalUrl,
+      type: 'article',
+      ...(post.meta.date && { publishedTime: post.meta.date }),
+      ...(post.meta.coverImage && {
+        images: [{ url: post.meta.coverImage }],
+      }),
+    },
+  }
 }
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {

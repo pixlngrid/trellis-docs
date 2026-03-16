@@ -17,7 +17,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const note = await getReleaseNoteBySlug(slug)
   if (!note) return { title: 'Not Found' }
-  return { title: `${note.meta.title} — Release Notes`, description: note.meta.description }
+
+  const canonicalUrl = `${siteConfig.url}/release-notes/${slug}/`
+
+  return {
+    title: `${note.meta.title} — Release Notes`,
+    description: note.meta.description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title: `${note.meta.title} — Release Notes`,
+      description: note.meta.description,
+      url: canonicalUrl,
+      type: 'article',
+      ...(note.meta.date && { publishedTime: note.meta.date }),
+    },
+  }
 }
 
 export default async function ReleaseNotePage({ params }: { params: Promise<{ slug: string }> }) {
