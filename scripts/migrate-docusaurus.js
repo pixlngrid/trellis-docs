@@ -27,6 +27,13 @@ const DOCUSAURUS_ONLY_FIELDS = [
   'hide_title',
 ];
 
+// ── Sidebar position map ─────────────────────────────────────────
+// Built from source Docusaurus frontmatter before stripping.
+// Keyed by cleaned doc ID (e.g., 'guides/writing-docs').
+const sidebarPositions = new Map(); // id → { position?: number, label?: string }
+// Category positions from _category_.json, keyed by cleaned relDir.
+const categoryPositions = new Map(); // relDir → { position?: number, label?: string }
+
 // ── Report accumulator ───────────────────────────────────────────
 const report = {
   copied: [],
@@ -175,14 +182,44 @@ function transformFrontmatter(data, relPath) {
 function transformContent(content, relPath, customComponentNames) {
   const changes = [];
 
-  // Split on fenced code blocks so we don't transform inside them.
-  // Odd-indexed parts are code blocks, even-indexed are prose.
-  const parts = content.split(/(```[\s\S]*?```)/g);
+  // Split content into alternating [prose, codeBlock, prose, codeBlock, ...]
+  // segments. We track fences line-by-line to correctly handle ```, ~~~,
+  // 4+ backtick fences, indented fences, and fences inside code blocks.
+  const lines = content.split('\n');
+  const segments = []; // { type: 'prose'|'code', text: string }
+  let fenceChar = null;
+  let fenceLen = 0;
+  let segStart = 0;
 
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 2 !== 0) continue; // skip code blocks
+  for (let idx = 0; idx < lines.length; idx++) {
+    const trimmed = lines[idx].trimStart();
+    if (!fenceChar) {
+      const m = trimmed.match(/^(`{3,}|~{3,})/);
+      if (m) {
+        if (idx > segStart) segments.push({ type: 'prose', text: lines.slice(segStart, idx).join('\n') });
+        fenceChar = m[1][0];
+        fenceLen = m[1].length;
+        segStart = idx;
+      }
+    } else {
+      const m = trimmed.match(/^(`{3,}|~{3,})\s*$/);
+      if (m && m[1][0] === fenceChar && m[1].length >= fenceLen) {
+        segments.push({ type: 'code', text: lines.slice(segStart, idx + 1).join('\n') });
+        fenceChar = null;
+        fenceLen = 0;
+        segStart = idx + 1;
+      }
+    }
+  }
+  // Remaining content (prose, or an unclosed fence treated as prose)
+  if (segStart < lines.length) {
+    segments.push({ type: fenceChar ? 'code' : 'prose', text: lines.slice(segStart).join('\n') });
+  }
 
-    let text = parts[i];
+  // Apply transforms only to prose segments
+  for (const seg of segments) {
+    if (seg.type !== 'prose') continue;
+    let text = seg.text;
 
     // 1. Strip @theme imports
     const themeImportRe = /^import\s+.*?\s+from\s+['"]@theme\/[^'"]+['"];?\s*\n?/gm;
@@ -240,10 +277,10 @@ function transformContent(content, relPath, customComponentNames) {
       );
     }
 
-    parts[i] = text;
+    seg.text = text;
   }
 
-  let result = parts.join('');
+  let result = segments.map((s) => s.text).join('\n');
 
   // 4. Clean up excessive blank lines from import removal
   result = result.replace(/\n{3,}/g, '\n\n');
@@ -453,7 +490,7 @@ function convertSidebarItem(item, categoryMeta) {
   }
 
   if (item.type === 'category') {
-    const children = (item.items || []).map((child) => convertSidebarItem(child, categoryMeta)).filter(Boolean);
+    const children = (item.items || []).map((child) => convertSidebarItem(child, categoryMeta)).flat().filter(Boolean);
 
     const result = {
       type: 'category',
@@ -490,6 +527,57 @@ function convertSidebarItem(item, categoryMeta) {
   return null;
 }
 
+// ── Sidebar position scanning ────────────────────────────────────
+// Reads sidebar_position and sidebar_label from Docusaurus source
+// files BEFORE migration strips them. Call once before Phase 1.
+function scanSidebarPositions(docsDir) {
+  function walk(dir, rel) {
+    if (!fs.existsSync(dir)) return;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+      const absPath = path.join(dir, entry.name);
+      const relPath = rel ? `${rel}/${entry.name}` : entry.name;
+
+      if (entry.isDirectory()) {
+        walk(absPath, relPath);
+      } else if (/\.mdx?$/.test(entry.name)) {
+        try {
+          const raw = fs.readFileSync(absPath, 'utf-8');
+          const { data } = matter(raw);
+          if (data.sidebar_position != null || data.sidebar_label) {
+            // Key by the cleaned ID (stripped prefixes, no extension)
+            let cleanedPath = normaliseReadme(relPath);
+            cleanedPath = stripPrefixesFromPath(cleanedPath);
+            const id = ensureMdxExtension(cleanedPath).replace(/\.mdx?$/, '');
+            const entry = {};
+            if (data.sidebar_position != null) entry.position = Number(data.sidebar_position);
+            if (data.sidebar_label) entry.label = data.sidebar_label;
+            sidebarPositions.set(id, entry);
+          }
+        } catch { /* skip unreadable */ }
+      }
+    }
+  }
+  walk(docsDir, '');
+}
+
+function scanCategoryPositions(categoryFiles) {
+  for (const catFile of categoryFiles) {
+    if (!catFile.absPath.endsWith('.json')) continue;
+    try {
+      const data = JSON.parse(fs.readFileSync(catFile.absPath, 'utf-8'));
+      const cleanedDir = stripPrefixesFromPath(catFile.relDir);
+      const entry = {};
+      if (data.position != null) entry.position = Number(data.position);
+      if (data.label) entry.label = data.label;
+      if (entry.position != null || entry.label) {
+        categoryPositions.set(cleanedDir, entry);
+      }
+    } catch { /* skip */ }
+  }
+}
+
 // ── Sidebar: autogenerate from filesystem ────────────────────────
 function buildSidebarFromFilesystem(dirName) {
   const baseDir = dirName === '.' ? TARGET_DOCS : path.join(TARGET_DOCS, dirName);
@@ -509,12 +597,21 @@ function buildSidebarFromFilesystem(dirName) {
       const indexPath = path.join(baseDir, entry.name, 'index.mdx');
       const hasIndex = fs.existsSync(indexPath);
 
-      const label = getCategoryLabel(path.join(baseDir, entry.name)) || titleCase(entry.name);
+      // Use _category_.json label, then sidebar_label from index, then titleCase
+      const catMeta = categoryPositions.get(subDir);
+      const indexMeta = sidebarPositions.get(`${subDir}/index`);
+      const label = (catMeta && catMeta.label) || (indexMeta && indexMeta.label) || getCategoryLabel(path.join(baseDir, entry.name)) || titleCase(entry.name);
+
+      // Position: _category_.json position takes precedence, then index sidebar_position
+      const position = (catMeta && catMeta.position != null) ? catMeta.position
+        : (indexMeta && indexMeta.position != null) ? indexMeta.position
+        : Infinity;
 
       const category = {
         type: 'category',
         label,
         collapsed: true,
+        _position: position,
         items: subItems.filter((si) => {
           // Don't list the index as a child item
           if (si.type === 'doc') {
@@ -534,9 +631,27 @@ function buildSidebarFromFilesystem(dirName) {
       const id = path
         .join(dirName === '.' ? '' : dirName, entry.name.replace(/\.mdx?$/, ''))
         .replace(/\\/g, '/');
-      items.push({ type: 'doc', id });
+      const meta = sidebarPositions.get(id);
+      const item = { type: 'doc', id };
+      if (meta && meta.label) item.label = meta.label;
+      item._position = (meta && meta.position != null) ? meta.position : Infinity;
+      items.push(item);
     }
   }
+
+  // Sort by sidebar_position (items without a position go to the end, preserving alpha order)
+  items.sort((a, b) => {
+    const pa = a._position ?? Infinity;
+    const pb = b._position ?? Infinity;
+    if (pa !== pb) return pa - pb;
+    // Tie-break: alphabetical by label or id
+    const la = a.label || a.id || '';
+    const lb = b.label || b.id || '';
+    return la.localeCompare(lb);
+  });
+
+  // Clean up the temporary _position field before serialization
+  for (const item of items) delete item._position;
 
   return items;
 }
@@ -568,6 +683,7 @@ function generateSidebarFile(items) {
     "  | { type: 'category'; label: string; link?: string; collapsed?: boolean; items: SidebarItem[] }",
     "  | { type: 'link'; label: string; href: string }",
     "  | { type: 'api'; id: string; label?: string }",
+    "  | { type: 'html'; value: string }",
     "",
     "",
   ].join('\n');
@@ -713,6 +829,173 @@ function scanCustomComponents(projectPath) {
   return components;
 }
 
+// ── Trellis built-in equivalents for common Docusaurus components ──
+// These components already exist in Trellis — no need to copy them.
+const TRELLIS_BUILTINS = new Map([
+  ['Tabs', { import: null, note: 'Built-in Trellis <Tabs>/<TabItem> — works as-is' }],
+  ['TabItem', { import: null, note: 'Built-in Trellis <TabItem> — works as-is' }],
+  ['Admonition', { import: null, note: 'Use Trellis :::note/:::tip/:::warning admonition syntax instead' }],
+  ['CodeBlock', { import: null, note: 'Use fenced code blocks (```) instead' }],
+  ['Details', { import: null, note: 'Use standard HTML <details>/<summary> — works in MDX' }],
+  ['TOCInline', { import: null, note: 'Trellis generates table of contents automatically' }],
+  ['DocCardList', { import: null, note: 'Built-in Trellis <DocCardList> — works as-is' }],
+]);
+
+// ── Copy custom components to Trellis ─────────────────────────────
+// Copies component files from src/components/ into components/custom/migrated/,
+// rewrites Docusaurus-specific imports, renames .jsx→.tsx / .js→.ts,
+// and registers used components in the MDX component map.
+const TARGET_COMPONENTS = path.join(ROOT, 'components', 'custom', 'migrated');
+const MDX_INDEX = path.join(ROOT, 'components', 'docs', 'mdx', 'index.tsx');
+
+function copyCustomComponents(customComponentNames, usedComponents, force, dryRun) {
+  const copied = [];
+  const skippedBuiltins = [];
+
+  for (const [compName] of usedComponents) {
+    // Skip components that have Trellis built-in equivalents
+    if (TRELLIS_BUILTINS.has(compName)) {
+      skippedBuiltins.push({ name: compName, note: TRELLIS_BUILTINS.get(compName).note });
+      continue;
+    }
+
+    // Find the full component info from the scan
+    const compInfo = customComponentNames.get(compName);
+    if (!compInfo) continue;
+
+    const srcPath = compInfo.srcPath;
+    const isDir = fs.statSync(srcPath).isDirectory();
+
+    if (isDir) {
+      // Copy the entire component directory
+      const destDir = path.join(TARGET_COMPONENTS, toKebabCase(compName));
+      if (!dryRun) copyComponentDir(srcPath, destDir, force);
+      copied.push({ name: compName, dest: destDir, isDir: true, isJs: compInfo.isJs });
+    } else {
+      // Copy single file, rename .jsx→.tsx / .js→.ts
+      const ext = path.extname(srcPath);
+      const newExt = ext === '.jsx' ? '.tsx' : ext === '.js' ? '.ts' : ext;
+      const destFile = path.join(TARGET_COMPONENTS, toKebabCase(compName) + newExt);
+      if (!dryRun) copySingleComponent(srcPath, destFile, force);
+      copied.push({ name: compName, dest: destFile, isDir: false, isJs: compInfo.isJs });
+    }
+  }
+
+  // Register copied components in MDX index
+  if (!dryRun && copied.length > 0) {
+    registerMdxComponents(copied);
+  }
+
+  return { copied, skippedBuiltins };
+}
+
+function toKebabCase(str) {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase();
+}
+
+function copySingleComponent(srcPath, destPath, force) {
+  if (!force && fs.existsSync(destPath)) return;
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  let content = fs.readFileSync(srcPath, 'utf-8');
+  content = rewriteDocusaurusImports(content);
+  fs.writeFileSync(destPath, content);
+}
+
+function copyComponentDir(srcDir, destDir, force) {
+  fs.mkdirSync(destDir, { recursive: true });
+
+  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
+    if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+    const srcPath = path.join(srcDir, entry.name);
+    const destName = renameExtension(entry.name);
+    const destPath = path.join(destDir, destName);
+
+    if (entry.isDirectory()) {
+      copyComponentDir(srcPath, destPath, force);
+    } else {
+      if (!force && fs.existsSync(destPath)) continue;
+      let content = fs.readFileSync(srcPath, 'utf-8');
+      if (/\.(tsx?|jsx?|css)$/.test(entry.name)) {
+        content = rewriteDocusaurusImports(content);
+      }
+      fs.writeFileSync(destPath, content);
+    }
+  }
+}
+
+function renameExtension(filename) {
+  return filename
+    .replace(/\.jsx$/, '.tsx')
+    .replace(/\.js$/, '.ts');
+}
+
+function rewriteDocusaurusImports(content) {
+  // Remove @theme/ imports (Trellis has built-in equivalents)
+  content = content.replace(/^import\s+.*?\s+from\s+['"]@theme\/[^'"]+['"];?\s*$/gm, '// [migration] @theme import removed — use Trellis built-in equivalent');
+
+  // Rewrite @site/src/components/ → relative path within components/custom/migrated/
+  content = content.replace(
+    /from\s+['"]@site\/src\/components\/([^'"]+)['"]/g,
+    (_, p) => `from './${p}'`
+  );
+
+  // Remove other @site/ imports with a warning comment
+  content = content.replace(
+    /^(import\s+.*?\s+from\s+['"]@site\/(?!src\/components)[^'"]+['"];?)$/gm,
+    '// [migration] TODO: rewrite this import for Trellis\n// $1'
+  );
+
+  // Rewrite CSS module imports from .module.css to work with Next.js
+  // (Next.js supports CSS modules natively, so the import pattern is the same)
+
+  return content;
+}
+
+function registerMdxComponents(copiedComponents) {
+  if (!fs.existsSync(MDX_INDEX)) {
+    report.warnings.push('Could not find components/docs/mdx/index.tsx — skipping MDX registration');
+    return;
+  }
+
+  let content = fs.readFileSync(MDX_INDEX, 'utf-8');
+
+  // Find the last import line to insert new imports after it
+  const importLines = [];
+  const registrations = [];
+
+  for (const comp of copiedComponents) {
+    const kebab = toKebabCase(comp.name);
+    const importPath = comp.isDir
+      ? `@/components/custom/migrated/${kebab}`
+      : `@/components/custom/migrated/${kebab}`;
+
+    importLines.push(`import { ${comp.name} } from '${importPath}'`);
+    registrations.push(`  ${comp.name},`);
+  }
+
+  // Insert imports before the first blank line after existing imports
+  const lastImportIdx = content.lastIndexOf('\nimport ');
+  const nextNewline = content.indexOf('\n', lastImportIdx + 1);
+  const insertPos = content.indexOf('\n', nextNewline + 1);
+
+  content = content.slice(0, insertPos) +
+    '\n// Migrated Docusaurus components\n' +
+    importLines.join('\n') +
+    content.slice(insertPos);
+
+  // Insert component registrations before the closing } of mdxComponents
+  const closingBrace = content.lastIndexOf('}');
+  content = content.slice(0, closingBrace) +
+    '  // Migrated Docusaurus components\n' +
+    registrations.join('\n') + '\n' +
+    content.slice(closingBrace);
+
+  fs.writeFileSync(MDX_INDEX, content);
+}
+
 // ── Migration report ─────────────────────────────────────────────
 function printReport() {
   console.log('\n');
@@ -757,24 +1040,34 @@ function printReport() {
     console.log('\nSidebar: Generated config/sidebar.ts');
   }
 
-  if (report.customComponentsUsed.size > 0) {
-    console.log('\nCustom components detected:');
-    console.log('(Each must be ported to components/ or replaced with a Trellis built-in.)');
-    const tsComps = [...report.customComponentsUsed].filter(([, m]) => !m.isJs).sort();
-    const jsComps = [...report.customComponentsUsed].filter(([, m]) => m.isJs).sort();
-    if (tsComps.length > 0) {
-      console.log('\n  TypeScript components (copy source to components/, check for API differences):');
-      for (const [compName, meta] of tsComps) {
-        console.log(`    <${compName}> — ${meta.files.length} file(s), source: ${meta.srcPath}`);
-        for (const f of meta.files) console.log(`      ${f}`);
-      }
+  if (report.componentsCopied && report.componentsCopied.length > 0) {
+    console.log('\nCustom components copied to components/custom/migrated/:');
+    for (const comp of report.componentsCopied) {
+      const suffix = comp.isJs ? ' ⚠ needs TypeScript type annotations (strict mode)' : '';
+      console.log(`  ${comp.name} → ${path.relative(ROOT, comp.dest)}${suffix}`);
     }
-    if (jsComps.length > 0) {
-      console.log('\n  JavaScript components (rename .jsx→.tsx / .js→.ts, then add TypeScript types):');
-      console.log('  Note: Trellis tsconfig uses strict:true — type annotations are required.');
-      for (const [compName, meta] of jsComps) {
-        console.log(`    <${compName}> — ${meta.files.length} file(s), source: ${meta.srcPath}`);
-        for (const f of meta.files) console.log(`      ${f}`);
+    console.log('  Registered in components/docs/mdx/index.tsx');
+  }
+
+  if (report.componentsSkippedBuiltins && report.componentsSkippedBuiltins.length > 0) {
+    console.log('\nComponents with Trellis built-in equivalents (not copied):');
+    for (const { name, note } of report.componentsSkippedBuiltins) {
+      console.log(`  ${name}: ${note}`);
+    }
+  }
+
+  // Components that were detected in content but NOT found in src/components/
+  if (report.customComponentsUsed.size > 0) {
+    const notCopied = [...report.customComponentsUsed].filter(([name]) => {
+      const wasCopied = report.componentsCopied && report.componentsCopied.some((c) => c.name === name);
+      const wasSkipped = report.componentsSkippedBuiltins && report.componentsSkippedBuiltins.some((c) => c.name === name);
+      return !wasCopied && !wasSkipped;
+    });
+    if (notCopied.length > 0) {
+      console.log('\nCustom components used in content but not found in src/components/:');
+      for (const [compName, meta] of notCopied) {
+        console.log(`  <${compName}> — ${meta.files.length} file(s)`);
+        for (const f of meta.files) console.log(`    ${f}`);
       }
     }
   }
@@ -802,22 +1095,23 @@ function printReport() {
   }
 
   console.log('\nNext steps:');
-  console.log('  1. Review migrated files in content/docs/');
-  console.log('  2. Review generated config/sidebar.ts');
-  console.log('  3. Run "npm run build" to verify the build succeeds');
-  console.log('  4. Check any warnings above and fix manually if needed');
-  if (report.customComponentsUsed.size > 0) {
-    const hasJs = [...report.customComponentsUsed.values()].some((m) => m.isJs);
-    console.log('  5. Port custom components listed above to your Trellis components/ directory');
-    console.log('     or replace them with Trellis built-ins (Callout, Tabs, etc.)');
+  let step = 1;
+  console.log(`  ${step++}. Review migrated files in content/docs/`);
+  console.log(`  ${step++}. Review generated config/sidebar.ts`);
+  console.log(`  ${step++}. Run "npm run build" to verify the build succeeds`);
+  console.log(`  ${step++}. Check any warnings above and fix manually if needed`);
+  if (report.componentsCopied && report.componentsCopied.length > 0) {
+    const hasJs = report.componentsCopied.some((c) => c.isJs);
+    console.log(`  ${step++}. Review copied components in components/custom/migrated/`);
+    console.log('     - Check that @theme/@site imports were rewritten correctly');
+    console.log('     - Verify component props and APIs work with Trellis');
     if (hasJs) {
-      console.log('     JavaScript components: rename .jsx → .tsx (or .js → .ts) and add');
-      console.log('     TypeScript type annotations — Trellis tsconfig enforces strict mode.');
+      console.log('     - Add TypeScript type annotations to renamed .js/.jsx files');
+      console.log('       (Trellis tsconfig enforces strict mode)');
     }
   }
   if (report.variableSuggestions.length > 0) {
-    const n = report.customComponentsUsed.size > 0 ? '6' : '5';
-    console.log(`  ${n}. Consider adding suggested variables to config/variables.ts`);
+    console.log(`  ${step++}. Consider adding suggested variables to config/variables.ts`);
   }
 }
 
@@ -862,6 +1156,13 @@ function main() {
   const { mdFiles, categoryFiles, assetFiles } = discoverFiles(docsDir);
   console.log(`\nPhase 1: Migrating content files...`);
   console.log(`  Found ${mdFiles.length} markdown file(s), ${categoryFiles.length} category file(s), ${assetFiles.length} asset(s)`);
+
+  // Scan sidebar_position / sidebar_label from source files before stripping
+  scanSidebarPositions(docsDir);
+  scanCategoryPositions(categoryFiles);
+  if (sidebarPositions.size > 0 || categoryPositions.size > 0) {
+    console.log(`  Found ${sidebarPositions.size} sidebar position(s) and ${categoryPositions.size} category position(s)`);
+  }
 
   // Build category metadata map for sidebar generation
   const categoryMeta = {};
@@ -940,9 +1241,36 @@ function main() {
     }
   }
 
-  // ── Phase 3: Variable suggestions ───────────────────────────
+  // ── Phase 3: Copy custom components ──────────────────────────
+  if (report.customComponentsUsed.size > 0) {
+    console.log('\nPhase 3: Copying custom components...');
+    const { copied: copiedComps, skippedBuiltins } = copyCustomComponents(
+      customComponentNames, report.customComponentsUsed, force, dryRun
+    );
+    report.componentsCopied = copiedComps;
+    report.componentsSkippedBuiltins = skippedBuiltins;
+
+    if (copiedComps.length > 0) {
+      console.log(`  Copied ${copiedComps.length} component(s) to components/custom/migrated/`);
+      for (const comp of copiedComps) {
+        const suffix = comp.isJs ? ' (JS → TS rename — add type annotations)' : '';
+        console.log(`    ${comp.name}${suffix}`);
+      }
+    }
+    if (skippedBuiltins.length > 0) {
+      console.log(`  Skipped ${skippedBuiltins.length} component(s) with Trellis built-in equivalents:`);
+      for (const { name, note } of skippedBuiltins) {
+        console.log(`    ${name}: ${note}`);
+      }
+    }
+    if (!dryRun && copiedComps.length > 0) {
+      console.log('  Registered components in components/docs/mdx/index.tsx');
+    }
+  }
+
+  // ── Phase 4: Variable suggestions ───────────────────────────
   if (!dryRun && report.copied.length > 0) {
-    console.log('\nPhase 3: Scanning for variable candidates...');
+    console.log('\nPhase 4: Scanning for variable candidates...');
     report.variableSuggestions = suggestVariables();
     if (report.variableSuggestions.length > 0) {
       console.log(`  Found ${report.variableSuggestions.length} candidate(s)`);

@@ -46,7 +46,9 @@ export function resolveSidebar(
 ): ResolvedSidebarItem[] {
   const items = sidebarItems || mainSidebar
 
-  function resolve(item: SidebarItem): ResolvedSidebarItem {
+  function resolve(item: SidebarItem): ResolvedSidebarItem | null {
+    if (!item || typeof item !== 'object' || !('type' in item)) return null
+
     if (item.type === 'doc') {
       const slug = item.id.replace(/\/index$/, '')
       return {
@@ -84,7 +86,7 @@ export function resolveSidebar(
       type: 'category',
       label: item.label,
       collapsed: item.collapsed,
-      items: item.items.map(resolve),
+      items: item.items.map(resolve).filter((i): i is ResolvedSidebarItem => i !== null),
     }
     if (item.link) {
       const slug = item.link.replace(/\/index$/, '')
@@ -93,6 +95,6 @@ export function resolveSidebar(
     return resolved
   }
 
-  return items.map(resolve)
+  return items.map(resolve).filter((i): i is ResolvedSidebarItem => i !== null)
 }
 
