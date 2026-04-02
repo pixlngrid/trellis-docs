@@ -52,6 +52,11 @@ export default function Home() {
         {/* Hero */}
         <div className="max-w-3xl mx-auto text-center py-20 px-4">
           <h1 className="text-5xl font-bold mb-4">{siteConfig.title}</h1>
+          {siteConfig.version && (
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] mb-4">
+              {siteConfig.version}
+            </span>
+          )}
           <p className="text-xl text-[var(--muted-foreground)] mb-8">
             An opinionated docs framework built on Next.js.
             <br />

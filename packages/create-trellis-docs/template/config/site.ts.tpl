@@ -1,5 +1,6 @@
 export const siteConfig = {
   title: '{{projectName}}',
+  version: 'v0.1.0',
   tagline: '{{tagline}}',
   url: '{{siteUrl}}',
   baseUrl: '/',

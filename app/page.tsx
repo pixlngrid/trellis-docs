@@ -26,6 +26,11 @@ export default function Home() {
               />
             ) : null}
           </div>
+          {siteConfig.version && (
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] mb-4">
+              {siteConfig.version}
+            </span>
+          )}
           <p className="text-xl text-[var(--muted-foreground)] mb-3">
             The docs framework that scales with your product.
           </p>

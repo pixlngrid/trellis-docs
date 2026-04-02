@@ -1,5 +1,6 @@
 export const siteConfig = {
   title: 'Trellis Docs',
+  version: 'v1.10.0',
   tagline: 'A Docs-as-Code Framework',
   url: 'https://pixlngrid.github.io/trellis-docs',
   baseUrl: '/',

@@ -141,6 +141,11 @@ export function Navbar() {
               />
             ) : null}
             <span className="text-lg font-semibold">{siteConfig.title}</span>
+            {siteConfig.version && (
+              <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-[var(--muted)] text-[var(--muted-foreground)]">
+                {siteConfig.version}
+              </span>
+            )}
           </Link>
 
           {/* Mobile/tablet utility buttons — visible below lg */}
