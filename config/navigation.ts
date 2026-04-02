@@ -5,7 +5,7 @@ const resourceItems = [
   ...((siteConfig as any).blog?.enabled ? [{ label: 'Blog', href: '/blog/' }] : []),
   { label: 'Roadmap', href: '/roadmap/' },
   { label: 'FAQs', href: '/faq/' },
-  { label: 'Glossary', href: '/guides/components/glossary/' },
+  { label: 'Glossary', href: '/glossary/' },
 ]
 
 export const navItems = [
