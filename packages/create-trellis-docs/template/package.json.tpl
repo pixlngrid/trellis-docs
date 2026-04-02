@@ -12,7 +12,8 @@
     "export:sidebar": "node scripts/export-sidebar.js",
     "setup:feedback-api": "node scripts/setup-feedback-api.js",
     "migrate:docusaurus": "node scripts/migrate-docusaurus.js",
-    "check-links": "node scripts/check-links.js"
+    "check-links": "node scripts/check-links.js",
+    "deploy": "node scripts/deploy-gh-pages.js"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.3",
@@ -51,7 +52,8 @@
     "tailwindcss": "^4.2.0",
     "typescript": "^5.7.0",
     "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0"
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-win32-x64-msvc": "^4.2.0",

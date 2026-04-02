@@ -48,6 +48,8 @@ const report = {
   sidebarGenerated: false,
   variableSuggestions: [],
   customComponentsUsed: new Map(), // componentName → [relPath, ...]
+  staticAssetsCopied: 0,
+  staticAssetsSkipped: 0,
 };
 
 // ── CLI ──────────────────────────────────────────────────────────
@@ -238,6 +240,14 @@ function transformContent(content, relPath, customComponentNames) {
       text = text.replace(siteImportRe, '');
     }
 
+    // 2b. Strip @docusaurus imports
+    const docusaurusImportRe = /^import\s+.*?\s+from\s+['"]@docusaurus\/[^'"]+['"];?\s*\n?/gm;
+    const docusaurusMatches = text.match(docusaurusImportRe);
+    if (docusaurusMatches) {
+      changes.push(`Stripped ${docusaurusMatches.length} @docusaurus import(s)`);
+      text = text.replace(docusaurusImportRe, '');
+    }
+
     // 3. HTML comments → MDX comments (<!-- ... --> → {/* ... */})
     const htmlCommentRe = /<!--([\s\S]*?)-->/g;
     let commentCount = 0;
@@ -416,6 +426,67 @@ function copyAsset(srcPath, relPath, force, dryRun) {
   fs.mkdirSync(path.dirname(targetPath), { recursive: true });
   fs.copyFileSync(srcPath, targetPath);
   report.assetsCopied.push(cleanedPath);
+}
+
+// ── Copy static assets (static/img/ → public/img/) ──────────────
+// Docusaurus serves files from static/ at the site root. Trellis uses
+// Next.js public/ for the same purpose. This function recursively copies
+// the contents of static/ into public/, preserving directory structure.
+function copyStaticAssets(projectPath, force, dryRun) {
+  const staticDir = path.join(projectPath, 'static');
+  const publicDir = path.join(ROOT, 'public');
+
+  if (!fs.existsSync(staticDir)) return;
+
+  const files = [];
+
+  function walk(dir, rel) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+      const absPath = path.join(dir, entry.name);
+      const relPath = rel ? `${rel}/${entry.name}` : entry.name;
+
+      if (entry.isDirectory()) {
+        walk(absPath, relPath);
+      } else {
+        files.push({ absPath, relPath });
+      }
+    }
+  }
+
+  walk(staticDir, '');
+
+  if (files.length === 0) return;
+
+  console.log(`\n  Copying static assets (${files.length} file(s)) from static/ to public/...`);
+  let copied = 0;
+  let skipped = 0;
+
+  for (const file of files) {
+    const targetPath = path.join(publicDir, file.relPath);
+
+    if (dryRun) {
+      console.log(`  [dry-run] static: ${file.relPath} -> public/${file.relPath}`);
+      copied++;
+      continue;
+    }
+
+    if (!force && fs.existsSync(targetPath)) {
+      skipped++;
+      continue;
+    }
+
+    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+    fs.copyFileSync(file.absPath, targetPath);
+    copied++;
+  }
+
+  report.staticAssetsCopied = copied;
+  report.staticAssetsSkipped = skipped;
+
+  if (copied > 0) console.log(`  Copied ${copied} static asset(s) to public/`);
+  if (skipped > 0) console.log(`  Skipped ${skipped} static asset(s) (already exist — use --force to overwrite)`);
 }
 
 // ── Sidebar: load Docusaurus config ──────────────────────────────
@@ -839,6 +910,14 @@ const TRELLIS_BUILTINS = new Map([
   ['Details', { import: null, note: 'Use standard HTML <details>/<summary> — works in MDX' }],
   ['TOCInline', { import: null, note: 'Trellis generates table of contents automatically' }],
   ['DocCardList', { import: null, note: 'Built-in Trellis <DocCardList> — works as-is' }],
+  ['DocCard', { import: null, note: 'Built-in Trellis <DocCard> — works as-is' }],
+  ['Callout', { import: null, note: 'Built-in Trellis <Callout> — works as-is' }],
+  ['FlippingCard', { import: null, note: 'Built-in Trellis <FlippingCard> — works as-is' }],
+  ['Glossary', { import: null, note: 'Built-in Trellis <Glossary> — works as-is' }],
+  ['Feedback', { import: null, note: 'Built-in Trellis <Feedback> — works as-is' }],
+  ['FaqTableOfContents', { import: null, note: 'Built-in Trellis <FaqTableOfContents> — works as-is' }],
+  ['Tooltip', { import: null, note: 'Built-in Trellis <Tooltip> — works as-is' }],
+  ['Chip', { import: null, note: 'Built-in Trellis <Chip> — works as-is' }],
 ]);
 
 // ── Copy custom components to Trellis ─────────────────────────────
@@ -872,9 +951,14 @@ function copyCustomComponents(customComponentNames, usedComponents, force, dryRu
       if (!dryRun) copyComponentDir(srcPath, destDir, force);
       copied.push({ name: compName, dest: destDir, isDir: true, isJs: compInfo.isJs });
     } else {
-      // Copy single file, rename .jsx→.tsx / .js→.ts
+      // Copy single file, rename .jsx→.tsx / .js→.tsx (if JSX) or .js→.ts
       const ext = path.extname(srcPath);
-      const newExt = ext === '.jsx' ? '.tsx' : ext === '.js' ? '.ts' : ext;
+      let newExt = ext === '.jsx' ? '.tsx' : ext === '.js' ? '.ts' : ext;
+      // Check if .js file actually contains JSX — needs .tsx not .ts
+      if (ext === '.js') {
+        const srcContent = fs.readFileSync(srcPath, 'utf-8');
+        if (containsJsx(srcContent)) newExt = '.tsx';
+      }
       const destFile = path.join(TARGET_COMPONENTS, toKebabCase(compName) + newExt);
       if (!dryRun) copySingleComponent(srcPath, destFile, force);
       copied.push({ name: compName, dest: destFile, isDir: false, isJs: compInfo.isJs });
@@ -900,7 +984,13 @@ function copySingleComponent(srcPath, destPath, force) {
   if (!force && fs.existsSync(destPath)) return;
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
   let content = fs.readFileSync(srcPath, 'utf-8');
+  const isJs = /\.(jsx?|js)$/.test(srcPath);
   content = rewriteDocusaurusImports(content);
+  if (isJs) content = addTypeAnnotations(content);
+  // Fix extension if content has JSX but dest is .ts (not .tsx)
+  if (destPath.endsWith('.ts') && !destPath.endsWith('.tsx') && containsJsx(content)) {
+    destPath = destPath.replace(/\.ts$/, '.tsx');
+  }
   fs.writeFileSync(destPath, content);
 }
 
@@ -910,16 +1000,22 @@ function copyComponentDir(srcDir, destDir, force) {
   for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
     if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
     const srcPath = path.join(srcDir, entry.name);
-    const destName = renameExtension(entry.name);
-    const destPath = path.join(destDir, destName);
+    let destName = renameExtension(entry.name);
+    let destPath = path.join(destDir, destName);
 
     if (entry.isDirectory()) {
       copyComponentDir(srcPath, destPath, force);
     } else {
       if (!force && fs.existsSync(destPath)) continue;
       let content = fs.readFileSync(srcPath, 'utf-8');
+      const isJs = /\.(jsx?|js)$/.test(entry.name);
       if (/\.(tsx?|jsx?|css)$/.test(entry.name)) {
         content = rewriteDocusaurusImports(content);
+      }
+      if (isJs) content = addTypeAnnotations(content);
+      // Fix extension if content has JSX but dest is .ts (not .tsx)
+      if (destPath.endsWith('.ts') && !destPath.endsWith('.tsx') && containsJsx(content)) {
+        destPath = destPath.replace(/\.ts$/, '.tsx');
       }
       fs.writeFileSync(destPath, content);
     }
@@ -932,9 +1028,237 @@ function renameExtension(filename) {
     .replace(/\.js$/, '.ts');
 }
 
+// Check if content contains JSX syntax (HTML-like tags)
+function containsJsx(content) {
+  // Strip strings and comments first to avoid false positives
+  const stripped = content
+    .replace(/\/\/.*$/gm, '')           // single-line comments
+    .replace(/\/\*[\s\S]*?\*\//g, '')   // multi-line comments
+    .replace(/'(?:[^'\\]|\\.)*'/g, '')  // single-quoted strings
+    .replace(/"(?:[^"\\]|\\.)*"/g, '')  // double-quoted strings
+    .replace(/`(?:[^`\\]|\\.)*`/g, ''); // template literals
+  // Look for JSX: <Component or <div or <svg etc.
+  return /<[a-zA-Z][a-zA-Z0-9.]*[\s/>]/.test(stripped);
+}
+
+// ── Auto-type JavaScript components for strict TypeScript ────────
+// Docusaurus defaults to JavaScript, so most custom components are .js/.jsx.
+// After renaming to .tsx/.ts, TypeScript strict mode rejects untyped props.
+// This function infers prop types from destructuring patterns and adds
+// interfaces and annotations so the component compiles without manual edits.
+function addTypeAnnotations(content) {
+  // ── 1. Type destructured props in function components ──────
+  // Matches: function Foo({ bar, baz }) or const Foo = ({ bar, baz }) =>
+  // Does NOT touch functions that already have TypeScript annotations (: or as)
+  content = content.replace(
+    /^((?:export\s+)?(?:(?:function\s+([A-Z]\w*))|(?:(?:const|let|var)\s+([A-Z]\w*)\s*=\s*(?:React\.memo\s*\(\s*)?(?:React\.forwardRef\s*\(\s*)?)))\s*\(\s*\{([^}]*)\}\s*\)/gm,
+    (match, _prefix, funcName, varName, propsBody) => {
+      // Skip if already typed (contains : or as keyword for types)
+      if (/:\s*\{/.test(match) || /\bProps\b/.test(match)) return match;
+
+      const compName = funcName || varName;
+      if (!compName) return match;
+
+      const props = parsePropsFromDestructuring(propsBody);
+      if (props.length === 0) return match;
+
+      const interfaceName = `${compName}Props`;
+      const interfaceBody = props.map((p) => `  ${p.name}${p.hasDefault ? '?' : ''}: ${p.type};`).join('\n');
+      const interfaceBlock = `interface ${interfaceName} {\n${interfaceBody}\n}\n\n`;
+
+      // Replace the destructured params with typed version
+      const typed = match.replace(
+        `{ ${propsBody} }`,
+        `{ ${propsBody} }: ${interfaceName}`
+      );
+
+      return interfaceBlock + typed;
+    }
+  );
+
+  // ── 2. Type single-param props (not destructured) ──────────
+  // Matches: function Foo(props) or const Foo = (props) =>
+  content = content.replace(
+    /^((?:export\s+)?(?:function\s+([A-Z]\w*)|(?:const|let|var)\s+([A-Z]\w*)\s*=\s*(?:React\.memo\s*\(\s*)?(?:React\.forwardRef\s*\(\s*)?))\s*\(\s*(\w+)\s*\)/gm,
+    (match, _prefix, funcName, varName, paramName) => {
+      if (/:\s*\w/.test(match) || paramName === 'props' && /Props\b/.test(match)) return match;
+      if (!/^[a-z]/.test(paramName)) return match; // Skip if not a simple param name
+
+      const compName = funcName || varName;
+      if (!compName) return match;
+
+      return match.replace(`(${paramName})`, `(${paramName}: Record<string, any>)`);
+    }
+  );
+
+  // ── 3. Type useState calls that TypeScript can't infer ─────
+  // useState(null) → useState<T | null>(null) — without this, TS infers `null` only
+  content = content.replace(
+    /useState\(\s*null\s*\)/g,
+    () => 'useState<any>(null)'
+  );
+  // useState([]) → useState<any[]>([])
+  content = content.replace(
+    /useState\(\s*\[\s*\]\s*\)/g,
+    () => 'useState<any[]>([])'
+  );
+  // useState({}) → useState<Record<string, any>>({})
+  content = content.replace(
+    /useState\(\s*\{\s*\}\s*\)/g,
+    () => 'useState<Record<string, any>>({})'
+  );
+
+  // ── 4. Type event handler parameters ───────────────────────
+  // (e) => or (event) => in onChange, onClick, onSubmit, etc.
+  content = content.replace(
+    /on(?:Change|Click|Submit|Input|Focus|Blur|KeyDown|KeyUp|KeyPress|Mouse\w+|Touch\w+)\s*=\s*\{?\s*(?:\(\s*(\w+)\s*\)|(\w+))\s*=>/g,
+    (match, parenParam, bareParam) => {
+      const param = parenParam || bareParam;
+      if (!param || /:\s*\w/.test(match)) return match;
+      if (parenParam) {
+        return match.replace(`(${param})`, `(${param}: React.SyntheticEvent)`);
+      }
+      return match.replace(`${param} =>`, `(${param}: React.SyntheticEvent) =>`);
+    }
+  );
+
+  // ── 5. Add 'use client' if the component uses hooks or browser APIs ──
+  const usesClientFeatures = /\b(useState|useEffect|useRef|useCallback|useMemo|useContext|useReducer|useLayoutEffect|window\.|document\.|navigator\.)\b/.test(content);
+  const hasUseClient = /^['"]use client['"];?\s*$/m.test(content);
+  if (usesClientFeatures && !hasUseClient) {
+    // Insert after React import if present, otherwise at the very top
+    const reactImportMatch = content.match(/^import\s+React\b[^\n]*\n/m);
+    if (reactImportMatch) {
+      const insertIdx = content.indexOf(reactImportMatch[0]) + reactImportMatch[0].length;
+      content = content.slice(0, insertIdx) + "'use client';\n" + content.slice(insertIdx);
+    } else {
+      content = "'use client';\n" + content;
+    }
+  }
+
+  return content;
+}
+
+// Parse prop names and infer types from destructuring pattern.
+// Input: "bar, baz = 'hello', count = 0, items = [], onClick, children"
+// Returns: [{ name, type, hasDefault }]
+function parsePropsFromDestructuring(propsBody) {
+  const props = [];
+  // Split on commas, but respect nested braces/brackets/parens
+  const parts = splitProps(propsBody.trim());
+
+  for (const raw of parts) {
+    const part = raw.trim();
+    if (!part) continue;
+
+    // Handle rest params: ...rest
+    if (part.startsWith('...')) {
+      props.push({ name: part, type: 'Record<string, any>', hasDefault: false });
+      continue;
+    }
+
+    // Handle renamed props: original: renamed or nested destructuring: { a, b }
+    // Skip nested destructuring — too complex to auto-type
+    if (part.includes('{') || part.includes('[')) continue;
+
+    // Split on = for default values
+    const eqIdx = part.indexOf('=');
+    const hasDefault = eqIdx !== -1;
+    const name = (hasDefault ? part.slice(0, eqIdx) : part).trim().replace(/:\s*\w+$/, '').trim();
+    const defaultValue = hasDefault ? part.slice(eqIdx + 1).trim() : null;
+
+    if (!name || /[^a-zA-Z0-9_$]/.test(name)) continue;
+
+    const type = inferTypeFromPropName(name, defaultValue);
+    props.push({ name, type, hasDefault });
+  }
+
+  return props;
+}
+
+// Split "a, b = [1,2], c = {x: 1}, d" respecting brackets
+function splitProps(str) {
+  const result = [];
+  let current = '';
+  let depth = 0;
+
+  for (const ch of str) {
+    if (ch === '(' || ch === '[' || ch === '{') depth++;
+    else if (ch === ')' || ch === ']' || ch === '}') depth--;
+
+    if (ch === ',' && depth === 0) {
+      result.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  if (current.trim()) result.push(current);
+  return result;
+}
+
+// Infer a TypeScript type from the prop name and default value
+function inferTypeFromPropName(name, defaultValue) {
+  // Infer from default value first (most reliable)
+  if (defaultValue != null) {
+    const dv = defaultValue.trim();
+    if (dv === 'true' || dv === 'false') return 'boolean';
+    if (dv === 'null') return 'any';
+    if (dv === 'undefined') return 'any';
+    if (/^['"`]/.test(dv)) return 'string';
+    if (/^-?\d+(\.\d+)?$/.test(dv)) return 'number';
+    if (/^\[/.test(dv)) return 'any[]';
+    if (/^\{/.test(dv)) return 'Record<string, any>';
+    if (/^\(/.test(dv) || /=>/.test(dv)) return '(...args: any[]) => any';
+  }
+
+  // Infer from naming conventions
+  const lower = name.toLowerCase();
+
+  // children is always React.ReactNode
+  if (name === 'children') return 'React.ReactNode';
+
+  // className, style
+  if (name === 'className') return 'string';
+  if (name === 'style') return 'React.CSSProperties';
+  if (name === 'id') return 'string';
+
+  // Boolean-like names
+  if (/^(is|has|can|should|show|hide|with|no|enable|disable|visible|active|open|closed|checked|disabled|required|loading|selected|expanded|collapsed|readonly|readOnly)/.test(name)) {
+    return 'boolean';
+  }
+
+  // Event handlers
+  if (/^on[A-Z]/.test(name)) return '(...args: any[]) => void';
+
+  // Render props
+  if (/^render[A-Z]/.test(name) || name === 'component') return 'React.ComponentType<any>';
+
+  // Common string-like names
+  if (/^(title|label|name|description|placeholder|text|message|alt|src|href|url|path|value|type|variant|size|color|icon|tag|role)$/i.test(lower)) {
+    return 'string';
+  }
+
+  // Plural names are likely arrays
+  if (/s$/.test(name) && !/^(class|this|css|status|radius|alias|focus|progress)$/i.test(name)) {
+    return 'any[]';
+  }
+
+  // Count/index/number-like names
+  if (/^(count|index|length|max|min|limit|offset|page|total|width|height|size|depth|level|step|timeout|delay|duration|interval|columns|rows)$/i.test(lower)) {
+    return 'number';
+  }
+
+  // Default fallback
+  return 'any';
+}
+
 function rewriteDocusaurusImports(content) {
   // Remove @theme/ imports (Trellis has built-in equivalents)
   content = content.replace(/^import\s+.*?\s+from\s+['"]@theme\/[^'"]+['"];?\s*$/gm, '// [migration] @theme import removed — use Trellis built-in equivalent');
+
+  // Remove @docusaurus/ imports (Docusaurus-specific hooks and utilities)
+  content = content.replace(/^import\s+.*?\s+from\s+['"]@docusaurus\/[^'"]+['"];?\s*$/gm, '// [migration] @docusaurus import removed — no Trellis equivalent');
 
   // Rewrite @site/src/components/ → relative path within components/custom/migrated/
   content = content.replace(
@@ -951,6 +1275,16 @@ function rewriteDocusaurusImports(content) {
   // Rewrite CSS module imports from .module.css to work with Next.js
   // (Next.js supports CSS modules natively, so the import pattern is the same)
 
+  // Ensure React import exists when the file contains JSX.
+  // Docusaurus .jsx files rely on the automatic JSX runtime and often omit
+  // the React import. After renaming to .tsx, TypeScript needs it to resolve
+  // JSX intrinsic elements (e.g., <svg>, <div>).
+  const hasJsx = /<[a-zA-Z][\s\S]*?>/.test(content);
+  const hasReactImport = /^import\s+React[\s,]/m.test(content) || /from\s+['"]react['"]/m.test(content);
+  if (hasJsx && !hasReactImport) {
+    content = 'import React from \'react\';\n' + content;
+  }
+
   return content;
 }
 
@@ -962,18 +1296,26 @@ function registerMdxComponents(copiedComponents) {
 
   let content = fs.readFileSync(MDX_INDEX, 'utf-8');
 
-  // Find the last import line to insert new imports after it
-  const importLines = [];
-  const registrations = [];
+  // Filter out components already imported or registered in the MDX index
+  const newImportLines = [];
+  const newRegistrations = [];
 
   for (const comp of copiedComponents) {
-    const kebab = toKebabCase(comp.name);
-    const importPath = comp.isDir
-      ? `@/components/custom/migrated/${kebab}`
-      : `@/components/custom/migrated/${kebab}`;
+    // Skip if already imported or registered
+    if (content.includes(`import { ${comp.name} }`) || content.includes(`import ${comp.name} `)) {
+      report.warnings.push(`${comp.name}: Already registered in MDX component map — skipping duplicate registration`);
+      continue;
+    }
 
-    importLines.push(`import { ${comp.name} } from '${importPath}'`);
-    registrations.push(`  ${comp.name},`);
+    const kebab = toKebabCase(comp.name);
+    const importPath = `@/components/custom/migrated/${kebab}`;
+
+    newImportLines.push(`import { ${comp.name} } from '${importPath}'`);
+    newRegistrations.push(`  ${comp.name},`);
+  }
+
+  if (newImportLines.length === 0) {
+    return;
   }
 
   // Insert imports before the first blank line after existing imports
@@ -983,14 +1325,14 @@ function registerMdxComponents(copiedComponents) {
 
   content = content.slice(0, insertPos) +
     '\n// Migrated Docusaurus components\n' +
-    importLines.join('\n') +
+    newImportLines.join('\n') +
     content.slice(insertPos);
 
   // Insert component registrations before the closing } of mdxComponents
   const closingBrace = content.lastIndexOf('}');
   content = content.slice(0, closingBrace) +
     '  // Migrated Docusaurus components\n' +
-    registrations.join('\n') + '\n' +
+    newRegistrations.join('\n') + '\n' +
     content.slice(closingBrace);
 
   fs.writeFileSync(MDX_INDEX, content);
@@ -1006,7 +1348,10 @@ function printReport() {
   console.log(`\nFiles migrated:  ${report.copied.length}`);
   console.log(`Files skipped:   ${report.skipped.length}`);
   if (report.assetsCopied.length > 0) {
-    console.log(`Assets copied:   ${report.assetsCopied.length}`);
+    console.log(`Assets copied:   ${report.assetsCopied.length} (from docs/)`);
+  }
+  if (report.staticAssetsCopied > 0) {
+    console.log(`Static assets:   ${report.staticAssetsCopied} (from static/ → public/)`);
   }
   console.log(`Errors:          ${report.errors.length}`);
   console.log(`Warnings:        ${report.warnings.length}`);
@@ -1185,7 +1530,7 @@ function main() {
     }
   }
 
-  // Copy assets (images etc.)
+  // Copy assets found alongside docs (images etc.)
   for (const file of assetFiles) {
     try {
       copyAsset(file.absPath, file.relPath, force, dryRun);
@@ -1193,6 +1538,10 @@ function main() {
       report.errors.push({ file: file.relPath, error: err.message });
     }
   }
+
+  // ── Phase 1b: Copy static assets ───────────────────────────
+  // Docusaurus stores images in static/img/ — copy to public/img/
+  copyStaticAssets(docusaurusPath, force, dryRun);
 
   // ── Phase 2: Sidebar conversion ─────────────────────────────
   console.log('\nPhase 2: Converting sidebar...');

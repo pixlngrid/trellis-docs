@@ -4,6 +4,7 @@ const prompts = require('prompts');
 const spawn = require('cross-spawn');
 
 const TEMPLATE_DIR = path.join(__dirname, '..', 'template');
+const WORKFLOWS_DIR = path.join(__dirname, '..', 'workflows');
 
 function toSlug(name) {
   return name
@@ -51,6 +52,18 @@ async function promptForMissing(projectName) {
       name: 'repoUrl',
       message: 'GitHub repo URL (optional):',
       initial: '',
+    },
+    {
+      type: 'select',
+      name: 'deployTarget',
+      message: 'Deployment target:',
+      choices: [
+        { title: 'None (I\'ll set it up later)', value: 'none' },
+        { title: 'GitHub Pages', value: 'github-pages' },
+        { title: 'Netlify', value: 'netlify' },
+        { title: 'Vercel', value: 'vercel' },
+      ],
+      initial: 0,
     }
   );
 
@@ -67,6 +80,7 @@ async function promptForMissing(projectName) {
     tagline: answers.tagline,
     siteUrl: answers.siteUrl,
     repoUrl: answers.repoUrl,
+    deployTarget: answers.deployTarget || 'none',
   };
 }
 
@@ -107,6 +121,42 @@ async function copyTemplate(destDir, vars) {
   }
 
   await copyDir(TEMPLATE_DIR, destDir);
+}
+
+async function installWorkflow(destDir, vars) {
+  if (!vars.deployTarget || vars.deployTarget === 'none') return;
+
+  const workflowFile = `${vars.deployTarget}.yml.tpl`;
+  const srcPath = path.join(WORKFLOWS_DIR, workflowFile);
+
+  if (!await fs.pathExists(srcPath)) return;
+
+  const ghDir = path.join(destDir, '.github', 'workflows');
+  await fs.ensureDir(ghDir);
+
+  let content = await fs.readFile(srcPath, 'utf-8');
+
+  // Process template variables
+  content = processTemplate(content, vars);
+
+  // For GitHub Pages, compute basePath from the repo URL or project name
+  if (vars.deployTarget === 'github-pages') {
+    let basePath = '';
+    if (vars.repoUrl) {
+      const match = vars.repoUrl.match(/github\.com\/[\w.-]+\/([\w.-]+?)(?:\.git)?$/);
+      if (match && !match[1].endsWith('.github.io')) {
+        basePath = `/${match[1]}`;
+      }
+    }
+    if (!basePath && vars.projectSlug) {
+      basePath = `/${vars.projectSlug}`;
+    }
+    content = content.replace(/\{\{basePath\}\}/g, basePath);
+  }
+
+  const destName = `deploy.yml`;
+  await fs.writeFile(path.join(ghDir, destName), content);
+  console.log(`  Added .github/workflows/${destName} for ${vars.deployTarget}`);
 }
 
 function installDeps(projectDir, packageManager) {
@@ -154,6 +204,7 @@ async function init(projectName, options = {}) {
   console.log(`\nScaffolding project in ${destDir}...\n`);
 
   await copyTemplate(destDir, vars);
+  await installWorkflow(destDir, vars);
 
   // Generate a platform-specific .npmrc so native optional dependencies
   // (lightningcss, @tailwindcss/oxide) install correctly even when the
@@ -187,16 +238,26 @@ async function init(projectName, options = {}) {
   const pm = options.packageManager || 'npm';
   const runCmd = pm === 'npm' ? 'npm run' : pm;
 
+  const deployHint =
+    vars.deployTarget === 'github-pages'
+      ? `\n  Deploy to GitHub Pages:\n\n    ${runCmd} deploy\n`
+      : vars.deployTarget === 'netlify'
+        ? `\n  Deploy: Push to main — the GitHub Actions workflow handles Netlify deployment.\n  Set NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID in your repo secrets.\n`
+        : vars.deployTarget === 'vercel'
+          ? `\n  Deploy: Push to main — the GitHub Actions workflow handles Vercel deployment.\n  Set VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID in your repo secrets.\n`
+          : '';
+
   console.log(`
   Done! Your Trellis docs site is ready.
 
   Next steps:
 
     cd ${vars.projectName}
-    ${options.skipInstall ? pm + ' install\n    ' : ''}${runCmd} dev
+    ${pm} install
+    ${runCmd} dev
 
   Your site will be available at http://localhost:3000
-`);
+${deployHint}`);
 }
 
 module.exports = { init };

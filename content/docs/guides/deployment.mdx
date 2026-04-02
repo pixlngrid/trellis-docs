@@ -1,9 +1,9 @@
 ---
 title: Deployment
 description: Build and deploy your Trellis docs site to any static hosting provider.
-keywords: [deployment, build, export, hosting, static, redirects]
+keywords: [deployment, build, export, hosting, static, redirects, github-pages, vercel, netlify]
 last_update:
-  date: 03/04/2026
+  date: 04/02/2026
   author: Trellis
 ---
 
@@ -77,9 +77,94 @@ out/
 
 All URLs use trailing slashes (configured in `next.config.mjs`), so `/guides/deployment/` resolves to `out/guides/deployment/index.html`.
 
+## Quick deploy
+
+If you selected a deployment target during `create-trellis-docs` setup, your project already has a `.github/workflows/deploy.yml` configured. Push to `main` and your site deploys automatically.
+
+You can also set up deployment later — see the provider-specific sections below.
+
 ## Hosting
 
 Upload or serve the contents of `out/` with any static hosting provider.
+
+### GitHub Pages
+
+{vars.productName} includes a one-command deploy, similar to Docusaurus:
+
+```bash
+npm run deploy
+```
+
+This builds the site, auto-detects the `basePath` from your GitHub remote URL, and pushes the `out/` directory to a `gh-pages` branch. On first deploy, go to your repo **Settings → Pages** and set the source to "Deploy from a branch" → `gh-pages`.
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--skip-build` | Push the existing `out/` directory without rebuilding |
+| `--branch <name>` | Use a custom branch (default: `gh-pages`) |
+| `--remote <name>` | Push to a different remote (default: `origin`) |
+
+You can also override the subpath prefix with an environment variable:
+
+```bash
+PAGES_BASE_PATH=/my-docs npm run deploy
+```
+
+#### GitHub Actions alternative
+
+For automated deploys on every push, use GitHub Actions with the newer Pages API (no `gh-pages` branch needed):
+
+```yaml title=".github/workflows/deploy.yml"
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          PAGES_BASE_PATH: /your-repo-name
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+With this approach, set your repo **Settings → Pages → Source** to "GitHub Actions" instead of "Deploy from a branch".
+
+:::caution
+If your site is served from a subpath (e.g. `https://org.github.io/repo/`), set `PAGES_BASE_PATH` to your repo name. The deploy script auto-detects this, but for GitHub Actions you need to set it explicitly in the workflow.
+:::
 
 ### Vercel
 
@@ -89,22 +174,17 @@ Connect your Git repository. Vercel detects Next.js automatically:
 - **Output directory:** `out`
 - **Framework preset:** Next.js
 
-### Netlify
+No `basePath` or environment variables needed — Vercel serves from the root domain.
 
-Connect your Git repository or drag-and-drop the `out/` folder:
+For CI-based deploys, add a workflow:
 
-- **Build command:** `npm run build`
-- **Publish directory:** `out`
-
-### GitHub Pages
-
-Push the `out/` directory to a `gh-pages` branch, or use a GitHub Actions workflow:
-
-```yaml
-name: Deploy to GitHub Pages
+```yaml title=".github/workflows/deploy.yml"
+name: Deploy to Vercel
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 jobs:
@@ -112,28 +192,64 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
+          cache: npm
       - run: npm ci
       - run: npm run build
-
-      - uses: actions/upload-pages-artifact@v3
+      - uses: amondnet/vercel-action@v25
         with:
-          path: out
-
-      - uses: actions/deploy-pages@v4
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: out
+          vercel-args: --prod
 ```
 
-:::caution
-If your site is served from a subpath (e.g. `https://org.github.io/repo/`), set `basePath` in `next.config.mjs`:
+Set `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` in your repo secrets.
 
-```js
-basePath: '/repo',
+### Netlify
+
+Connect your Git repository or drag-and-drop the `out/` folder:
+
+- **Build command:** `npm run build`
+- **Publish directory:** `out`
+
+For CI-based deploys, add a workflow:
+
+```yaml title=".github/workflows/deploy.yml"
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: nwtgck/actions-netlify@v3
+        with:
+          publish-dir: out
+          production-branch: main
+          production-deploy: ${{ github.ref == 'refs/heads/main' }}
+          deploy-message: "Deploy from GitHub Actions"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 ```
-:::
+
+Set `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` in your repo secrets.
 
 ### AWS S3 + CloudFront
 

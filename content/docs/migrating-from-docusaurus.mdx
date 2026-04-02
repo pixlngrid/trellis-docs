@@ -115,6 +115,10 @@ The script warns about `<CodeBlock>` components and non-Docusaurus imports that 
 
 Non-markdown files (images, PDFs, etc.) in the `docs/` directory are copied alongside the content with the same path transforms.
 
+#### Static assets
+
+Docusaurus serves files from `static/` at the site root — most projects store images in `static/img/`. The script recursively copies the entire `static/` directory into `public/` (the Next.js equivalent), preserving the directory structure. Image references like `/img/screenshot.png` continue to work without changes.
+
 ### Phase 2: Sidebar conversion
 
 The script reads your Docusaurus sidebar configuration and generates a {vars.productName} `config/sidebar.ts` file.
