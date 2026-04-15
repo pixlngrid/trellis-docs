@@ -12,6 +12,11 @@ const nextConfig = {
   },
   trailingSlash: true,
   images: { unoptimized: true },
+  turbopack: {
+    resolveAlias: {
+      '@': resolve(__dirname),
+    },
+  },
   webpack: (config) => {
     config.resolve.alias['@'] = resolve(__dirname)
     return config

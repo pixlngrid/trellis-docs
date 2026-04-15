@@ -3,7 +3,7 @@ title: Migrating from Docusaurus
 description: Move your docs, sidebar, and assets from a Docusaurus project to Trellis with the automated migration script.
 keywords: [migration, docusaurus, import, convert, sidebar]
 last_update:
-  date: 03/19/2026
+  date: 04/15/2026
   author: Trellis
 ---
 
@@ -29,6 +29,7 @@ node scripts/migrate-docusaurus.js <path-to-docusaurus-project>
 |------|-------------|
 | `--dry-run` | Preview what would change without writing any files |
 | `--force` | Overwrite existing files in `content/docs/` |
+| `--no-type-check` | Skip the post-migration TypeScript check on copied components |
 
 Always run with `--dry-run` first to review the changes:
 
@@ -151,6 +152,18 @@ For every custom component detected in Phase 0 that is actually used in your mig
 CSS modules (`.module.css`) are copied as-is — Next.js supports CSS modules natively with the same import pattern as Docusaurus.
 :::
 
+### Phase 3b: TypeScript check
+
+Immediately after components are copied, the script runs `tsc --noEmit` against the {vars.productName} project and filters the output down to errors inside the just-migrated files. Because the JS → TS auto-typing in Phase 3 relies on heuristics (prop-name inference, default-value inference, `any` fallbacks), some files may still need manual tightening before they satisfy strict mode.
+
+The type check surfaces each error inline in the migration report, grouped by file, with its line, column, and `TSxxxx` code — giving you an actionable worklist instead of discovering errors later at `npm run build` time.
+
+Pass `--no-type-check` to skip this phase (useful on CI runs where you've already validated types, or when `tsc` isn't available on the machine running the migration).
+
+:::note
+If `npx` or `tsc` cannot be resolved, the phase is skipped with a visible reason rather than failing the migration. Errors that exist elsewhere in the {vars.productName} project are filtered out — only errors in files written by this migration run are reported.
+:::
+
 ### Phase 4: Variable suggestions
 
 After migration, the script scans your content for repeated strings — version numbers, product names, and URLs that appear three or more times. These are candidates for [content variables](/guides/site-configuration/#content-variables) in `config/variables.ts`.
@@ -186,9 +199,19 @@ Custom components copied to components/custom/migrated/:
   InfoBox → components/custom/migrated/info-box.tsx ⚠ needs TypeScript type annotations (strict mode)
   Registered in components/docs/mdx/index.tsx
 
+Phase 3b: Type-checking 3 migrated file(s)...
+  ✗ 2 type error(s) in 1 migrated file(s) — see report
+
 Components with Trellis built-in equivalents (not copied):
   Tabs: Built-in Trellis <Tabs>/<TabItem> — works as-is
   CodeBlock: Use fenced code blocks (```) instead
+
+TypeScript errors in migrated components (2 in 1 file(s)):
+(These files compile as-is with auto-typing but may need manual tightening.)
+
+  components/custom/migrated/info-box.tsx
+    14:22  error TS7006  Parameter 'variant' implicitly has an 'any' type.
+    27:5   error TS2322  Type 'string | undefined' is not assignable to type 'string'.
 
 Suggested variables for config/variables.ts:
   acme_platform: 'Acme Platform' (found 28 times)
@@ -266,6 +289,47 @@ Fix any MDX compilation errors. Common issues:
 | Unknown component | A Docusaurus component (`<CodeBlock>`, `<BrowserWindow>`) that needs to be removed or replaced |
 | Type error: comparison has no overlap | The `SidebarItem` type in `config/sidebar.ts` is missing the `link` or `api` variants — add them (see [Sidebar type](#phase-2-sidebar-conversion)) |
 | Expression expected | Bare `<` or `>` characters in text — wrap in backticks or escape as `&lt;` / `&gt;` |
+
+### 4. Convert `<img>` JSX tags
+
+Docusaurus commonly uses the `require()` pattern to reference colocated images inside MDX:
+
+```jsx
+<img
+  id="uielement4"
+  src={require('./images/entity-validation.png').default}
+  alt="Entity Validation"
+/>
+```
+
+MDX in {vars.productName} does not allow `require()` calls for security reasons. Run the bundled helper to rewrite every `<img>` tag in a file to standard markdown image syntax:
+
+```bash
+node scripts/convert-img-tags.js content/docs/my-page.mdx --write
+```
+
+The above example is rewritten to:
+
+```md
+![Entity Validation](./images/entity-validation.png)
+```
+
+| Flag | Description |
+|------|-------------|
+| `--write` | Modify files in place (required — the default is dry-run) |
+| `--dry-run` | Preview changes without modifying files (default if `--write` is omitted) |
+
+The converter handles:
+
+- Multi-line `<img>` tags (self-closing or paired `<img></img>`)
+- `src` as a `require('...').default` expression or a plain string literal
+- `width` / `height` attributes → Trellis title syntax (`![alt](src "width=200px")`)
+
+It drops unsupported JSX attributes (`id`, `className`, `style`). Tags the script can't parse are left untouched and a warning is printed so you can fix them by hand.
+
+:::note
+Shell globbing (`"content/**/*.mdx"`) may not expand on Windows — pass explicit file paths or wrap the call in a shell loop when converting many files at once.
+:::
 
 ### 5. Update site configuration
 
