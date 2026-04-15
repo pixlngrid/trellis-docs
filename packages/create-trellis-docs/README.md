@@ -1,11 +1,11 @@
-# create-trellis-docs
+# @patriciamcphee/create-trellis-docs
 
 Scaffold a new documentation site powered by [Trellis Docs](https://pixlngrid.github.io/trellis-docs/) — an opinionated docs framework built on Next.js, Tailwind CSS v4, and shadcn/ui.
 
 ## Usage
 
 ```bash
-npx create-trellis-docs my-docs
+npx @patriciamcphee/create-trellis-docs my-docs
 ```
 
 You'll be prompted for a site title, tagline, URL, and optional GitHub repo URL. The scaffolder creates a ready-to-run project with all Trellis features included.
@@ -35,7 +35,7 @@ Options:
 ## Upgrading an Existing Project
 
 ```bash
-npx create-trellis-docs@latest upgrade
+npx @patriciamcphee/create-trellis-docs@latest upgrade
 ```
 
 Updates framework files (components, lib, scripts, app routes, build config) using an allow-list. Your content, config, landing page, sidebar, design tokens, and branding are never touched.
@@ -43,7 +43,7 @@ Updates framework files (components, lib, scripts, app routes, build config) usi
 Use `--dry-run` to preview changes without writing files.
 
 ```bash
-npx create-trellis-docs@latest upgrade --dry-run
+npx @patriciamcphee/create-trellis-docs@latest upgrade --dry-run
 ```
 
 Options:

@@ -37,7 +37,7 @@ Define your brand in `design-tokens.json` and the build step generates CSS custo
 ### Scaffold a New Project
 
 ```bash
-npx create-trellis-docs my-docs
+npx @patriciamcphee/create-trellis-docs my-docs
 ```
 
 Options:
@@ -50,7 +50,7 @@ Options:
 ### Upgrade an Existing Project
 
 ```bash
-npx create-trellis-docs@latest upgrade
+npx @patriciamcphee/create-trellis-docs@latest upgrade
 ```
 
 Updates framework files using an allow-list — your content, config, and customizations are never touched. Use `--dry-run` to preview changes first.
@@ -114,7 +114,7 @@ trellis/
 │   └── glossary.json           # Glossary data
 ├── public/img/                 # Static images
 ├── packages/
-│   └── create-trellis-docs/    # CLI scaffolder (npx create-trellis-docs)
+│   └── create-trellis-docs/    # CLI scaffolder (npx @patriciamcphee/create-trellis-docs)
 ├── design-tokens.json          # Design system definitions
 ├── redirects.json              # URL redirect definitions
 ├── next.config.mjs             # Next.js configuration

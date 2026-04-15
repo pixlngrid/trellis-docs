@@ -4,7 +4,7 @@
 // config, landing page, and design tokens are never touched.
 //
 // Usage:
-//   npx create-trellis-docs@latest upgrade [--dry-run] [--skip-install] [-p npm|yarn|pnpm]
+//   npx @patriciamcphee/create-trellis-docs@latest upgrade [--dry-run] [--skip-install] [-p npm|yarn|pnpm]
 
 const path = require('path');
 const fs = require('fs-extra');
