@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense, Children, isValidElement } from 'react'
 import { cn } from '@/lib/utils'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
@@ -30,8 +30,11 @@ function TabsInner({ children, queryString, defaultValue }: TabsProps) {
   const searchParams = useSearchParams()
   const tabListRef = useRef<HTMLUListElement>(null)
 
-  // Extract tab values from children
-  const tabs = (Array.isArray(children) ? children : [children]).filter(Boolean) as React.ReactElement<TabItemProps>[]
+  // Extract tab values from children. Use React.Children.toArray +
+  // isValidElement so whitespace text nodes (e.g. the `'\n  '` MDX emits
+  // between <TabItem>s) are filtered out — otherwise `tab.props.value`
+  // throws because strings don't have `.props`.
+  const tabs = Children.toArray(children).filter(isValidElement) as React.ReactElement<TabItemProps>[]
   const tabValues = tabs.map((tab) => ({
     value: tab.props.value,
     label: tab.props.label || tab.props.value,

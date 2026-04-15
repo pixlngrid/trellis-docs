@@ -492,6 +492,56 @@ function copyStaticAssets(projectPath, force, dryRun) {
   if (skipped > 0) console.log(`  Skipped ${skipped} static asset(s) (already exist — use --force to overwrite)`);
 }
 
+// ── Copy data files (src/data/ → data/migrated/) ────────────────
+// Docusaurus components commonly import JSON/data files from
+// `@site/src/data/*`. rewriteDocusaurusImports remaps the specifier to
+// `@/data/migrated/*`; this function copies the actual files so the
+// rewritten imports resolve. Copies the whole src/data/ tree if it exists.
+function copyMigratedDataFiles(projectPath, force, dryRun) {
+  const srcDir = path.join(projectPath, 'src', 'data');
+  const destDir = path.join(ROOT, 'data', 'migrated');
+
+  if (!fs.existsSync(srcDir)) return;
+
+  const files = [];
+  (function walk(dir, rel) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+      const abs = path.join(dir, entry.name);
+      const r = rel ? `${rel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) walk(abs, r);
+      else files.push({ abs, rel: r });
+    }
+  })(srcDir, '');
+
+  if (files.length === 0) return;
+
+  console.log(`\n  Copying data files (${files.length} file(s)) from src/data/ to data/migrated/...`);
+  let copied = 0;
+  let skipped = 0;
+
+  for (const file of files) {
+    const target = path.join(destDir, file.rel);
+
+    if (dryRun) {
+      console.log(`  [dry-run] data: ${file.rel} -> data/migrated/${file.rel}`);
+      copied++;
+      continue;
+    }
+    if (!force && fs.existsSync(target)) {
+      skipped++;
+      continue;
+    }
+
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(file.abs, target);
+    copied++;
+  }
+
+  if (copied > 0) console.log(`  Copied ${copied} data file(s) to data/migrated/`);
+  if (skipped > 0) console.log(`  Skipped ${skipped} data file(s) (already exist — use --force to overwrite)`);
+}
+
 // ── Sidebar: load Docusaurus config ──────────────────────────────
 function loadDocusaurusSidebar(projectPath) {
   const candidates = ['sidebars.js', 'sidebars.cjs', 'sidebars.json'];
@@ -866,7 +916,13 @@ function suggestVariables() {
 // Note: src/theme/ (Docusaurus swizzle overrides) is intentionally excluded —
 // Trellis has its own built-in equivalents for all swizzleable components.
 function scanCustomComponents(projectPath) {
-  // Map<name, { srcPath: string, isJs: boolean }>
+  // Map<name, { srcPath: string, isJs: boolean, isFolder: boolean, scope: string, deps: Set<string> }>
+  //   srcPath: entry file (index.tsx or the .tsx/.jsx file itself)
+  //   scope:   the component's root on disk — folder for directory components,
+  //            same as srcPath for single-file components. Used by the dependency
+  //            scanner to find all source files within the component.
+  //   deps:    names of other scanned components this component imports
+  //            (populated by scanComponentDependencies after the walk).
   const components = new Map();
   const dirsToScan = [
     path.join(projectPath, 'src', 'components'),
@@ -885,7 +941,9 @@ function scanCustomComponents(projectPath) {
           const jsIndex = path.join(full, 'index.jsx');
           const srcPath = fs.existsSync(tsIndex) ? tsIndex : fs.existsSync(jsIndex) ? jsIndex : full;
           const isJs = srcPath.endsWith('.jsx') || srcPath.endsWith('.js');
-          if (!components.has(entry.name)) components.set(entry.name, { srcPath, isJs });
+          if (!components.has(entry.name)) {
+            components.set(entry.name, { srcPath, isJs, isFolder: true, scope: full, deps: new Set() });
+          }
         }
         walk(full);
       } else if (/\.(tsx?|jsx?)$/.test(entry.name)) {
@@ -893,14 +951,119 @@ function scanCustomComponents(projectPath) {
         const isJs = entry.name.endsWith('.jsx') || entry.name.endsWith('.js');
         // PascalCase file name = component — index files handled by parent dir above
         if (/^[A-Z]/.test(baseName) && baseName !== 'Index' && !components.has(baseName)) {
-          components.set(baseName, { srcPath: full, isJs });
+          components.set(baseName, { srcPath: full, isJs, isFolder: false, scope: full, deps: new Set() });
         }
       }
     }
   }
 
   for (const dir of dirsToScan) walk(dir);
+
+  // Second pass: populate `deps` for each component by parsing its source
+  // files for imports that point at other scanned components.
+  scanComponentDependencies(components, projectPath);
+
   return components;
+}
+
+// List every `.ts/.tsx/.js/.jsx` file reachable from a component's scope.
+// For folder components this walks the entire directory; for file components
+// it returns just the single file.
+function listComponentSourceFiles(scope) {
+  if (!fs.existsSync(scope)) return [];
+  const stat = fs.statSync(scope);
+  if (stat.isFile()) return [scope];
+  const files = [];
+  (function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (/\.(tsx?|jsx?)$/.test(entry.name)) files.push(full);
+    }
+  })(scope);
+  return files;
+}
+
+// Given an import specifier (e.g., '@site/src/components/Foo', '../Bar/Bar'),
+// return the name of the scanned component it refers to, or null.
+function resolveImportToComponentName(importPath, sourceFile, projectPath) {
+  // @site/src/components/Name[/...] → Name
+  const siteMatch = importPath.match(/^@site\/src\/components\/([A-Z][\w]*)/);
+  if (siteMatch) return siteMatch[1];
+
+  if (!importPath.startsWith('.')) return null;
+
+  // Resolve relative import to an absolute path, then check if it falls
+  // under src/components/. The first segment under that root is the
+  // component name (since components are named by their PascalCase folder
+  // or file).
+  const resolved = path.resolve(path.dirname(sourceFile), importPath);
+  const componentsDir = path.resolve(projectPath, 'src', 'components');
+  const rel = path.relative(componentsDir, resolved);
+  if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return null;
+  const firstSeg = rel.split(/[\\/]/)[0];
+  return /^[A-Z]/.test(firstSeg) ? firstSeg : null;
+}
+
+function scanComponentDependencies(components, projectPath) {
+  const allNames = new Set(components.keys());
+  const importRe = /^\s*import\s+(?:[^'"]+?\s+from\s+)?['"]([^'"]+)['"]/gm;
+
+  for (const [name, info] of components) {
+    const sources = listComponentSourceFiles(info.scope);
+    for (const srcFile of sources) {
+      let content;
+      try { content = fs.readFileSync(srcFile, 'utf-8'); } catch { continue; }
+
+      let m;
+      while ((m = importRe.exec(content)) !== null) {
+        const depName = resolveImportToComponentName(m[1], srcFile, projectPath);
+        if (depName && depName !== name && allNames.has(depName)) {
+          info.deps.add(depName);
+        }
+      }
+      importRe.lastIndex = 0;
+    }
+  }
+}
+
+// Expand a set of directly-used components (from MDX content) to include
+// their transitive dependencies. Returns a new Map where each entry carries
+// `isDirect` (true = used in MDX, false = pulled in by another component)
+// and `pulledInBy` (name of the ancestor that first referenced this dep).
+function expandUsedComponentsWithDeps(directUsed, allComponents) {
+  const result = new Map();
+
+  // Seed with direct usages — preserve the original file list.
+  for (const [name, info] of directUsed) {
+    result.set(name, { ...info, isDirect: true, pulledInBy: null });
+  }
+
+  const queue = [...directUsed.keys()];
+  while (queue.length > 0) {
+    const name = queue.shift();
+    const info = allComponents.get(name);
+    if (!info || !info.deps) continue;
+
+    for (const depName of info.deps) {
+      if (result.has(depName)) continue;
+      if (TRELLIS_BUILTINS.has(depName)) continue; // don't pull in builtins
+      const depInfo = allComponents.get(depName);
+      if (!depInfo) continue;
+
+      result.set(depName, {
+        files: [],
+        isJs: depInfo.isJs,
+        srcPath: depInfo.srcPath,
+        isDirect: false,
+        pulledInBy: name,
+      });
+      queue.push(depName);
+    }
+  }
+
+  return result;
 }
 
 // ── Trellis built-in equivalents for common Docusaurus components ──
@@ -934,7 +1097,7 @@ function copyCustomComponents(customComponentNames, usedComponents, force, dryRu
   const copied = [];
   const skippedBuiltins = [];
 
-  for (const [compName] of usedComponents) {
+  for (const [compName, usage] of usedComponents) {
     // Skip components that have Trellis built-in equivalents
     if (TRELLIS_BUILTINS.has(compName)) {
       skippedBuiltins.push({ name: compName, note: TRELLIS_BUILTINS.get(compName).note });
@@ -946,13 +1109,14 @@ function copyCustomComponents(customComponentNames, usedComponents, force, dryRu
     if (!compInfo) continue;
 
     const srcPath = compInfo.srcPath;
-    const isDir = fs.statSync(srcPath).isDirectory();
+    const isDir = compInfo.isFolder;
+    const isDirect = usage ? usage.isDirect !== false : true;
+    const pulledInBy = usage && usage.pulledInBy ? usage.pulledInBy : null;
 
     if (isDir) {
-      // Copy the entire component directory
       const destDir = path.join(TARGET_COMPONENTS, toKebabCase(compName));
-      if (!dryRun) copyComponentDir(srcPath, destDir, force);
-      copied.push({ name: compName, dest: destDir, isDir: true, isJs: compInfo.isJs });
+      if (!dryRun) copyComponentDir(compInfo.scope, destDir, force);
+      copied.push({ name: compName, dest: destDir, isDir: true, isJs: compInfo.isJs, isDirect, pulledInBy });
     } else {
       // Copy single file, rename .jsx→.tsx / .js→.tsx (if JSX) or .js→.ts
       const ext = path.extname(srcPath);
@@ -964,13 +1128,16 @@ function copyCustomComponents(customComponentNames, usedComponents, force, dryRu
       }
       const destFile = path.join(TARGET_COMPONENTS, toKebabCase(compName) + newExt);
       if (!dryRun) copySingleComponent(srcPath, destFile, force);
-      copied.push({ name: compName, dest: destFile, isDir: false, isJs: compInfo.isJs });
+      copied.push({ name: compName, dest: destFile, isDir: false, isJs: compInfo.isJs, isDirect, pulledInBy });
     }
   }
 
-  // Register copied components in MDX index
-  if (!dryRun && copied.length > 0) {
-    registerMdxComponents(copied);
+  // Register only direct (MDX-used) components in the MDX index.
+  // Transitive deps are imported by other components, not by MDX content,
+  // so they don't belong in the global MDX component map.
+  if (!dryRun) {
+    const directCopies = copied.filter((c) => c.isDirect);
+    if (directCopies.length > 0) registerMdxComponents(directCopies);
   }
 
   return { copied, skippedBuiltins };
@@ -990,6 +1157,9 @@ function copySingleComponent(srcPath, destPath, force) {
   const isJs = /\.(jsx?|js)$/.test(srcPath);
   content = rewriteDocusaurusImports(content);
   if (isJs) content = addTypeAnnotations(content);
+  // Always ensure 'use client' — TypeScript components using hooks need it too,
+  // and addTypeAnnotations only runs for JS sources.
+  content = ensureUseClientDirective(content);
   // Fix extension if content has JSX but dest is .ts (not .tsx)
   if (destPath.endsWith('.ts') && !destPath.endsWith('.tsx') && containsJsx(content)) {
     destPath = destPath.replace(/\.ts$/, '.tsx');
@@ -1012,10 +1182,14 @@ function copyComponentDir(srcDir, destDir, force) {
       if (!force && fs.existsSync(destPath)) continue;
       let content = fs.readFileSync(srcPath, 'utf-8');
       const isJs = /\.(jsx?|js)$/.test(entry.name);
+      const isScript = /\.(tsx?|jsx?)$/.test(entry.name);
       if (/\.(tsx?|jsx?|css)$/.test(entry.name)) {
         content = rewriteDocusaurusImports(content);
       }
       if (isJs) content = addTypeAnnotations(content);
+      // TypeScript sources skip addTypeAnnotations, but still need 'use client'
+      // when they use hooks. Run the directive injector on every script file.
+      if (isScript) content = ensureUseClientDirective(content);
       // Fix extension if content has JSX but dest is .ts (not .tsx)
       if (destPath.endsWith('.ts') && !destPath.endsWith('.tsx') && containsJsx(content)) {
         destPath = destPath.replace(/\.ts$/, '.tsx');
@@ -1114,17 +1288,27 @@ function runPostMigrationTypeCheck(copiedComps) {
   return { skipped: false, checked: migratedFiles.length, errors };
 }
 
-// Check if content contains JSX syntax (HTML-like tags)
+// Check if content contains JSX syntax (HTML-like tags).
+// We deliberately DO NOT strip strings — a regex-based string stripper is
+// unreliable when apostrophes appear inside double-quoted strings (common
+// for English contractions and CSS values like `"'DM Sans', sans-serif"`),
+// because the single-quote regex greedily matches between any two
+// apostrophes across the file and can eat real JSX. A false positive here
+// (rare) just causes a file to be written as `.tsx` instead of `.ts`, which
+// still compiles. A false negative puts JSX in a `.ts` file, which breaks
+// the build.
 function containsJsx(content) {
-  // Strip strings and comments first to avoid false positives
   const stripped = content
-    .replace(/\/\/.*$/gm, '')           // single-line comments
-    .replace(/\/\*[\s\S]*?\*\//g, '')   // multi-line comments
-    .replace(/'(?:[^'\\]|\\.)*'/g, '')  // single-quoted strings
-    .replace(/"(?:[^"\\]|\\.)*"/g, '')  // double-quoted strings
-    .replace(/`(?:[^`\\]|\\.)*`/g, ''); // template literals
-  // Look for JSX: <Component or <div or <svg etc.
-  return /<[a-zA-Z][a-zA-Z0-9.]*[\s/>]/.test(stripped);
+    .replace(/\/\/.*$/gm, '')         // single-line comments
+    .replace(/\/\*[\s\S]*?\*\//g, ''); // multi-line comments
+  // Look for unambiguous JSX shapes:
+  //   - closing tag:       </div> or </Foo>
+  //   - PascalCase usage:  <Button ... or <Icon />
+  //   - return/arrow JSX:  return <, => <, => (<
+  if (/<\/[a-zA-Z][a-zA-Z0-9.]*\s*>/.test(stripped)) return true;
+  if (/<[A-Z][A-Za-z0-9.]*[\s/>]/.test(stripped)) return true;
+  if (/(?:return|=>)\s*\(?\s*<[a-zA-Z]/.test(stripped)) return true;
+  return false;
 }
 
 // ── Auto-type JavaScript components for strict TypeScript ────────
@@ -1145,11 +1329,13 @@ function addTypeAnnotations(content) {
       const compName = funcName || varName;
       if (!compName) return match;
 
-      const props = parsePropsFromDestructuring(propsBody);
-      if (props.length === 0) return match;
+      const { props, hasRest } = parsePropsFromDestructuring(propsBody);
+      if (props.length === 0 && !hasRest) return match;
 
       const interfaceName = `${compName}Props`;
-      const interfaceBody = props.map((p) => `  ${p.name}${p.hasDefault ? '?' : ''}: ${p.type};`).join('\n');
+      const lines = props.map((p) => `  ${p.name}${p.hasDefault ? '?' : ''}: ${p.type};`);
+      if (hasRest) lines.push('  [key: string]: any;');
+      const interfaceBody = lines.join('\n');
       const interfaceBlock = `interface ${interfaceName} {\n${interfaceBody}\n}\n\n`;
 
       // Replace the destructured params with typed version
@@ -1209,27 +1395,49 @@ function addTypeAnnotations(content) {
   );
 
   // ── 5. Add 'use client' if the component uses hooks or browser APIs ──
-  const usesClientFeatures = /\b(useState|useEffect|useRef|useCallback|useMemo|useContext|useReducer|useLayoutEffect|window\.|document\.|navigator\.)\b/.test(content);
-  const hasUseClient = /^['"]use client['"];?\s*$/m.test(content);
-  if (usesClientFeatures && !hasUseClient) {
-    // Insert after React import if present, otherwise at the very top
-    const reactImportMatch = content.match(/^import\s+React\b[^\n]*\n/m);
-    if (reactImportMatch) {
-      const insertIdx = content.indexOf(reactImportMatch[0]) + reactImportMatch[0].length;
-      content = content.slice(0, insertIdx) + "'use client';\n" + content.slice(insertIdx);
-    } else {
-      content = "'use client';\n" + content;
-    }
-  }
+  content = ensureUseClientDirective(content);
 
   return content;
 }
 
+// Insert `'use client';` at the top of a component file when it uses React
+// hooks or browser-only APIs. Idempotent — files that already have the
+// directive correctly placed are left unchanged.
+//
+// Next.js requires the directive to be the first non-comment statement,
+// before any import. Rule: reject `'use client'` that follows an import
+// with "The 'use client' directive must be placed before other expressions."
+//
+// Called for BOTH JS and TS component files (Docusaurus components can be
+// authored in TypeScript too, and those still need the directive under
+// Next.js App Router).
+function ensureUseClientDirective(content) {
+  // Detects any `useXxx(` call (React built-ins, library hooks like MUI's
+  // useMediaQuery, custom hooks) plus direct browser API access. Broader
+  // than React's known hooks because library hooks have the same naming
+  // convention but aren't in any fixed list.
+  const usesClientFeatures = /\buse[A-Z]\w*\s*\(|\b(?:window|document|navigator|localStorage|sessionStorage)\./.test(content);
+  if (!usesClientFeatures) return content;
+
+  const hasUseClient = /^\s*['"]use client['"];?\s*$/m.test(content);
+  if (hasUseClient) return content;
+
+  // Insert after any leading block comment(s) so JSDoc stays at the top,
+  // but before any import statement.
+  const leadingCommentMatch = content.match(/^(\s*(?:\/\*[\s\S]*?\*\/\s*)*)/);
+  const insertIdx = leadingCommentMatch ? leadingCommentMatch[0].length : 0;
+  return content.slice(0, insertIdx) + "'use client';\n\n" + content.slice(insertIdx);
+}
+
 // Parse prop names and infer types from destructuring pattern.
 // Input: "bar, baz = 'hello', count = 0, items = [], onClick, children"
-// Returns: [{ name, type, hasDefault }]
+// Returns: { props: [{ name, type, hasDefault }], hasRest: boolean }
+// hasRest signals that the destructuring had a `...rest` pattern, which
+// must be represented as an index signature in the generated interface,
+// not as a literal `...rest:` property (that's invalid TS syntax).
 function parsePropsFromDestructuring(propsBody) {
   const props = [];
+  let hasRest = false;
   // Split on commas, but respect nested braces/brackets/parens
   const parts = splitProps(propsBody.trim());
 
@@ -1237,9 +1445,9 @@ function parsePropsFromDestructuring(propsBody) {
     const part = raw.trim();
     if (!part) continue;
 
-    // Handle rest params: ...rest
+    // Rest params collapse into an index signature; don't emit a named prop.
     if (part.startsWith('...')) {
-      props.push({ name: part, type: 'Record<string, any>', hasDefault: false });
+      hasRest = true;
       continue;
     }
 
@@ -1259,7 +1467,7 @@ function parsePropsFromDestructuring(propsBody) {
     props.push({ name, type, hasDefault });
   }
 
-  return props;
+  return { props, hasRest };
 }
 
 // Split "a, b = [1,2], c = {x: 1}, d" respecting brackets
@@ -1343,7 +1551,51 @@ function rewriteDocusaurusImports(content) {
   // Remove @theme/ imports (Trellis has built-in equivalents)
   content = content.replace(/^import\s+.*?\s+from\s+['"]@theme\/[^'"]+['"];?\s*$/gm, '// [migration] @theme import removed — use Trellis built-in equivalent');
 
-  // Remove @docusaurus/ imports (Docusaurus-specific hooks and utilities)
+  // Remap known Docusaurus hooks to Trellis equivalents BEFORE the catch-all
+  // removal. useColorMode (from @docusaurus/theme-common) maps to useTheme
+  // (from next-themes, already a Trellis runtime dep). Field names differ:
+  //   Docusaurus  { colorMode, setColorMode } = useColorMode()
+  //   next-themes { resolvedTheme, setTheme } = useTheme()
+  // We preserve the original variable names via aliased destructuring so the
+  // rest of the file (e.g. `colorMode === 'dark'`) keeps working unchanged.
+  const hasUseColorMode = /\buseColorMode\s*\(/.test(content);
+  if (hasUseColorMode) {
+    content = content.replace(
+      /^import\s*\{([^}]*)\}\s+from\s+['"]@docusaurus\/theme-common['"];?\s*$/gm,
+      (_, names) => /\buseColorMode\b/.test(names) ? "import { useTheme } from 'next-themes';" : '// [migration] @docusaurus/theme-common import removed — no Trellis equivalent'
+    );
+    // Destructuring patterns — ordered most-specific first.
+    content = content.replace(
+      /const\s*\{\s*colorMode\s*,\s*setColorMode\s*\}\s*=\s*useColorMode\s*\(\s*\)/g,
+      'const { resolvedTheme: colorMode, setTheme: setColorMode } = useTheme()'
+    );
+    content = content.replace(
+      /const\s*\{\s*setColorMode\s*,\s*colorMode\s*\}\s*=\s*useColorMode\s*\(\s*\)/g,
+      'const { setTheme: setColorMode, resolvedTheme: colorMode } = useTheme()'
+    );
+    content = content.replace(
+      /const\s*\{\s*colorMode\s*\}\s*=\s*useColorMode\s*\(\s*\)/g,
+      'const { resolvedTheme: colorMode } = useTheme()'
+    );
+    content = content.replace(
+      /const\s*\{\s*setColorMode\s*\}\s*=\s*useColorMode\s*\(\s*\)/g,
+      'const { setTheme: setColorMode } = useTheme()'
+    );
+    // Ensure the useTheme import exists — the theme-common rewrite above
+    // handles the common case, but if the original file imported useColorMode
+    // from somewhere else, we add it fresh.
+    if (!/^import\s+\{[^}]*\buseTheme\b[^}]*\}\s+from\s+['"]next-themes['"]/m.test(content)) {
+      const reactImportMatch = content.match(/^import\s+React[^\n]*\n/m);
+      if (reactImportMatch) {
+        const idx = content.indexOf(reactImportMatch[0]) + reactImportMatch[0].length;
+        content = content.slice(0, idx) + "import { useTheme } from 'next-themes';\n" + content.slice(idx);
+      } else {
+        content = "import { useTheme } from 'next-themes';\n" + content;
+      }
+    }
+  }
+
+  // Remove remaining @docusaurus/ imports (Docusaurus-specific hooks and utilities)
   content = content.replace(/^import\s+.*?\s+from\s+['"]@docusaurus\/[^'"]+['"];?\s*$/gm, '// [migration] @docusaurus import removed — no Trellis equivalent');
 
   // Rewrite @site/src/components/ → relative path within components/custom/migrated/
@@ -1352,9 +1604,17 @@ function rewriteDocusaurusImports(content) {
     (_, p) => `from './${p}'`
   );
 
-  // Remove other @site/ imports with a warning comment
+  // Rewrite @site/src/data/ → @/data/migrated/. The actual data files are
+  // copied separately in Phase 1b (see copyMigratedDataFiles).
   content = content.replace(
-    /^(import\s+.*?\s+from\s+['"]@site\/(?!src\/components)[^'"]+['"];?)$/gm,
+    /from\s+['"]@site\/src\/data\/([^'"]+)['"]/g,
+    (_, p) => `from '@/data/migrated/${p}'`
+  );
+
+  // Remove other @site/ imports with a warning comment. The negative
+  // lookahead excludes paths we handle elsewhere (components, data).
+  content = content.replace(
+    /^(import\s+.*?\s+from\s+['"]@site\/(?!src\/(?:components|data))[^'"]+['"];?)$/gm,
     '// [migration] TODO: rewrite this import for Trellis\n// $1'
   );
 
@@ -1372,6 +1632,46 @@ function rewriteDocusaurusImports(content) {
   }
 
   return content;
+}
+
+// Classify how a copied component exports itself: 'named' (preferred),
+// 'default', or 'named' as a safe fallback when we can't read the file.
+// The MDX index import statement must match what the file actually exports,
+// or Turbopack/SWC rejects the build: "Export X doesn't exist in target module".
+function detectComponentExportKind(comp, kebab) {
+  // Try to locate the dest file. Directory components have an index.tsx;
+  // single-file components are either .tsx or .ts at TARGET_COMPONENTS/<kebab>.
+  const candidates = comp.isDir
+    ? [
+        path.join(TARGET_COMPONENTS, kebab, 'index.tsx'),
+        path.join(TARGET_COMPONENTS, kebab, 'index.ts'),
+      ]
+    : [
+        path.join(TARGET_COMPONENTS, `${kebab}.tsx`),
+        path.join(TARGET_COMPONENTS, `${kebab}.ts`),
+      ];
+
+  const destPath = candidates.find((p) => fs.existsSync(p));
+  if (!destPath) return 'named';
+
+  let content;
+  try { content = fs.readFileSync(destPath, 'utf-8'); } catch { return 'named'; }
+
+  const stripped = content
+    .replace(/\/\/.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+
+  const nameRe = comp.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const hasNamed =
+    new RegExp(`^\\s*export\\s+(?:async\\s+)?(?:function|const|let|var|class)\\s+${nameRe}\\b`, 'm').test(stripped) ||
+    new RegExp(`^\\s*export\\s*\\{[^}]*\\b${nameRe}\\b[^}]*\\}`, 'm').test(stripped);
+  const hasDefault =
+    /^\s*export\s+default\s+/m.test(stripped) ||
+    /^\s*export\s*\{[^}]*\bdefault\b[^}]*\}/m.test(stripped);
+
+  if (hasNamed) return 'named';
+  if (hasDefault) return 'default';
+  return 'named';
 }
 
 function registerMdxComponents(copiedComponents) {
@@ -1396,7 +1696,16 @@ function registerMdxComponents(copiedComponents) {
     const kebab = toKebabCase(comp.name);
     const importPath = `@/components/custom/migrated/${kebab}`;
 
-    newImportLines.push(`import { ${comp.name} } from '${importPath}'`);
+    // Detect how the copied component exports itself. Docusaurus components
+    // commonly use `export default`, while Trellis/shadcn code favors named.
+    // Reading the actual dest file means we emit whichever form the code
+    // expects — mismatched imports fail at build time.
+    const exportKind = detectComponentExportKind(comp, kebab);
+    const importStmt = exportKind === 'default'
+      ? `import ${comp.name} from '${importPath}'`
+      : `import { ${comp.name} } from '${importPath}'`;
+
+    newImportLines.push(importStmt);
     newRegistrations.push(`  ${comp.name},`);
   }
 
@@ -1422,6 +1731,115 @@ function registerMdxComponents(copiedComponents) {
     content.slice(closingBrace);
 
   fs.writeFileSync(MDX_INDEX, content);
+}
+
+// ── Runtime dependency detection (Phase 0.5) ─────────────────────
+// Scans every discovered component's source files for bare-package imports
+// and checks whether each package is present in the target Trellis package.json.
+// Also reads peer dependencies from each found package's own manifest (in the
+// Docusaurus project's node_modules) so hidden requirements like @emotion/react
+// for MUI are surfaced before the user runs `npm run build`.
+
+// Built-in modules provided by Trellis that don't need to be installed.
+const RUNTIME_DEPS_IGNORE = new Set([
+  'react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime',
+  'next',
+]);
+
+function isBarePackageSpecifier(spec) {
+  if (!spec) return false;
+  if (spec.startsWith('.')) return false;     // relative
+  if (spec.startsWith('/')) return false;     // absolute
+  if (spec.startsWith('@site/')) return false;      // Docusaurus alias
+  if (spec.startsWith('@theme/')) return false;     // Docusaurus alias
+  if (spec.startsWith('@docusaurus/')) return false; // Docusaurus core
+  if (spec.startsWith('@/')) return false;    // Trellis alias
+  return true;
+}
+
+function extractPackageName(spec) {
+  if (spec.startsWith('@')) {
+    const parts = spec.split('/');
+    return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : null;
+  }
+  return spec.split('/')[0];
+}
+
+function scanRuntimeDependencies(components) {
+  // Map<packageName, { usedBy: Set<componentName> }>
+  const byPackage = new Map();
+  const importRe = /^\s*import\s+(?:[^'"]+?\s+from\s+)?['"]([^'"]+)['"]/gm;
+  const dynamicImportRe = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+
+  for (const [compName, info] of components) {
+    const sources = listComponentSourceFiles(info.scope);
+    for (const srcFile of sources) {
+      let content;
+      try { content = fs.readFileSync(srcFile, 'utf-8'); } catch { continue; }
+
+      const collect = (re) => {
+        let m;
+        while ((m = re.exec(content)) !== null) {
+          const spec = m[1];
+          if (!isBarePackageSpecifier(spec)) continue;
+          const pkg = extractPackageName(spec);
+          if (!pkg || RUNTIME_DEPS_IGNORE.has(pkg)) continue;
+          if (!byPackage.has(pkg)) byPackage.set(pkg, { usedBy: new Set() });
+          byPackage.get(pkg).usedBy.add(compName);
+        }
+        re.lastIndex = 0;
+      };
+      collect(importRe);
+      collect(dynamicImportRe);
+    }
+  }
+  return byPackage;
+}
+
+// For each directly-imported package, read its own package.json in the
+// Docusaurus node_modules and pull in its peerDependencies. This catches
+// hidden requirements like @emotion/react (peer of @mui/material) that the
+// user's source never imports directly but will fail at build time.
+function augmentWithPeerDependencies(byPackage, docusaurusPath) {
+  const direct = [...byPackage.keys()];
+  for (const pkgName of direct) {
+    const pkgPath = path.join(docusaurusPath, 'node_modules', pkgName, 'package.json');
+    if (!fs.existsSync(pkgPath)) continue;
+    let pkg;
+    try { pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')); } catch { continue; }
+
+    for (const peerName of Object.keys(pkg.peerDependencies || {})) {
+      if (RUNTIME_DEPS_IGNORE.has(peerName)) continue;
+      if (!byPackage.has(peerName)) byPackage.set(peerName, { usedBy: new Set(), peerOf: new Set() });
+      const entry = byPackage.get(peerName);
+      if (!entry.peerOf) entry.peerOf = new Set();
+      entry.peerOf.add(pkgName);
+    }
+  }
+  return byPackage;
+}
+
+function loadTargetPackageJson() {
+  const pkgPath = path.join(ROOT, 'package.json');
+  if (!fs.existsSync(pkgPath)) return null;
+  try { return JSON.parse(fs.readFileSync(pkgPath, 'utf-8')); } catch { return null; }
+}
+
+function computeMissingDeps(byPackage, targetPkg) {
+  if (!targetPkg) return { missing: byPackage, installed: new Map() };
+  const installed = new Set([
+    ...Object.keys(targetPkg.dependencies || {}),
+    ...Object.keys(targetPkg.devDependencies || {}),
+    ...Object.keys(targetPkg.peerDependencies || {}),
+    ...Object.keys(targetPkg.optionalDependencies || {}),
+  ]);
+  const missing = new Map();
+  const already = new Map();
+  for (const [pkg, info] of byPackage) {
+    if (installed.has(pkg)) already.set(pkg, info);
+    else missing.set(pkg, info);
+  }
+  return { missing, already };
 }
 
 // ── Migration report ─────────────────────────────────────────────
@@ -1531,6 +1949,21 @@ function printReport() {
     }
   }
 
+  if (report.runtimeDepsMissing && report.runtimeDepsMissing.size > 0) {
+    console.log(`\nRuntime dependencies missing from Trellis package.json (${report.runtimeDepsMissing.size}):`);
+    console.log('(Migrated components import these, but the target project doesn\'t have them installed.)');
+    for (const [pkg, info] of report.runtimeDepsMissing) {
+      const peerOf = info.peerOf && info.peerOf.size > 0 ? [...info.peerOf].sort().join(', ') : null;
+      const usedBy = info.usedBy && info.usedBy.size > 0 ? [...info.usedBy].sort().slice(0, 5).join(', ') : null;
+      const bits = [];
+      if (usedBy) bits.push(`used by ${usedBy}`);
+      if (peerOf) bits.push(`peer of ${peerOf}`);
+      console.log(`  ${pkg}${bits.length ? '  (' + bits.join('; ') + ')' : ''}`);
+    }
+    console.log(`\n  Install all at once:`);
+    console.log(`    npm install ${[...report.runtimeDepsMissing.keys()].sort().join(' ')}`);
+  }
+
   if (report.warnings.length > 0) {
     console.log('\nWarnings:');
     for (const w of report.warnings) {
@@ -1596,6 +2029,47 @@ function main() {
     console.log('  No custom components found in src/components/');
   }
 
+  // ── Phase 0.5: Scan runtime dependencies ────────────────────
+  // Extract bare-package imports from every scanned component, augment with
+  // peer deps from the Docusaurus node_modules, and diff against the Trellis
+  // package.json. Surfaces hidden requirements (e.g., @emotion/react is a
+  // peer dep of @mui/material) BEFORE `npm run build` fails on them.
+  if (customComponentNames.size > 0) {
+    console.log('\nPhase 0.5: Scanning runtime dependencies...');
+    const byPackage = scanRuntimeDependencies(customComponentNames);
+    augmentWithPeerDependencies(byPackage, docusaurusPath);
+    const targetPkg = loadTargetPackageJson();
+    const { missing, already } = computeMissingDeps(byPackage, targetPkg);
+
+    report.runtimeDepsUsed = byPackage;
+    report.runtimeDepsMissing = missing;
+    report.runtimeDepsAlreadyInstalled = already;
+
+    console.log(`  Found ${byPackage.size} runtime package(s) referenced by migrated components`);
+    if (already.size > 0) console.log(`  ✓ ${already.size} already present in Trellis package.json`);
+
+    if (missing.size > 0) {
+      console.log(`  ✗ ${missing.size} missing — install before "npm run build":`);
+      for (const [pkg, info] of missing) {
+        const peerOf = info.peerOf && info.peerOf.size > 0 ? [...info.peerOf].sort().join(', ') : null;
+        const usedBy = info.usedBy && info.usedBy.size > 0 ? [...info.usedBy].sort() : [];
+        let tag;
+        if (usedBy.length > 0) {
+          const shown = usedBy.slice(0, 3).join(', ') + (usedBy.length > 3 ? `, +${usedBy.length - 3} more` : '');
+          tag = `used by: ${shown}`;
+          if (peerOf) tag += `; also peer of ${peerOf}`;
+        } else if (peerOf) {
+          tag = `peer of ${peerOf}`;
+        } else {
+          tag = 'referenced';
+        }
+        console.log(`    ${pkg}  (${tag})`);
+      }
+      const installCmd = `npm install ${[...missing.keys()].sort().join(' ')}`;
+      console.log(`\n  Install:\n    ${installCmd}`);
+    }
+  }
+
   // ── Phase 1: Content files ──────────────────────────────────
   const docsDir = findDocsDir(docusaurusPath);
   if (!docsDir) {
@@ -1645,9 +2119,12 @@ function main() {
     }
   }
 
-  // ── Phase 1b: Copy static assets ───────────────────────────
+  // ── Phase 1b: Copy static assets + data files ──────────────
   // Docusaurus stores images in static/img/ — copy to public/img/
   copyStaticAssets(docusaurusPath, force, dryRun);
+  // src/data/*.json → data/migrated/*.json so rewritten @/data/migrated/
+  // imports in migrated components resolve.
+  copyMigratedDataFiles(docusaurusPath, force, dryRun);
 
   // ── Phase 2: Sidebar conversion ─────────────────────────────
   console.log('\nPhase 2: Converting sidebar...');
@@ -1699,17 +2176,37 @@ function main() {
   // ── Phase 3: Copy custom components ──────────────────────────
   if (report.customComponentsUsed.size > 0) {
     console.log('\nPhase 3: Copying custom components...');
+
+    // Expand MDX-used set to include transitive dependencies — components
+    // that aren't used directly in MDX but are imported by ones that are.
+    const expanded = expandUsedComponentsWithDeps(
+      report.customComponentsUsed, customComponentNames
+    );
+    const transitiveCount = [...expanded.values()].filter((c) => !c.isDirect).length;
+    if (transitiveCount > 0) {
+      console.log(`  Resolved ${transitiveCount} transitive dependency/dependencies:`);
+      for (const [name, info] of expanded) {
+        if (!info.isDirect) console.log(`    ${name} (pulled in by ${info.pulledInBy})`);
+      }
+    }
+
     const { copied: copiedComps, skippedBuiltins } = copyCustomComponents(
-      customComponentNames, report.customComponentsUsed, force, dryRun
+      customComponentNames, expanded, force, dryRun
     );
     report.componentsCopied = copiedComps;
     report.componentsSkippedBuiltins = skippedBuiltins;
 
     if (copiedComps.length > 0) {
-      console.log(`  Copied ${copiedComps.length} component(s) to components/custom/migrated/`);
+      const directCount = copiedComps.filter((c) => c.isDirect).length;
+      const transCount = copiedComps.length - directCount;
+      const breakdown = transCount > 0
+        ? ` (${directCount} direct, ${transCount} transitive)`
+        : '';
+      console.log(`  Copied ${copiedComps.length} component(s) to components/custom/migrated/${breakdown}`);
       for (const comp of copiedComps) {
+        const tag = comp.isDirect ? '' : ' [transitive]';
         const suffix = comp.isJs ? ' (JS → TS rename — add type annotations)' : '';
-        console.log(`    ${comp.name}${suffix}`);
+        console.log(`    ${comp.name}${tag}${suffix}`);
       }
     }
     if (skippedBuiltins.length > 0) {
@@ -1718,8 +2215,8 @@ function main() {
         console.log(`    ${name}: ${note}`);
       }
     }
-    if (!dryRun && copiedComps.length > 0) {
-      console.log('  Registered components in components/docs/mdx/index.tsx');
+    if (!dryRun && copiedComps.some((c) => c.isDirect)) {
+      console.log('  Registered direct components in components/docs/mdx/index.tsx');
     }
 
     // ── Phase 3b: Post-migration type check ───────────────────
