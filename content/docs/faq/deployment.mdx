@@ -1,0 +1,43 @@
+---
+title: Deployment
+description: Questions about building and deploying your Trellis docs site.
+last_update:
+  date: 04/02/2026
+  author: Trellis
+---
+
+### How do I deploy to GitHub Pages?
+
+Run `npm run deploy`. This builds the site, auto-detects the `basePath` from your git remote URL, and pushes the `out/` directory to a `gh-pages` branch. On first deploy, go to your repo **Settings → Pages** and set the source to "Deploy from a branch" → `gh-pages`. See the [Deployment guide](/guides/deployment/) for details.
+
+### Can I use GitHub Actions instead of the deploy command?
+
+Yes. {vars.productName} supports both approaches. The `npm run deploy` command pushes to a `gh-pages` branch, while the GitHub Actions workflow uses the newer Pages API with `actions/upload-pages-artifact` and `actions/deploy-pages`. If you selected a deployment target during `create-trellis-docs` setup, a workflow was already added to `.github/workflows/deploy.yml`.
+
+### How do I deploy to Vercel?
+
+Connect your Git repository in the Vercel dashboard. Vercel detects Next.js automatically. Set the build command to `npm run build` and the output directory to `out`. No `basePath` or environment variables are needed. See the [Deployment guide](/guides/deployment/) for a CI workflow alternative.
+
+### How do I deploy to Netlify?
+
+Connect your Git repository in the Netlify dashboard or drag-and-drop the `out/` folder. Set the build command to `npm run build` and the publish directory to `out`. See the [Deployment guide](/guides/deployment/) for a CI workflow alternative.
+
+### What is `PAGES_BASE_PATH` and when do I need it?
+
+`PAGES_BASE_PATH` is an environment variable that sets the `basePath` in `next.config.mjs`. You need it when your site is served from a subpath, like `https://org.github.io/repo-name/`. The `npm run deploy` command auto-detects this from your git remote, but for GitHub Actions workflows you need to set it explicitly.
+
+### Why are my images broken after deploying to GitHub Pages?
+
+Most likely your site is on a subpath (e.g. `/repo-name/`) but the build didn't include the `basePath`. Make sure `PAGES_BASE_PATH` is set to your repo name when building. The `npm run deploy` command handles this automatically.
+
+### Can I deploy to other hosts like Cloudflare Pages or Firebase?
+
+Yes. {vars.productName} produces a fully static `out/` directory that works with any host that serves static files — Cloudflare Pages, Firebase Hosting, AWS S3 + CloudFront, Apache, Nginx, or any CDN.
+
+### How does the link checker work during deployment?
+
+The `npm run build` command runs `check-links.js` as the final step. It crawls every HTML file in `out/` and fails the build if any internal link points to a missing page. Use `--warn-only` in CI if you want to report broken links without blocking the deploy.
+
+### How do I set up redirects when I move pages?
+
+Add entries to `redirects.json` at the project root. The redirects plugin generates HTML pages with `<meta http-equiv="refresh">` tags at build time. Both `/path.html` and `/path/index.html` are created to handle trailing slash variations. See the [Deployment guide](/guides/deployment/) for the full configuration.

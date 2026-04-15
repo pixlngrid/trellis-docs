@@ -1,0 +1,62 @@
+---
+title: Troubleshooting
+description: Common issues and solutions when building and running a Trellis docs site.
+last_update:
+  date: 04/02/2026
+  author: Trellis
+---
+
+### The build fails with "Module not found: Can't resolve '@/...'"
+
+The `@/` path alias may not resolve correctly on some setups. Verify that `next.config.mjs` includes the explicit webpack alias:
+
+```js
+webpack: (config) => {
+  config.resolve.alias['@'] = resolve(__dirname)
+  return config
+},
+```
+
+### The build fails with "X is not a valid Shiki language"
+
+Shiki language identifiers are case-sensitive. Use lowercase: `typescript` not `TypeScript`, `json` not `JSON`. Check the error message for which code block has the invalid language.
+
+### The build fails with MDX parsing errors about unescaped braces
+
+Curly braces `{` and `}` are JSX expressions in MDX. If you have literal braces in your content (e.g. code snippets not inside fenced blocks), wrap them in backticks or use a fenced code block. HTML comments (`<!-- -->`) also cause MDX errors — use `{/* comment */}` instead.
+
+### The build fails with "Missing @include partial"
+
+An `@include` directive references a file that doesn't exist. Check the path is relative to the current file and the partial file exists. Partials should be prefixed with `_` (e.g. `_shared-setup.mdx`).
+
+### The build fails mentioning an unregistered MDX component
+
+If you use a custom JSX component like `<MyWidget />` in your MDX, it must be registered in `components/docs/mdx/index.tsx`. Add an import and include it in the `mdxComponents` object.
+
+### npm install fails with missing native dependencies on Windows
+
+If your `.npmrc` has `os = "linux"` or another non-Windows value, npm skips platform-specific optional dependencies like lightningcss. Fix with: `npm install --os=win32`. The `create-trellis-docs` scaffolder generates a platform-specific `.npmrc` automatically.
+
+### The dev server starts but pages are blank or show hydration errors
+
+This usually means a client-side hook (`useState`, `useEffect`, etc.) is being called in a server component. Add `'use client'` at the top of any component that uses React hooks or browser APIs.
+
+### The search returns no results
+
+Run `npm run build` (or just `node scripts/build-search-index.js`) to regenerate `public/searchIndex.json`. The search index is built at build time and not updated during `npm run dev`. Pages with `draft: true` are excluded from the index.
+
+### Images work in dev but are broken in the deployed site
+
+Check whether your site is deployed to a subpath (e.g. `/repo-name/`). If so, make sure `PAGES_BASE_PATH` is set during the build so that Next.js prefixes all asset paths correctly.
+
+### The `.next/trace` file causes permission errors on Windows
+
+This is a known Next.js issue on Windows. Delete the `.next` directory and rebuild: `rm -rf .next && npm run build`. If it persists, try running the build from a fresh terminal.
+
+### How do I debug which pages are missing from the build?
+
+Check `generateStaticParams()` in `app/(docs)/[...slug]/page.tsx`. If a page is linked in the sidebar but its file is missing or marked as `draft: true`, the build may fail. Run `npm run export:sidebar` to generate a CSV audit of all sidebar entries and their file paths.
+
+### The FAQ index is empty
+
+Make sure your FAQ files are in `content/docs/faq/` and use `###` headings for questions. Run `node scripts/build-faq-index.js` to regenerate the index. Files with `draft: true` are excluded.

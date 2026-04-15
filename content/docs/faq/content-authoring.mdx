@@ -1,0 +1,77 @@
+---
+title: Content Authoring
+description: Questions about writing and formatting documentation content in Trellis.
+last_update:
+  date: 04/02/2026
+  author: Trellis
+---
+
+### What file format should I use for docs?
+
+Use `.mdx` files in the `content/docs/` directory. MDX is Markdown with JSX support, so you can use standard Markdown syntax plus embedded React components. Plain `.md` files also work but don't support component usage.
+
+### How do I use variables in my content?
+
+Define variables in `config/variables.ts` and reference them in your content with `{vars.variableName}`. This is useful for product names, version numbers, URLs, and other values that appear across multiple pages.
+
+### How do I include a partial (reusable content snippet)?
+
+Create a file with an underscore prefix (e.g. `_shared-note.mdx`) in your docs directory, then reference it with `@include ./_shared-note.mdx` in any page. The include is resolved at build time. Partials prefixed with `_` are excluded from search indexing and the sidebar.
+
+### How do I add admonitions (callouts)?
+
+Use the `:::` syntax with a type keyword:
+
+```md
+:::note
+This is a note.
+:::
+
+:::tip
+This is a tip.
+:::
+
+:::warning
+This is a warning.
+:::
+
+:::caution
+This is a caution.
+:::
+```
+
+### How do I write comments in MDX?
+
+Use JSX-style comments: `{/* This is a comment */}`. HTML-style comments (`<!-- -->`) are not valid in MDX and will cause build errors.
+
+### How do I add syntax-highlighted code blocks?
+
+Use fenced code blocks with a language identifier:
+
+````md
+```javascript
+const x = 42;
+```
+````
+
+{vars.productName} uses Shiki for syntax highlighting and supports all common languages. You can add a title with ` ```js title="example.js" `.
+
+### How do I create a table of contents for a page?
+
+The table of contents is generated automatically from `##` and `###` headings on each page. It appears in the right sidebar on desktop. Use `hide_table_of_contents: true` in frontmatter to disable it for a specific page.
+
+### How do I add images?
+
+Place images in the `public/img/` directory and reference them with absolute paths: `![Alt text](/img/screenshot.png)`. For images colocated with docs, place them alongside your `.mdx` files and use relative paths.
+
+### How do I link between docs pages?
+
+Use standard Markdown links with absolute paths that match the file structure: `[Getting Started](/getting-started/)`. Always include the trailing slash to match the `trailingSlash: true` setting.
+
+### How do I mark a page as a draft?
+
+Add `draft: true` to the page's frontmatter. Draft pages are excluded from the search index, sitemap, and FAQ index, but are still accessible during development.
+
+### Can I use React components in my docs?
+
+Yes. Register custom components in `components/docs/mdx/index.tsx` and they become available in all MDX files without imports. {vars.productName} includes several built-in components: Tabs, Callout, Chip, FlippingCard, Glossary, Tooltip, DocCard, and more.

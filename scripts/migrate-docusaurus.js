@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 const matter = require('gray-matter');
 
 const ROOT = path.join(__dirname, '..');
@@ -55,21 +56,23 @@ const report = {
 // ── CLI ──────────────────────────────────────────────────────────
 function parseArgs() {
   const args = process.argv.slice(2);
-  const flags = { force: false, dryRun: false };
+  const flags = { force: false, dryRun: false, typeCheck: true };
   let docusaurusPath = null;
 
   for (const arg of args) {
     if (arg === '--force') flags.force = true;
     else if (arg === '--dry-run') flags.dryRun = true;
+    else if (arg === '--no-type-check') flags.typeCheck = false;
     else if (!arg.startsWith('--')) docusaurusPath = arg;
   }
 
   if (!docusaurusPath) {
-    console.log('Usage: node scripts/migrate-docusaurus.js <path-to-docusaurus-project> [--force] [--dry-run]');
+    console.log('Usage: node scripts/migrate-docusaurus.js <path-to-docusaurus-project> [--force] [--dry-run] [--no-type-check]');
     console.log('');
     console.log('Options:');
-    console.log('  --force     Overwrite existing files in content/docs/');
-    console.log('  --dry-run   Preview changes without writing files');
+    console.log('  --force          Overwrite existing files in content/docs/');
+    console.log('  --dry-run        Preview changes without writing files');
+    console.log('  --no-type-check  Skip TypeScript check on migrated components');
     process.exit(1);
   }
 
@@ -1028,6 +1031,89 @@ function renameExtension(filename) {
     .replace(/\.js$/, '.ts');
 }
 
+// ── Post-migration TypeScript check ──────────────────────────────
+// Runs `tsc --noEmit` against the Trellis project after components are
+// copied, then filters errors down to only the files we just migrated.
+// This catches cases where the JS→TS auto-typing fell back to `any` or
+// missed a pattern, so the user gets a concrete worklist instead of
+// discovering errors at `npm run build` time.
+function collectMigratedTsFiles(copiedComps) {
+  const files = [];
+  const walk = (p) => {
+    if (!fs.existsSync(p)) return;
+    const stat = fs.statSync(p);
+    if (stat.isFile()) {
+      if (/\.tsx?$/.test(p)) files.push(path.resolve(p));
+      return;
+    }
+    if (stat.isDirectory()) {
+      for (const entry of fs.readdirSync(p, { withFileTypes: true })) {
+        if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+        walk(path.join(p, entry.name));
+      }
+    }
+  };
+  for (const comp of copiedComps) {
+    const kebab = toKebabCase(comp.name);
+    if (comp.isDir) {
+      walk(path.join(TARGET_COMPONENTS, kebab));
+    } else {
+      // Single-file copies may have been adjusted .ts → .tsx inside
+      // copySingleComponent, so check both.
+      const base = path.join(TARGET_COMPONENTS, kebab);
+      walk(base + '.ts');
+      walk(base + '.tsx');
+    }
+  }
+  return files;
+}
+
+function runPostMigrationTypeCheck(copiedComps) {
+  const migratedFiles = collectMigratedTsFiles(copiedComps);
+  if (migratedFiles.length === 0) {
+    return { skipped: true, reason: 'no migrated TS/TSX files' };
+  }
+
+  console.log(`\nPhase 3b: Type-checking ${migratedFiles.length} migrated file(s)...`);
+
+  const result = spawnSync('npx', ['--no-install', 'tsc', '--noEmit', '--pretty', 'false'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    shell: process.platform === 'win32',
+  });
+
+  if (result.error && result.error.code === 'ENOENT') {
+    return { skipped: true, reason: 'npx not found on PATH' };
+  }
+  // tsc not installed: npx --no-install exits with non-zero and writes to stderr
+  if (result.status !== 0 && !(result.stdout || result.stderr).includes('error TS')) {
+    return {
+      skipped: true,
+      reason: `tsc not available (exit ${result.status}): ${(result.stderr || '').trim().slice(0, 200)}`,
+    };
+  }
+
+  const output = `${result.stdout || ''}\n${result.stderr || ''}`;
+  const migratedSet = new Set(migratedFiles);
+  const errors = [];
+  // tsc format: "path/file.tsx(line,col): error TSxxxx: message"
+  const re = /^(.+?)\((\d+),(\d+)\):\s+(error\s+TS\d+):\s+(.+)$/gm;
+  let m;
+  while ((m = re.exec(output)) !== null) {
+    const absFile = path.resolve(ROOT, m[1]);
+    if (!migratedSet.has(absFile)) continue;
+    errors.push({
+      file: path.relative(ROOT, absFile).replace(/\\/g, '/'),
+      line: +m[2],
+      col: +m[3],
+      code: m[4],
+      message: m[5].trim(),
+    });
+  }
+
+  return { skipped: false, checked: migratedFiles.length, errors };
+}
+
 // Check if content contains JSX syntax (HTML-like tags)
 function containsJsx(content) {
   // Strip strings and comments first to avoid false positives
@@ -1425,6 +1511,26 @@ function printReport() {
     }
   }
 
+  if (report.typeCheckResult && !report.typeCheckResult.skipped && report.typeCheckResult.errors.length > 0) {
+    const errors = report.typeCheckResult.errors;
+    const byFile = new Map();
+    for (const e of errors) {
+      if (!byFile.has(e.file)) byFile.set(e.file, []);
+      byFile.get(e.file).push(e);
+    }
+    console.log(`\nTypeScript errors in migrated components (${errors.length} in ${byFile.size} file(s)):`);
+    console.log('(These files compile as-is with auto-typing but may need manual tightening.)');
+    for (const [file, errs] of byFile) {
+      console.log(`\n  ${file}`);
+      for (const e of errs.slice(0, 10)) {
+        console.log(`    ${e.line}:${e.col}  ${e.code}  ${e.message}`);
+      }
+      if (errs.length > 10) {
+        console.log(`    ... and ${errs.length - 10} more`);
+      }
+    }
+  }
+
   if (report.warnings.length > 0) {
     console.log('\nWarnings:');
     for (const w of report.warnings) {
@@ -1462,7 +1568,7 @@ function printReport() {
 
 // ── Main ─────────────────────────────────────────────────────────
 function main() {
-  const { docusaurusPath, force, dryRun } = parseArgs();
+  const { docusaurusPath, force, dryRun, typeCheck } = parseArgs();
 
   console.log('Docusaurus -> Trellis Migration');
   console.log('================================');
@@ -1614,6 +1720,20 @@ function main() {
     }
     if (!dryRun && copiedComps.length > 0) {
       console.log('  Registered components in components/docs/mdx/index.tsx');
+    }
+
+    // ── Phase 3b: Post-migration type check ───────────────────
+    if (!dryRun && typeCheck && copiedComps.length > 0) {
+      report.typeCheckResult = runPostMigrationTypeCheck(copiedComps);
+      const r = report.typeCheckResult;
+      if (r.skipped) {
+        console.log(`  Type check skipped: ${r.reason}`);
+      } else if (r.errors.length === 0) {
+        console.log(`  ✓ All ${r.checked} migrated file(s) pass type check`);
+      } else {
+        const fileCount = new Set(r.errors.map((e) => e.file)).size;
+        console.log(`  ✗ ${r.errors.length} type error(s) in ${fileCount} migrated file(s) — see report`);
+      }
     }
   }
 

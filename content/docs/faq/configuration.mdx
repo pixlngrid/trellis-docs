@@ -1,0 +1,51 @@
+---
+title: Configuration
+description: Questions about configuring your Trellis docs site.
+last_update:
+  date: 04/02/2026
+  author: Trellis
+---
+
+### Where is the main site configuration?
+
+All site-wide settings live in `config/site.ts`. This includes the site title, version, URL, logo, color mode, search weights, blog/release notes toggles, API docs, i18n, analytics, SEO defaults, and versioning.
+
+### How do I change the site title and logo?
+
+Edit `config/site.ts`. Set `title` for the site name. For the logo, either set `logo.useBuiltIn: false` and provide paths to your images in `logo.navbar` and `logo.hero`, or replace the built-in SVG components in `components/brand/`.
+
+### How do I customize the sidebar?
+
+Edit `config/sidebar.ts`. Each item is either a `doc` (with an `id` matching the file path), a `category` (with nested items), or a `link` (external URL). Categories can have a `link` property pointing to an index page and a `collapsed` property.
+
+### How do I add items to the top navigation?
+
+Edit `config/navigation.ts`. The `navItems` array accepts direct links (`{ label, href }`) and dropdown menus (`{ label, items: [{ label, href }] }`). The Resources dropdown is auto-populated based on enabled features.
+
+### How do I customize the design tokens (colors, spacing)?
+
+Edit `design-tokens.json` at the project root. This JSON file defines colors, spacing, border radii, and typography values. Run `npm run build-tokens` to regenerate `app/tokens.css`, or use `npm run dev` which runs it automatically.
+
+### How do I enable or disable the blog?
+
+Set `blog.enabled` to `true` or `false` in `config/site.ts`. When disabled, the `/blog` routes are not generated and the Blog link is hidden from the navigation.
+
+### How do I enable or disable release notes?
+
+Set `releaseNotes.enabled` to `true` or `false` in `config/site.ts`. When disabled, the `/release-notes` routes are not generated and the Release Notes link is hidden from the navigation.
+
+### How do I enable API documentation?
+
+Set `apiDocs.enabled: true` in `config/site.ts` and place your OpenAPI spec files (`.yaml`, `.yml`, or `.json`) in the `content/api/` directory. The build script generates an index at `public/api-specs/_index.json`.
+
+### How do I enable dark mode or change the default theme?
+
+Edit `colorMode` in `config/site.ts`. Set `defaultMode` to `'dark'` or `'light'`, and `respectPrefersColorScheme` to `true` if you want to follow the user's OS preference. Users can toggle themes using the navbar switch.
+
+### How do I set up Google Analytics?
+
+Set `analytics.enabled: true` and add your GA4 measurement ID (e.g. `'G-XXXXXXXXXX'`) in `config/site.ts`. The gtag script loads with Next.js `afterInteractive` strategy. No tracking code is loaded when disabled.
+
+### How do I enable documentation versioning?
+
+Set `versioning.enabled: true` in `config/site.ts`. Use `npm run version:snapshot <version>` to create a versioned snapshot of your docs. This copies the current `content/docs/` and `config/sidebar.ts` into versioned directories and updates `versions.json`.

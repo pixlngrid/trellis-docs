@@ -1,0 +1,43 @@
+---
+title: Migration
+description: Questions about migrating to Trellis from Docusaurus and other frameworks.
+last_update:
+  date: 04/02/2026
+  author: Trellis
+---
+
+### How do I migrate from Docusaurus?
+
+Run `node scripts/migrate-docusaurus.js <path-to-docusaurus-project>`. The script copies your content, converts the sidebar, transforms frontmatter, strips Docusaurus-specific imports, and converts MDX partial imports to `@include` directives. See the [Migrating from Docusaurus](/migrating-from-docusaurus/) guide for a full walkthrough.
+
+### What happens to my Docusaurus sidebar?
+
+The migration script reads your `sidebars.js` (or `.cjs`, `.json`, `.ts`) and converts it to {vars.productName}'s `config/sidebar.ts` format. It respects `sidebar_position` and `sidebar_label` from frontmatter and `_category_.json` files. If no sidebar file is found, it generates one from the filesystem structure.
+
+### Are my custom components migrated automatically?
+
+Yes, if they're in `src/components/`. The script copies them to `components/custom/migrated/`, renames `.jsx` → `.tsx` / `.js` → `.ts`, rewrites `@theme/*` and `@site/*` imports, and registers them in the MDX component map. Components with Trellis built-in equivalents (Tabs, CodeBlock, Admonition, etc.) are skipped.
+
+### What about Docusaurus theme overrides (swizzled components)?
+
+Swizzled components from `src/theme/` are intentionally skipped — {vars.productName} has its own built-in equivalents. Check the migration report for any theme components that were detected but not copied, and map them to the corresponding Trellis features.
+
+### Will my page URLs change after migration?
+
+Pages with custom `slug` frontmatter will have their URLs change, since {vars.productName} uses file-based routing. The migration report warns about any custom slugs that were stripped. Pages with numbered prefixes (e.g. `01-getting-started.md`) are renamed to remove the prefix, which also changes the URL. Add entries to `redirects.json` to preserve old URLs.
+
+### How are `require()` image paths handled?
+
+The migration script converts `require('@site/static/img/foo.png').default` to `'/img/foo.png'`. Other `require()` patterns that can't be auto-converted produce a warning. Rewrite these as static image paths or Next.js `<Image>` imports.
+
+### What happens to MDX partial imports?
+
+Docusaurus-style `import Foo from './_foo.mdx'` with `<Foo />` usage is converted to `@include ./_foo.mdx` directives. If a usage pattern can't be auto-converted, the migration report includes a warning with the file and component name.
+
+### Can I do a dry run before migrating?
+
+Yes. Run with the `--dry-run` flag: `node scripts/migrate-docusaurus.js <path> --dry-run`. This previews all file copies, renames, and sidebar changes without writing anything to disk.
+
+### What does `--force` do?
+
+By default, the migration script skips files that already exist in `content/docs/`. The `--force` flag overwrites existing files, which is useful if you want to re-run the migration after making changes to the source project.
