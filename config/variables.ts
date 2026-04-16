@@ -10,6 +10,6 @@
 export const docVariables: Record<string, string> = {
   productName: 'Trellis Docs',
   companyName: "Pixl'n Grid",
-  version: '1.2.0',
+  version: '1.12.0',
   frameworkName: 'Next.js',
 }
