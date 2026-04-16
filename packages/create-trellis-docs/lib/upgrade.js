@@ -40,13 +40,27 @@ const ALLOW_DIRS = [
   'scripts',
 ];
 
-// Files within allowed dirs that should never be overwritten (user-customized).
+// Files and path prefixes within allowed dirs that should never be
+// overwritten (user-customized or user-migrated). Entries that match an
+// exact relative path skip that single file; entries ending a directory
+// segment skip the entire subtree beneath it. Checked by `isSkipped()`.
 const SKIP_FILES = [
   'components/docs/mdx/index.tsx',
-  'components/custom',
+  'components/custom/migrated',   // user-migrated Docusaurus components
   'app/globals.css',
   'app/layout.tsx',
 ];
+
+// True if `rel` is explicitly listed in SKIP_FILES OR lives beneath a
+// directory listed there. Prefix matching uses a trailing `/` guard so
+// `components/custom/migrated` does NOT match `components/custom/migrate-helper.tsx`.
+function isSkipped(rel) {
+  for (const entry of SKIP_FILES) {
+    if (rel === entry) return true;
+    if (rel.startsWith(entry + '/')) return true;
+  }
+  return false;
+}
 
 // Individual files to sync.
 const ALLOW_FILES = [
@@ -85,15 +99,17 @@ async function walkDir(dir) {
 async function collectAllowedFiles() {
   const files = new Set();
 
-  // Allowed directories — walk each and include all non-.tpl files
+  // Allowed directories — walk each and include all non-.tpl files that
+  // aren't skipped. isSkipped() handles both exact paths and directory
+  // prefixes, so a SKIP entry like 'components/custom/migrated' excludes
+  // every file beneath it without blocking sibling files in the parent.
   for (const dir of ALLOW_DIRS) {
-    // Skip entire directories listed in SKIP_FILES
-    if (SKIP_FILES.includes(dir)) continue;
+    if (isSkipped(dir)) continue;
     const srcDir = path.join(TEMPLATE_DIR, dir);
     const dirFiles = await walkDir(srcDir);
     for (const absPath of dirFiles) {
       const rel = normalizePath(path.relative(TEMPLATE_DIR, absPath));
-      if (!rel.endsWith('.tpl') && !SKIP_FILES.includes(rel)) {
+      if (!rel.endsWith('.tpl') && !isSkipped(rel)) {
         files.add(rel);
       }
     }
@@ -102,7 +118,7 @@ async function collectAllowedFiles() {
   // Individual allowed files
   for (const file of ALLOW_FILES) {
     const srcPath = path.join(TEMPLATE_DIR, file);
-    if ((await fs.pathExists(srcPath)) && !file.endsWith('.tpl') && !SKIP_FILES.includes(file)) {
+    if ((await fs.pathExists(srcPath)) && !file.endsWith('.tpl') && !isSkipped(file)) {
       files.add(file);
     }
   }
@@ -134,15 +150,20 @@ async function diffFiles(allowedFiles, projectDir) {
   return stats;
 }
 
-/** Find project files in allowed dirs that no longer exist in the template. */
+/** Find project files in allowed dirs that no longer exist in the template.
+ * Skips paths under SKIP_FILES entries — the user's migrated/custom files
+ * wouldn't exist in the template by design, so flagging them as "stale"
+ * would produce a huge false-positive list. */
 async function findStaleFiles(projectDir) {
   const stale = [];
 
   for (const dir of ALLOW_DIRS) {
+    if (isSkipped(dir)) continue;
     const destDir = path.join(projectDir, dir);
     const projectFiles = await walkDir(destDir);
     for (const absPath of projectFiles) {
       const rel = normalizePath(path.relative(projectDir, absPath));
+      if (isSkipped(rel)) continue;
       const templatePath = path.join(TEMPLATE_DIR, rel);
       if (!(await fs.pathExists(templatePath))) {
         stale.push(rel);
@@ -151,6 +172,30 @@ async function findStaleFiles(projectDir) {
   }
 
   return stale.sort();
+}
+
+// Parse a semver range into a [major, minor, patch] tuple. Returns null for
+// tags (`latest`, `next`), git/http URLs, or anything we can't confidently
+// compare. When either side is null, the caller preserves the user's value
+// (don't risk downgrading over something we don't understand).
+function parseVersion(str) {
+  if (typeof str !== 'string') return null;
+  const m = str.trim().match(/^[\^~>=<]*\s*(\d+)\.(\d+)\.(\d+)/);
+  if (!m) return null;
+  return [Number(m[1]), Number(m[2]), Number(m[3])];
+}
+
+// Returns true if version `a` is >= version `b`. Returns null when either
+// is unparseable.
+function versionGte(a, b) {
+  const pa = parseVersion(a);
+  const pb = parseVersion(b);
+  if (!pa || !pb) return null;
+  for (let i = 0; i < 3; i++) {
+    if (pa[i] > pb[i]) return true;
+    if (pa[i] < pb[i]) return false;
+  }
+  return true; // equal
 }
 
 /** Merge dependencies and scripts from template package.json into the project. */
@@ -170,19 +215,36 @@ async function mergePackageJson(projectDir, dryRun) {
   const details = [];
   let changed = false;
 
-  // Merge dependencies
+  // Merge dependencies. Rule: never downgrade. If the user already has a
+  // version >= the template's, leave it alone. Only upgrade when the
+  // template is strictly newer, or when the user is missing the dep
+  // entirely. If either version is unparseable (tag, git URL, local path),
+  // preserve the user's value to avoid risky overwrites.
   if (tplPkg.dependencies) {
     if (!userPkg.dependencies) userPkg.dependencies = {};
-    for (const [dep, ver] of Object.entries(tplPkg.dependencies)) {
-      if (!userPkg.dependencies[dep]) {
-        details.push(`  ${c.green('+')} ${dep}@${ver}`);
-        userPkg.dependencies[dep] = ver;
+    for (const [dep, tplVer] of Object.entries(tplPkg.dependencies)) {
+      const userVer = userPkg.dependencies[dep];
+      if (!userVer) {
+        details.push(`  ${c.green('+')} ${dep}@${tplVer}`);
+        userPkg.dependencies[dep] = tplVer;
         changed = true;
-      } else if (userPkg.dependencies[dep] !== ver) {
-        details.push(`  ${c.cyan('↑')} ${dep}: ${userPkg.dependencies[dep]} → ${ver}`);
-        userPkg.dependencies[dep] = ver;
-        changed = true;
+        continue;
       }
+      if (userVer === tplVer) continue;
+
+      const userIsNewer = versionGte(userVer, tplVer);
+      if (userIsNewer === true) {
+        details.push(`  ${c.dim('=')} ${dep}: ${userVer} ${c.dim(`(kept — newer than template ${tplVer})`)}`);
+        continue;
+      }
+      if (userIsNewer === null) {
+        details.push(`  ${c.dim('=')} ${dep}: ${userVer} ${c.dim(`(kept — can't compare against template ${tplVer})`)}`);
+        continue;
+      }
+      // userIsNewer === false → template is newer, upgrade.
+      details.push(`  ${c.cyan('↑')} ${dep}: ${userVer} → ${tplVer}`);
+      userPkg.dependencies[dep] = tplVer;
+      changed = true;
     }
   }
 
