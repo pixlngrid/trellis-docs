@@ -9,13 +9,11 @@ import { siteConfig } from '@/config/site'
 import { navItems } from '@/config/navigation'
 import { cn } from '@/lib/utils'
 import { SearchDialog } from '@/components/docs/search/search-dialog'
-import { PlaceholderIcon } from '@/components/brand/placeholder-logo'
-import { resolveSidebar, type ResolvedSidebarItem } from '@/lib/sidebar'
+import { TrellisIcon } from '@/components/brand/trellis-logo'
+import { resolveSidebar, getSidebarForPathname, type ResolvedSidebarItem } from '@/lib/sidebar'
 import { useDocContext } from '@/lib/doc-context'
 import { VersionSwitcher } from '@/components/docs/version-switcher'
 import { LocaleSwitcher } from '@/components/docs/locale-switcher'
-
-const defaultSidebarItems = resolveSidebar()
 
 function MobileSidebarItems({ items, onNavigate, depth = 0 }: { items: ResolvedSidebarItem[]; onNavigate: () => void; depth?: number }) {
   const pathname = usePathname()
@@ -108,10 +106,10 @@ export function Navbar() {
   const pathname = usePathname()
   const { urlPrefix } = useDocContext()
 
-  // Use context-aware sidebar when locale/version prefix is active
-  const sidebarItems = urlPrefix
-    ? resolveSidebar(undefined, urlPrefix)
-    : defaultSidebarItems
+  // Multi-sidebar resolution: pick the sidebar whose name matches the current
+  // page's `displayed_sidebar` frontmatter. Falls back to mainSidebar.
+  const items = getSidebarForPathname(pathname, urlPrefix)
+  const sidebarItems = resolveSidebar(undefined, urlPrefix, items)
 
   return (
     <>
@@ -132,7 +130,7 @@ export function Navbar() {
           {/* Logo + title */}
           <Link href="/" className="flex items-center gap-2 mr-6 text-[var(--foreground)] no-underline">
             {siteConfig.logo.useBuiltIn ? (
-              <PlaceholderIcon size={32} />
+              <TrellisIcon size={32} />
             ) : siteConfig.logo.navbar ? (
               <img
                 src={siteConfig.logo.navbar}

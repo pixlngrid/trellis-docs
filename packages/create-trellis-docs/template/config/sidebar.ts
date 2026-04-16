@@ -24,3 +24,10 @@ export const mainSidebar: SidebarItem[] = [
     ],
   },
 ]
+
+
+// ── Sidebar registry (for multi-sidebar support) ─────────────────
+// See docs: https://pixlngrid.github.io/trellis-docs/guides/docs/#multiple-sidebars
+export const sidebars: Record<string, SidebarItem[]> = {
+  main: mainSidebar,
+}

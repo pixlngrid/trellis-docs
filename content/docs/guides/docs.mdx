@@ -396,6 +396,71 @@ The CSV includes one row per page in sidebar order, with the following columns:
 
 The export reflects the sidebar order, not alphabetical order, so the CSV rows match the reading sequence a user would follow through the docs.
 
+## Multiple sidebars
+
+By default every page uses the `mainSidebar` export from `config/sidebar.ts`. You can define additional sidebars and tell specific pages to use them via `displayed_sidebar` frontmatter — the same pattern Docusaurus uses.
+
+### Define named sidebars
+
+Export additional `SidebarItem[]` arrays and register them in a `sidebars` object at the bottom of `config/sidebar.ts`:
+
+```ts title="config/sidebar.ts"
+export const mainSidebar: SidebarItem[] = [
+  // ...
+]
+
+export const contributingGuideSidebar: SidebarItem[] = [
+  {
+    type: 'category',
+    label: 'Contributing',
+    collapsed: false,
+    items: [
+      { type: 'doc', id: 'contributing/getting-started' },
+      { type: 'doc', id: 'contributing/pull-requests' },
+      // ...
+    ],
+  },
+]
+
+export const sidebars: Record<string, SidebarItem[]> = {
+  main: mainSidebar,
+  contributingGuide: contributingGuideSidebar,
+}
+```
+
+The keys in `sidebars` are the names you'll reference in frontmatter. The `main` key is the default fallback — pages without a `displayed_sidebar` frontmatter always render `main`.
+
+### Assign pages to a sidebar
+
+Add `displayed_sidebar` to any page's frontmatter:
+
+```md title="content/docs/contributing/getting-started.mdx"
+---
+title: Getting Started
+displayed_sidebar: contributingGuide
+---
+
+...
+```
+
+When a visitor navigates to that page, the navbar and side navigation render the `contributingGuide` sidebar instead of `main`. Every subsequent click within the same sidebar tree stays on that sidebar; navigating to a page without (or with a different) `displayed_sidebar` switches back.
+
+### Listing the same page in multiple sidebars
+
+A page can appear in multiple sidebar trees — just include its doc id in each sidebar's `items` array. The `displayed_sidebar` frontmatter on the page itself decides which sidebar renders when the page is the current one, but the page remains a valid navigation target from any sidebar that lists it.
+
+This is useful for cross-cutting topics (contributor guides, FAQs, glossary pages) that belong in several navigational contexts.
+
+### How it works
+
+At build time, `scripts/build-sidebar-map.js` walks `content/docs/`, reads each file's `displayed_sidebar` frontmatter, and writes `lib/sidebar-map.generated.ts` — a slug → sidebar-name lookup. At render time, the sidebar and navbar components consult this map via `usePathname()` and pick the right sidebar from the registry.
+
+The script runs automatically as part of `npm run dev` and `npm run build`, or you can invoke it directly with `npm run build-sidebar-map`. Pages without `displayed_sidebar` are simply absent from the map and fall back to `main`.
+
+:::note
+Sidebar selection is purely frontmatter-driven — there's no path-based override. A page at `/contributing/getting-started` will render `main` unless its frontmatter says otherwise. This is intentional: URL structure shouldn't constrain navigation structure.
+:::
+
 ## Landing page
 
 By default, the root URL (`/`) renders a landing page with a hero section and feature cards. This is defined in `app/page.tsx`.

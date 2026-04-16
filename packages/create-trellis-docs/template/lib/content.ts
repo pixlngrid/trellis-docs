@@ -41,6 +41,11 @@ export interface DocMeta {
   role?: string[]
   draft?: boolean
   slug: string
+  // Optional sidebar registry key. Must match a key in
+  // config/sidebar.ts `sidebars` export. Read at build time by
+  // scripts/build-sidebar-map.js to populate the slug → sidebar-name
+  // lookup consumed by getSidebarForPathname.
+  displayed_sidebar?: string
 }
 
 export interface DocEntry {

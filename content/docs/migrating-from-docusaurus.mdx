@@ -1,9 +1,9 @@
 ---
 title: Migrating from Docusaurus
 description: Move your docs, sidebar, and assets from a Docusaurus project to Trellis with the automated migration script.
-keywords: [migration, docusaurus, import, convert, sidebar]
+keywords: [migration, docusaurus, import, convert, sidebar, fixer scripts, infima, useColorMode, css modules, peer dependencies]
 last_update:
-  date: 04/15/2026
+  date: 04/16/2026
   author: Trellis
 ---
 
@@ -54,6 +54,18 @@ Before touching any files, the script walks the Docusaurus project's `src/compon
 `src/theme/` (Docusaurus swizzle overrides) is intentionally excluded — Trellis has its own built-in equivalents for Navbar, Footer, and other swizzleable components, so those overrides don't need to be ported.
 
 The script distinguishes between TypeScript (`.ts`/`.tsx`) and JavaScript (`.js`/`.jsx`) source files because they require different porting steps — see [Custom components](#2-port-custom-components) below.
+
+### Phase 0.5: Runtime dependency scan
+
+Once components are discovered, the script extracts every bare-package `import` specifier from their source files (e.g., `@mui/material`, `react-bootstrap`, `clsx`) and diffs against the target project's `package.json`. It also reads each found package's own `peerDependencies` from the Docusaurus `node_modules/` to surface hidden requirements — for example, `@mui/material` declares `@emotion/react` and `@emotion/styled` as peer deps that your code never imports directly but that the build will fail without.
+
+The report lists three buckets:
+
+- **Already installed** — packages Trellis already has (e.g., `clsx`, `react`)
+- **Missing — direct imports** — packages your migrated components reference by name
+- **Missing — peer dependencies** — packages pulled in transitively through a direct import
+
+At the end of Phase 0.5, the script prints a copy-paste `npm install` command listing every missing package, so you can install them in one shot before `npm run build`.
 
 ### Phase 1: Content files
 
@@ -140,13 +152,17 @@ If a `config/sidebar.ts` already exists, the script backs it up to `config/sideb
 For every custom component detected in Phase 0 that is actually used in your migrated content, the script:
 
 1. **Checks for Trellis built-in equivalents** — `Tabs`, `TabItem`, `Admonition`, `CodeBlock`, `Details`, `TOCInline`, and `DocCardList` are skipped since Trellis provides them natively
-2. **Copies the source files** to `components/custom/migrated/` — component directories are copied recursively, single files are copied directly
-3. **Renames JS to TS** — `.jsx` → `.tsx` and `.js` → `.ts` (Trellis enforces strict TypeScript)
-4. **Rewrites Docusaurus imports** in the copied source:
+2. **Resolves transitive dependencies** — components imported by a used component (but not referenced in MDX themselves) are pulled in as `[transitive]` so the import graph closes. Only MDX-used components are registered globally; transitive deps stay internal.
+3. **Copies the source files** to `components/custom/migrated/` — component directories are copied recursively, single files are copied directly
+4. **Renames JS to TS** — `.jsx` → `.tsx` and `.js` → `.ts` (Trellis enforces strict TypeScript)
+5. **Rewrites Docusaurus imports** in the copied source:
    - `@theme/*` imports are commented out (use Trellis built-ins instead)
    - `@site/src/components/*` imports are rewritten to relative paths
-   - Other `@site/*` imports are commented out with a TODO marker
-5. **Registers components in the MDX component map** — adds imports and entries to `components/docs/mdx/index.tsx` so the components are available globally in all MDX pages without per-file imports
+   - `@site/src/data/*.json` imports are rewritten to `@/data/migrated/*.json`, and the referenced JSON files are copied to `data/migrated/`
+   - `useColorMode` from `@docusaurus/theme-common` is automatically remapped to `useTheme` from `next-themes`; destructuring patterns are aliased (`{ resolvedTheme: colorMode, setTheme: setColorMode }`) so `colorMode === 'dark'` style checks keep working without code edits
+   - Other `@site/*` / `@docusaurus/*` imports are commented out with a TODO marker
+6. **Auto-types JS components** for strict TypeScript — adds prop interfaces from destructuring patterns, types `useState(null)`-style inference gaps, types event-handler params, adds `'use client'` when hooks/browser APIs are detected, and annotates untyped arrow-function params as `: any`
+7. **Registers components in the MDX component map** — reads each copied file's exports to determine named-vs-default import syntax, then adds the right line to `components/docs/mdx/index.tsx`
 
 :::note
 CSS modules (`.module.css`) are copied as-is — Next.js supports CSS modules natively with the same import pattern as Docusaurus.
@@ -290,46 +306,159 @@ Fix any MDX compilation errors. Common issues:
 | Type error: comparison has no overlap | The `SidebarItem` type in `config/sidebar.ts` is missing the `link` or `api` variants — add them (see [Sidebar type](#phase-2-sidebar-conversion)) |
 | Expression expected | Bare `<` or `>` characters in text — wrap in backticks or escape as `&lt;` / `&gt;` |
 
-### 4. Convert `<img>` JSX tags
+### 4. Run the fixer scripts
 
-Docusaurus commonly uses the `require()` pattern to reference colocated images inside MDX:
+{vars.productName} ships a set of targeted fixers for patterns the main migration script can't automate cleanly — things that depend on the target project state, or that are better handled post-migration because the errors only surface at build time. Each one defaults to dry-run mode; pass `--write` to apply changes.
 
-```jsx
-<img
-  id="uielement4"
-  src={require('./images/entity-validation.png').default}
-  alt="Entity Validation"
-/>
-```
+| Script | What it fixes | When to run |
+|--------|---------------|-------------|
+| [`convert-img-tags.js`](#convert-img-tags) | Rewrites `<img src={require('./foo.png').default}>` JSX tags to markdown `![alt](./foo.png)` syntax | Docusaurus MDX commonly imports images via `require()`, which MDX in Trellis rejects |
+| [`fix-use-client.js`](#fix-use-client) | Adds missing `'use client'` directives to components that use hooks or browser APIs; moves misplaced ones to the top of the file | Errors like `useState is not defined` at runtime, or `The 'use client' directive must be placed before other expressions` at build |
+| [`fix-jsx-extension.js`](#fix-jsx-extension) | Renames `.ts` files that contain JSX to `.tsx` | `Parsing ecmascript source code failed` / `Expected '>', got 'ident'` errors |
+| [`fix-rest-props.js`](#fix-rest-props) | Replaces invalid `...rest: Record<string, any>` in generated interfaces with an index signature | `Expected ident` TypeScript parse errors in generated prop interfaces |
+| [`fix-css-modules.js`](#fix-css-modules) | Wraps bare-element selectors in `:global()` so `.module.css` files pass Next.js's pure-selector rule | `Selector "h3" is not pure. Pure selectors must contain at least one local class or id` |
+| [`fix-css-imports.js`](#fix-css-imports) | Comments out `@import` statements pointing at Docusaurus token / custom / variables stylesheets | `Can't resolve '../../css/tokens.css'` |
+| [`fix-docs-imports.js`](#fix-docs-imports) | Rewrites relative imports pointing at the old Docusaurus `docs/` tree (e.g., `'../../docs/images/foo.svg'`) to Trellis `@/content/docs/` alias paths | `Module not found` for paths that traverse into a removed `docs/` sibling |
+| [`fix-data-imports.js`](#fix-data-imports) | Restores `@site/src/data/*` JSON imports the migration commented out, and copies the data files to `data/migrated/` | `ReferenceError: infrastructureData is not defined` at runtime |
+| [`fix-theme-hooks.js`](#fix-theme-hooks) | Converts remaining Docusaurus `useColorMode()` calls to `next-themes` `useTheme()` (usually handled by the main migration, but covers edge cases it missed) | `useColorMode is not defined` at runtime |
+| [`fix-mdx-imports.js`](#fix-mdx-imports) | Reads each migrated component's actual export style and rewrites `components/docs/mdx/index.tsx` to use named or default import accordingly | `Export X doesn't exist in target module. Did you mean to import default?` |
+| [`fix-infima.js`](#fix-infima) | Converts Docusaurus Infima CSS classes (`container-fluid`, `row`, `col col--6`, `card__header`, `margin-top--sm`, `text--muted`, etc.) to Tailwind / shadcn equivalents | Your content uses Infima markup for grids, cards, or spacing and the layout breaks |
+| [`fix-untyped-params.js`](#fix-untyped-params) | Adds `: any` to untyped arrow-function parameters (useCallback, useMemo, array methods, helpers) | `Parameter 'x' implicitly has an 'any' type` during `npm run build` type checking |
 
-MDX in {vars.productName} does not allow `require()` calls for security reasons. Run the bundled helper to rewrite every `<img>` tag in a file to standard markdown image syntax:
+Each script supports the same flags:
+
+| Flag | Description |
+|------|-------------|
+| `--dry-run` | Preview changes (default when `--write` is omitted) |
+| `--write` | Apply changes in place |
+
+Run order matters a little: apply build-blocking fixes first (`fix-jsx-extension`, `fix-use-client`, `fix-rest-props`), then content/layout fixes (`fix-css-modules`, `fix-css-imports`, `fix-docs-imports`, `fix-data-imports`, `fix-mdx-imports`, `fix-infima`), then strict-mode fixes (`fix-untyped-params`, `fix-theme-hooks`). The `convert-img-tags` script runs against MDX in `content/docs/` and can be run at any point.
+
+{/* The detailed sections below give usage notes for each fixer. */}
+
+#### convert-img-tags
 
 ```bash
 node scripts/convert-img-tags.js content/docs/my-page.mdx --write
 ```
 
-The above example is rewritten to:
-
-```md
-![Entity Validation](./images/entity-validation.png)
-```
-
-| Flag | Description |
-|------|-------------|
-| `--write` | Modify files in place (required — the default is dry-run) |
-| `--dry-run` | Preview changes without modifying files (default if `--write` is omitted) |
-
-The converter handles:
-
-- Multi-line `<img>` tags (self-closing or paired `<img></img>`)
-- `src` as a `require('...').default` expression or a plain string literal
-- `width` / `height` attributes → Trellis title syntax (`![alt](src "width=200px")`)
-
-It drops unsupported JSX attributes (`id`, `className`, `style`). Tags the script can't parse are left untouched and a warning is printed so you can fix them by hand.
+Handles multi-line `<img>` tags (self-closing or paired), `src={require('...').default}` expressions, and `width`/`height` attributes (mapped to the Trellis title syntax, e.g. `![alt](src "width=200px")`). Drops unsupported JSX attributes (`id`, `className`, `style`). Tags the script can't parse are left untouched with a warning.
 
 :::note
 Shell globbing (`"content/**/*.mdx"`) may not expand on Windows — pass explicit file paths or wrap the call in a shell loop when converting many files at once.
 :::
+
+#### fix-use-client
+
+```bash
+node scripts/fix-use-client.js --write
+```
+
+Scans `components/custom/migrated/` for `.tsx`/`.ts` files. Adds `'use client'` at the top (after any leading JSDoc) to files that call hooks (`useState`, `useEffect`, `useCallback`, `useMediaQuery`, or any `useXxx(`), or that access `window.`/`document.`/`navigator.`/`localStorage.`/`sessionStorage.`. Moves misplaced directives (ones the old migration inserted after imports) to the correct position. Files that don't use client features are left alone.
+
+#### fix-jsx-extension
+
+```bash
+node scripts/fix-jsx-extension.js --write
+```
+
+Walks `components/custom/migrated/` and renames any `.ts` file whose contents actually contain JSX to `.tsx`. Uses a robust detector that recognizes closing tags (`</div>`), PascalCase component usage (`<Button>`), and arrow-body JSX (`=> <`). No import updates needed — Next.js resolves extensionless imports against both `.ts` and `.tsx` via `tsconfig`.
+
+#### fix-rest-props
+
+```bash
+node scripts/fix-rest-props.js --write
+```
+
+Replaces invalid `...props: Record<string, any>;` lines inside generated TypeScript interfaces with `[key: string]: any;` (the correct TS syntax for arbitrary extra keys).
+
+#### fix-css-modules
+
+```bash
+node scripts/fix-css-modules.js --write
+```
+
+Processes `.module.css` files. Wraps top-level bare-element selectors (`h3`, `h3, h4`, `ul li`, etc.) in `:global(...)` so they pass Next.js's purity rule. Leaves alone: selectors that already contain `.`, `#`, `:global`, or `&`, and rules inside `@keyframes` blocks. Walks into `@media` and `@supports` blocks correctly.
+
+:::note
+`:global()` preserves the Docusaurus behavior of styles leaking into the global stylesheet. For long-term correctness, refactor each wrapped rule to nest under a containing class — the fixer prints a reminder after every run.
+:::
+
+#### fix-css-imports
+
+```bash
+node scripts/fix-css-imports.js --write
+```
+
+Comments out `@import` statements targeting Docusaurus token files (`tokens.css`, `custom.css`, `variables.css`) or any `@site/`/`~/` alias path. Trellis loads design tokens globally via `app/tokens.css`, so per-component imports are unnecessary. Leaves a migration note so you can port any `var(--ifm-*)` references manually.
+
+#### fix-docs-imports
+
+```bash
+node scripts/fix-docs-imports.js --write
+```
+
+Finds imports like `import Circle1 from '../../../docs/contributor-guide/images/1-circle.svg'` and rewrites them to `'@/content/docs/contributor-guide/images/1-circle.svg'` after verifying the target file exists. Also detects `@site/docs/*` alias imports. Flags SVG-as-component usage (`<Circle1 />`) since Next.js's default config returns a URL string — you'll need SVGR or a refactor to `<img src={Circle1} />` for those to render correctly.
+
+#### fix-data-imports
+
+```bash
+node scripts/fix-data-imports.js ../path/to/docusaurus-project --write
+```
+
+Takes the Docusaurus project path as its first argument. Handles both commented-out (migration TODO) and live `@site/src/data/*.json` imports. Copies each referenced JSON file to `data/migrated/` in the Trellis project and rewrites the import path to `@/data/migrated/<name>.json`.
+
+#### fix-theme-hooks
+
+```bash
+node scripts/fix-theme-hooks.js --write
+```
+
+Remaps Docusaurus's `useColorMode()` (from `@docusaurus/theme-common`) to `next-themes`' `useTheme()`. Four destructuring shapes are handled automatically with alias preservation:
+
+| Before | After |
+|--------|-------|
+| `{ colorMode } = useColorMode()` | `{ resolvedTheme: colorMode } = useTheme()` |
+| `{ setColorMode } = useColorMode()` | `{ setTheme: setColorMode } = useTheme()` |
+| `{ colorMode, setColorMode } = useColorMode()` | `{ resolvedTheme: colorMode, setTheme: setColorMode } = useTheme()` |
+
+Adds the `import { useTheme } from 'next-themes'` line if not already present. `next-themes` is already a {vars.productName} runtime dependency — no install needed.
+
+#### fix-mdx-imports
+
+```bash
+node scripts/fix-mdx-imports.js --write
+```
+
+Reads `components/docs/mdx/index.tsx` and, for each `import { X } from '@/components/custom/migrated/...'` line, looks at how the target file actually exports `X`. If the target uses `export default` and no named export matches, the import is rewritten to `import X from ...`. Files that use named exports (or both) are left alone.
+
+#### fix-infima
+
+```bash
+node scripts/fix-infima.js --write                 # MDX in content/docs/
+node scripts/fix-infima.js --write --also-jsx      # also scan migrated JSX components
+```
+
+Rewrites Docusaurus Infima CSS classes to Tailwind equivalents across ~50 tokens:
+
+| Category | Infima | Tailwind |
+|----------|--------|----------|
+| Grid | `container-fluid` / `row` / `col col--6` | `w-full px-4` / `grid grid-cols-12 gap-4` / `col-span-12 md:col-span-6` |
+| Cards | `card` / `card__header` / `card__body` | shadcn-style rounded-border divs |
+| Spacing | `margin-top--sm` / `padding-horiz--lg` | `mt-2` / `px-6` |
+| Text | `text--center` / `text--muted` / `text--danger` | `text-center` / `text-muted-foreground` / `text-red-600 dark:text-red-400` |
+| Buttons | `button--primary` / `button--lg` | shadcn-flavored utility strings |
+| Badges | `badge--warning` | Rounded-pill Tailwind |
+
+Unknown tokens (project-specific classes like `.before`, `.no-pointer`) are preserved as-is — you'll still need to write CSS for them, but layout won't break. The fixer reports any unmapped Infima-looking tokens at the end so you can audit them.
+
+#### fix-untyped-params
+
+```bash
+node scripts/fix-untyped-params.js --write
+```
+
+Adds `: any` to every untyped arrow-function parameter in migrated components. Handles defaults (`x = 0` → `x: any = 0`), rest params (`...args` → `...args: any[]`), and destructured params (`{ a, b }` → `{ a, b }: any`). Already-typed params are left alone. Safe unblocker for strict mode — once the code compiles, tighten types manually where it matters.
 
 ### 5. Update site configuration
 

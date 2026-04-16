@@ -1,13 +1,14 @@
 {
   "name": "create-trellis-docs",
-  "version": "1.11.1",
+  "version": "1.12.0",
   "license": "MIT",
   "scripts": {
-    "dev": "node scripts/build-tokens.js && cross-env NODE_ENV=development next dev",
-    "build": "node scripts/build-tokens.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && node scripts/build-api-index.js && node scripts/build-sitemap.js && next build && node scripts/check-links.js",
+    "dev": "node scripts/build-tokens.js && node scripts/build-sidebar-map.js && cross-env NODE_ENV=development next dev",
+    "build": "node scripts/build-tokens.js && node scripts/build-sidebar-map.js && node scripts/build-search-index.js && node scripts/build-faq-index.js && node scripts/build-api-index.js && node scripts/build-sitemap.js && next build && node scripts/check-links.js",
     "start": "next start",
     "lint": "next lint",
     "build-tokens": "node scripts/build-tokens.js",
+    "build-sidebar-map": "node scripts/build-sidebar-map.js",
     "version:snapshot": "node scripts/version-snapshot.js",
     "export:sidebar": "node scripts/export-sidebar.js",
     "setup:feedback-api": "node scripts/setup-feedback-api.js",

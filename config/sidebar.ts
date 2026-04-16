@@ -90,3 +90,17 @@ export const mainSidebar: SidebarItem[] = [
     ],
   },
 ]
+
+
+// ── Sidebar registry (for multi-sidebar support) ─────────────────
+// Add named sidebars here, then reference them in a page's frontmatter:
+//   ---
+//   displayed_sidebar: contributingToAlchemy
+//   ---
+// Pages without a displayed_sidebar fall back to the `main` entry.
+// Example:
+//   export const contributingToAlchemySidebar: SidebarItem[] = [...]
+//   export const sidebars = { main: mainSidebar, contributingToAlchemy: contributingToAlchemySidebar }
+export const sidebars: Record<string, SidebarItem[]> = {
+  main: mainSidebar,
+}

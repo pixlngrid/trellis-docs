@@ -1,6 +1,37 @@
 import { mainSidebar, type SidebarItem } from '@/config/sidebar'
+import * as sidebarConfig from '@/config/sidebar'
+import { sidebarAssignments } from '@/lib/sidebar-map.generated'
 
 export type { SidebarItem }
+
+// Look up a named sidebar from the registry in config/sidebar.ts. If a
+// `sidebars` object is exported, we use it. Otherwise we fall back to the
+// flat named exports (back-compat with pre-multi-sidebar configs). Unknown
+// names resolve to mainSidebar so rendering never fails.
+export function getSidebarByName(name?: string): SidebarItem[] {
+  if (!name || name === 'main') return mainSidebar;
+  const registry = (sidebarConfig as Record<string, unknown>).sidebars as
+    | Record<string, SidebarItem[]>
+    | undefined;
+  if (registry && registry[name]) return registry[name];
+  // Back-compat: allow `<camelCase>Sidebar` named exports.
+  const legacyKey = `${name}Sidebar` as keyof typeof sidebarConfig;
+  const legacy = sidebarConfig[legacyKey] as SidebarItem[] | undefined;
+  if (Array.isArray(legacy)) return legacy;
+  return mainSidebar;
+}
+
+// Given a URL pathname (e.g. '/contributing-to-alchemy/getting-started/'),
+// find the right sidebar by consulting the build-time frontmatter map.
+// Pathnames without an assignment fall back to 'main'.
+export function getSidebarForPathname(pathname: string, urlPrefix = ''): SidebarItem[] {
+  const stripped = pathname
+    .replace(new RegExp(`^${urlPrefix}`), '')
+    .replace(/^\/+/, '')
+    .replace(/\/+$/, '');
+  const name = sidebarAssignments[stripped] || sidebarAssignments[`${stripped}/index`] || 'main';
+  return getSidebarByName(name);
+}
 
 export interface ResolvedSidebarItem {
   type: 'doc' | 'category' | 'html'

@@ -1160,6 +1160,9 @@ function copySingleComponent(srcPath, destPath, force) {
   // Always ensure 'use client' — TypeScript components using hooks need it too,
   // and addTypeAnnotations only runs for JS sources.
   content = ensureUseClientDirective(content);
+  // TypeScript sources skip addTypeAnnotations but still need strict-mode
+  // fixes for untyped arrow-function params; apply to everything.
+  content = addMissingParamTypes(content);
   // Fix extension if content has JSX but dest is .ts (not .tsx)
   if (destPath.endsWith('.ts') && !destPath.endsWith('.tsx') && containsJsx(content)) {
     destPath = destPath.replace(/\.ts$/, '.tsx');
@@ -1190,6 +1193,7 @@ function copyComponentDir(srcDir, destDir, force) {
       // TypeScript sources skip addTypeAnnotations, but still need 'use client'
       // when they use hooks. Run the directive injector on every script file.
       if (isScript) content = ensureUseClientDirective(content);
+      if (isScript) content = addMissingParamTypes(content);
       // Fix extension if content has JSX but dest is .ts (not .tsx)
       if (destPath.endsWith('.ts') && !destPath.endsWith('.tsx') && containsJsx(content)) {
         destPath = destPath.replace(/\.ts$/, '.tsx');
@@ -1397,7 +1401,78 @@ function addTypeAnnotations(content) {
   // ── 5. Add 'use client' if the component uses hooks or browser APIs ──
   content = ensureUseClientDirective(content);
 
+  // ── 6. Type untyped arrow-function parameters as `: any` ──────
+  // Strict TS mode rejects implicit any. Callback-style params (useCallback,
+  // useMemo, array methods, inline handlers) slip past the component-level
+  // inference above, so we type them conservatively as any.
+  content = addMissingParamTypes(content);
+
   return content;
+}
+
+// Add `: any` annotations to parameters of arrow functions that don't have
+// them. Deliberately conservative — `: any` unblocks the strict-mode build
+// without changing behavior; callers can tighten types manually later.
+//
+// Also called from copySingleComponent/copyComponentDir for TypeScript
+// sources that skip addTypeAnnotations.
+function addMissingParamTypes(content) {
+  const splitParams = (str) => {
+    const out = [];
+    let current = '';
+    let depth = 0;
+    for (const ch of str) {
+      if (ch === '(' || ch === '[' || ch === '{' || ch === '<') depth++;
+      else if (ch === ')' || ch === ']' || ch === '}' || ch === '>') depth--;
+      if (ch === ',' && depth === 0) { out.push(current); current = ''; }
+      else current += ch;
+    }
+    if (current.length > 0) out.push(current);
+    return out;
+  };
+
+  const typeParam = (param) => {
+    const trimmed = param.trim();
+    if (!trimmed) return param;
+    if (/:\s*[^,=]/.test(trimmed)) return param;
+
+    const leading = param.match(/^\s*/)[0];
+    const trailing = param.match(/\s*$/)[0];
+    const body = param.slice(leading.length, param.length - trailing.length);
+
+    if (body.startsWith('...')) return `${leading}${body}: any[]${trailing}`;
+
+    // Default value: split on first `=` at depth 0.
+    let depth = 0;
+    let eqIdx = -1;
+    for (let i = 0; i < body.length; i++) {
+      const ch = body[i];
+      if (ch === '(' || ch === '[' || ch === '{' || ch === '<') depth++;
+      else if (ch === ')' || ch === ']' || ch === '}' || ch === '>') depth--;
+      else if (ch === '=' && depth === 0 && body[i + 1] !== '=' && body[i - 1] !== '=') {
+        eqIdx = i;
+        break;
+      }
+    }
+    if (eqIdx !== -1) {
+      const name = body.slice(0, eqIdx).trimEnd();
+      const rest = body.slice(eqIdx);
+      return `${leading}${name}: any ${rest.trimStart()}${trailing}`;
+    }
+    return `${leading}${body}: any${trailing}`;
+  };
+
+  return content.replace(/\(([^()]*)\)\s*=>/g, (match, params) => {
+    if (!params.trim()) return match;
+    const parts = splitParams(params);
+    const anyUntyped = parts.some((p) => {
+      const t = p.trim();
+      return t.length > 0 && !/:\s*[^,=]/.test(t);
+    });
+    if (!anyUntyped) return match;
+    const rebuilt = parts.map(typeParam).join(',');
+    return rebuilt === params ? match : `(${rebuilt}) =>`;
+  });
 }
 
 // Insert `'use client';` at the top of a component file when it uses React

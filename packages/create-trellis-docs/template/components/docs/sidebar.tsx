@@ -5,10 +5,8 @@ import { usePathname } from 'next/navigation'
 import { useState, useCallback, useEffect, createContext, useContext } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { resolveSidebar, type ResolvedSidebarItem } from '@/lib/sidebar'
+import { resolveSidebar, getSidebarForPathname, type ResolvedSidebarItem } from '@/lib/sidebar'
 import { useDocContext } from '@/lib/doc-context'
-
-const defaultSidebarItems = resolveSidebar()
 
 // Accordion context — only one top-level category open at a time
 const AccordionContext = createContext<{
@@ -142,9 +140,11 @@ function findActiveCategory(
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { urlPrefix } = useDocContext()
   const pathname = usePathname()
-  const sidebarItems = urlPrefix
-    ? resolveSidebar(undefined, urlPrefix)
-    : defaultSidebarItems
+  // Multi-sidebar resolution: pick the sidebar whose name matches the current
+  // page's `displayed_sidebar` frontmatter (baked in at build time). Falls
+  // back to mainSidebar for pages that don't specify one.
+  const items = getSidebarForPathname(pathname, urlPrefix)
+  const sidebarItems = resolveSidebar(undefined, urlPrefix, items)
 
   const activeCategory = findActiveCategory(sidebarItems, pathname)
   const [openId, setOpenId] = useState<string | null>(activeCategory)
