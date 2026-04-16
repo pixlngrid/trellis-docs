@@ -8,19 +8,12 @@ export const siteConfig = {
   baseUrl: '/',
   favicon: '/img/favicon.svg',
 
-  // Logo configuration
-  // To use your own logo, replace these paths with your image files in public/img/
-  // or set to null and provide a custom component via logo.component
+  // Logo configuration. Replace these with your own brand assets in
+  // public/img/. Set a field to null to hide that logo.
   logo: {
-    // Navbar icon (small, ~32px). Path relative to public/, or null to hide.
-    navbar: '/img/trellis-navbar-logo.svg',
-    // Landing page hero logo. Path relative to public/, or null to hide.
-    hero: '/img/trellis-hero-logo.svg',
-    // Alt text for accessibility
+    navbar: '/img/trellis-icon.svg',       // small icon next to the title
+    hero: '/img/trellis-stacked.svg',      // landing-page hero image (optional)
     alt: 'Trellis Logo',
-    // Set to true to use the built-in Trellis SVG components instead of image files.
-    // When true, the image paths above are ignored.
-    useBuiltIn: true,
   },
   organizationName: 'Pixl\'n Grid Studios',
   projectName: 'trellis-docs',

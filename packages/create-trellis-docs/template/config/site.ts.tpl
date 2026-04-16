@@ -9,11 +9,12 @@ export const siteConfig = {
   projectName: '{{projectSlug}}',
   repoUrl: '{{repoUrl}}',
   editBaseUrl: '{{repoUrl}}/edit/main',
+  // Logo configuration. Replace these with your own brand assets in
+  // public/img/. Set a field to null to hide that logo.
   logo: {
-    navbar: '/img/favicon.svg',
-    hero: null,
+    navbar: '/img/placeholder-logo.svg',  // small icon next to the title
+    hero: null,                            // landing-page hero image (optional)
     alt: '{{projectName}} Logo',
-    useBuiltIn: true,
   },
   lastUpdated: {
     showAuthor: false,

@@ -72,6 +72,17 @@ const ALLOW_FILES = [
   'tsconfig.json',
 ];
 
+// Paths the framework used to ship but no longer does. Surfaced during the
+// upgrade preview so the user knows what's safe to delete after upgrading.
+// Files only — directories are matched as prefixes (everything beneath the
+// path becomes flagged).
+const REMOVED_PATHS = [
+  // Removed in v1.13: branding moved to data-driven config (logo.navbar /
+  // logo.hero in site.ts point at images in public/img/). The components/brand/
+  // directory and `useBuiltIn` flag are no longer used.
+  'components/brand',
+];
+
 // ── Helpers ──────────────────────────────────────────────────────
 
 /** Normalize path separators to forward slashes. */
@@ -172,6 +183,22 @@ async function findStaleFiles(projectDir) {
   }
 
   return stale.sort();
+}
+
+/** Find any REMOVED_PATHS entry that still exists in the user's project.
+ * Each entry is a single file or a directory prefix. Returns relative paths
+ * (file or directory) so the upgrade preview can list them and the user
+ * knows what to delete. */
+async function findRemovedPaths(projectDir) {
+  const found = [];
+  for (const entry of REMOVED_PATHS) {
+    const abs = path.join(projectDir, entry);
+    if (await fs.pathExists(abs)) {
+      const stat = await fs.stat(abs);
+      found.push(stat.isDirectory() ? `${entry}/` : entry);
+    }
+  }
+  return found.sort();
 }
 
 // Parse a semver range into a [major, minor, patch] tuple. Returns null for
@@ -312,8 +339,11 @@ async function upgrade(options = {}) {
   // 3. Compare template vs project
   const stats = await diffFiles(allowedFiles, projectDir);
 
-  // 4. Find stale files
+  // 4. Find stale files (in template-managed dirs but no longer in template)
+  //    and removed paths (explicitly dropped by the framework — e.g., the old
+  //    components/brand/ directory).
   const staleFiles = await findStaleFiles(projectDir);
+  const removedPaths = await findRemovedPaths(projectDir);
 
   // 5. Merge package.json (preview only in dry run)
   const pkgResult = await mergePackageJson(projectDir, true); // always preview first
@@ -337,6 +367,12 @@ async function upgrade(options = {}) {
   if (staleFiles.length > 0) {
     console.log(`\n  ${c.yellow('Stale files')} ${c.dim('(no longer in template — remove manually if unused):')}`);
     for (const f of staleFiles) console.log(`    - ${f}`);
+  }
+
+  if (removedPaths.length > 0) {
+    console.log(`\n  ${c.yellow('Removed framework paths')} ${c.dim('(safe to delete — no longer used):')}`);
+    for (const p of removedPaths) console.log(`    ${c.red('✗')} ${p}`);
+    console.log(`    ${c.dim('See https://github.com/pixlngrid/trellis-docs/blob/main/CHANGELOG.md for context.')}`);
   }
 
   if (pkgResult.details.length > 0) {

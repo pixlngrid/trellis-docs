@@ -12,7 +12,7 @@ All site-wide settings live in `config/site.ts`. This includes the site title, v
 
 ### How do I change the site title and logo?
 
-Edit `config/site.ts`. Set `title` for the site name. For the logo, either set `logo.useBuiltIn: false` and provide paths to your images in `logo.navbar` and `logo.hero`, or replace the built-in SVG components in `components/brand/`.
+Edit `config/site.ts`. Set `title` for the site name. For the logo, drop your image files into `public/img/` and update `logo.navbar` and `logo.hero` to point at them. Set either field to `null` to hide that logo.
 
 ### How do I customize the sidebar?
 

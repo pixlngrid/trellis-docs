@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { siteConfig } from '@/config/site'
 import { Navbar } from '@/components/docs/navbar'
 import { Footer } from '@/components/docs/footer'
-import { TrellisStacked } from '@/components/brand/trellis-logo'
 import { FeatureCards } from '@/components/landing/feature-cards'
 
 export default function Home() {
@@ -14,9 +13,7 @@ export default function Home() {
         {/* Hero */}
         <div className="max-w-3xl mx-auto text-center py-16 px-4">
           <div className="flex justify-center">
-            {siteConfig.logo.useBuiltIn ? (
-              <TrellisStacked size={300} />
-            ) : siteConfig.logo.hero ? (
+            {siteConfig.logo.hero && (
               <Image
                 src={siteConfig.logo.hero}
                 alt={siteConfig.logo.alt}
@@ -24,7 +21,7 @@ export default function Home() {
                 height={300}
                 className="h-44 w-auto"
               />
-            ) : null}
+            )}
           </div>
           {siteConfig.version && (
             <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] mb-4">

@@ -9,7 +9,6 @@ import { siteConfig } from '@/config/site'
 import { navItems } from '@/config/navigation'
 import { cn } from '@/lib/utils'
 import { SearchDialog } from '@/components/docs/search/search-dialog'
-import { TrellisIcon } from '@/components/brand/trellis-logo'
 import { resolveSidebar, getSidebarForPathname, type ResolvedSidebarItem } from '@/lib/sidebar'
 import { useDocContext } from '@/lib/doc-context'
 import { VersionSwitcher } from '@/components/docs/version-switcher'
@@ -129,15 +128,13 @@ export function Navbar() {
 
           {/* Logo + title */}
           <Link href="/" className="flex items-center gap-2 mr-6 text-[var(--foreground)] no-underline">
-            {siteConfig.logo.useBuiltIn ? (
-              <TrellisIcon size={32} />
-            ) : siteConfig.logo.navbar ? (
+            {siteConfig.logo.navbar && (
               <img
                 src={siteConfig.logo.navbar}
                 alt={siteConfig.logo.alt}
                 className="h-8 w-auto"
               />
-            ) : null}
+            )}
             <span className="text-lg font-semibold">{siteConfig.title}</span>
             {siteConfig.version && (
               <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-[var(--muted)] text-[var(--muted-foreground)]">

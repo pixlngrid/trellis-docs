@@ -38,10 +38,9 @@ After scaffolding a project, the first thing you'll want to do is configure it f
 
 | Setting | Description |
 |---------|-------------|
-| `logo.navbar` | Image path for the navbar logo (relative to `public/`) |
-| `logo.hero` | Image path for the landing page hero — set to `null` to use `navbar` |
+| `logo.navbar` | Image path for the navbar logo (relative to `public/`). Set to `null` to hide. |
+| `logo.hero` | Image path for the landing page hero. Set to `null` to hide. |
 | `logo.alt` | Alt text for the logo image |
-| `logo.useBuiltIn` | When `true`, renders the SVG component from `components/brand/` instead of an `<img>` tag |
 
 ### Color mode
 
@@ -247,7 +246,6 @@ export const siteConfig = {
     navbar: '/img/logo.svg',
     hero: null,
     alt: 'Acme Logo',
-    useBuiltIn: false,
   },
   lastUpdated: {
     showAuthor: false,

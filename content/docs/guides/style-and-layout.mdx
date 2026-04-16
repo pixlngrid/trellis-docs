@@ -283,48 +283,33 @@ If using a web font, add the import in `app/globals.css`:
 
 ## Replacing the logo
 
-Trellis ships with built-in SVG logo components. To use your own logo:
+Logos are configured via paths in `config/site.ts` — there's no React component to edit. Drop your image files into `public/img/` and update the paths:
 
-### Option A: Image files (simplest)
-
-1. Place your logo images in `public/img/`:
+1. **Place your logo images in `public/img/`:**
    - **Navbar logo** — small mark, ~32px tall (e.g. `my-logo-small.svg`)
    - **Hero logo** — larger version for the landing page (e.g. `my-logo-hero.svg`)
 
-2. Update `config/site.ts`:
+2. **Update `config/site.ts`:**
 
 ```ts title="config/site.ts"
 logo: {
   navbar: '/img/my-logo-small.svg',
   hero: '/img/my-logo-hero.svg',
   alt: 'My Company Logo',
-  useBuiltIn: false,  // Use image files instead of built-in SVG components
 },
 ```
 
-### Option B: React components (advanced)
-
-For full control, replace the built-in components in `components/brand/trellis-logo.tsx` with your own SVG React components. The built-in components are:
-
-| Component | Used in | Description |
-|-----------|---------|-------------|
-| `TrellisIcon` | Navbar | Small circular mark |
-| `TrellisStacked` | Landing page hero | Icon + text stacked vertically |
-| `TrellisHorizontal` | — | Icon + text side by side |
-| `TrellisWordmark` | — | Text only, no icon |
-| `TrellisFavicon` | — | Simplified 32x32 mark |
-
-Keep `useBuiltIn: true` in `config/site.ts` to use these components.
+Set either field to `null` to hide that logo. The navbar still renders the site title even when `navbar` is null.
 
 :::tip
-Logo text elements use `fill="currentColor"` so they automatically adapt to light and dark mode. Follow this pattern for your own SVG components.
+SVGs rendered via `<img>` don't inherit `currentColor`, so theme switching with a single SVG is limited. If you need different logos for light and dark modes, ship two SVGs and toggle in CSS, or use a fixed neutral color that reads well in both themes.
 :::
 
 ## Full rebranding checklist
 
 1. **Colors** — Update `brand` and `accent` sections in `design-tokens.json`.
 2. **Typography** — Update `typography.fontFamily` (add web font import if needed).
-3. **Logo** — Replace images in `public/img/` or update components in `components/brand/`.
+3. **Logo** — Drop your image files into `public/img/` and update the `logo` paths in `config/site.ts`.
 4. **Config** — Update `title`, `tagline`, `url`, `repoUrl`, and `logo` in `config/site.ts`.
 5. **Navigation** — Update links in `config/navigation.ts` and copyright in `footerConfig`.
 6. **Regenerate** — Run `npm run build-tokens`.

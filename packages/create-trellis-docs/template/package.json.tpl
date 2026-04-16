@@ -37,7 +37,7 @@
     "lucide-react": "^0.474.0",
     "mermaid": "^11.11.0",
     "motion": "^12.34.3",
-    "next": "^15.2.0",
+    "next": "^16.2.3",
     "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.4.4",
     "panzoom": "^9.4.3",
