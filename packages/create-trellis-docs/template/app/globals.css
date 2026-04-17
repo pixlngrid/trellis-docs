@@ -122,6 +122,17 @@
     margin: 0.5rem 0;
   }
 
+  /* Lead paragraph — if the MDX content opens with a paragraph, style it as
+     a summary/subtitle. The <h1> is rendered outside .prose from frontmatter,
+     so :first-child here targets the first element of the MDX body. */
+  .prose > p:first-child {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--muted-foreground);
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
   .prose ol:not(.not-prose ol) {
     list-style-type: decimal;
     padding-left: 1.5em;
