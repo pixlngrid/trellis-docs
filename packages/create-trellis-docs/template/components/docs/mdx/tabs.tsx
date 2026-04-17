@@ -94,7 +94,7 @@ function TabsInner({ children, queryString, defaultValue }: TabsProps) {
       <ul
         ref={tabListRef}
         role="tablist"
-        className="flex gap-1 border-b border-[var(--border)] mb-4"
+        className="flex gap-1 border-b border-[var(--border)]"
       >
         {tabValues.map((tab, i) => (
           <li
@@ -121,6 +121,11 @@ function TabsInner({ children, queryString, defaultValue }: TabsProps) {
           key={tab.props.value}
           role="tabpanel"
           hidden={tab.props.value !== selected}
+          // Panel visually connects to the tab strip above by sharing its
+          // bottom border (the panel has no top border and no rounded top
+          // corners). The first/last-child margin resets prevent prose
+          // spacing from making the padding look uneven at the edges.
+          className="border border-t-0 border-[var(--border)] rounded-b-md p-4 bg-[var(--card)] text-[var(--card-foreground)] [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
         >
           {tab.props.children}
         </div>

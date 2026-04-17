@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-04-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -49,6 +49,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/faq/configuration/</loc>
+    <lastmod>2026-04-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/faq/content-authoring/</loc>
+    <lastmod>2026-04-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/faq/deployment/</loc>
+    <lastmod>2026-04-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://pixlngrid.github.io/trellis-docs/faq/general/</loc>
     <lastmod>2026-02-20</lastmod>
     <changefreq>weekly</changefreq>
@@ -61,6 +79,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/faq/migration/</loc>
+    <lastmod>2026-04-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/faq/troubleshooting/</loc>
+    <lastmod>2026-04-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://pixlngrid.github.io/trellis-docs/features/</loc>
     <lastmod>2026-03-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -69,6 +99,12 @@
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/getting-started/</loc>
     <lastmod>2026-02-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/glossary/</loc>
+    <lastmod>2026-03-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -116,7 +152,7 @@
   </url>
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/guides/deployment/</loc>
-    <lastmod>2026-03-04</lastmod>
+    <lastmod>2026-04-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -212,7 +248,7 @@
   </url>
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/migrating-from-docusaurus/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -248,7 +284,7 @@
   </url>
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/blog/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-04-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -272,13 +308,19 @@
   </url>
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/release-notes/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-04-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/release-notes/v1.0.0/</loc>
     <lastmod>2026-02-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/release-notes/v1.10.0/</loc>
+    <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -321,6 +363,12 @@
   <url>
     <loc>https://pixlngrid.github.io/trellis-docs/release-notes/v1.8.0/</loc>
     <lastmod>2026-03-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://pixlngrid.github.io/trellis-docs/release-notes/v1.9.0/</loc>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
