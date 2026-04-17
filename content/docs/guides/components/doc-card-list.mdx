@@ -32,6 +32,18 @@ Pass the `category` prop with the exact sidebar category label. The component fi
 
 <DocCardList category="Guides" />
 
+### Grouped mode (nested subcategories)
+
+When a sidebar category has subcategories, passing `grouped` renders each subcategory as its own titled section with its own card grid. Direct docs of the top-level category render first in an ungrouped block; subcategories then render in sidebar order beneath them.
+
+```mdx
+<DocCardList category="Contribute to Alchemy" grouped />
+```
+
+Flat mode (the default) collapses subcategories into single cards linking to each subcategory's index page. Grouped mode expands them into sections, which is what you want on overview pages where subcategories have multiple children the reader might want to skim.
+
+One level of grouping only — sub-subcategories still collapse to single cards within their parent section.
+
 ### Manual mode (explicit items)
 
 Pass an `items` array when you want full control over which cards appear and in what order.
@@ -84,8 +96,9 @@ Use `DocCard` directly when you need just one card.
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `category` | `string` | No | Sidebar category label (case-insensitive). Resolves child items automatically. |
+| `category` | `string` | No | Sidebar category label (case-insensitive). Resolves child items automatically. Searches every sidebar in `config/sidebar.ts`'s `sidebars` registry. |
 | `items` | `DocCardListItem[]` | No | Explicit array of card data. Takes priority over `category`. |
+| `grouped` | `boolean` | No | When `true` (and `category` is set), subcategories render as titled sections with their own card grid. Ignored when `items` is provided. Default: `false`. |
 
 Provide either `category` or `items`. If both are passed, `items` wins.
 

@@ -22,16 +22,21 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
   const resolvedSrc = basePath && src.startsWith('/') ? `${basePath}${src}` : src
 
-  // Parse title for directives: "nozoom", width ("50%", "400px"), or plain text
+  // Parse title for directives: "nozoom", "noborder", width ("50%", "400px"),
+  // or plain text. Directives are removed from the title before render;
+  // anything unrecognized survives as the caption/tooltip text.
   let customWidth: string | undefined
   let displayTitle: string | undefined = title
   let zoomable = true
+  let bordered = true
   if (title) {
     const tokens = title.split(/\s+/)
     const filtered: string[] = []
     for (const token of tokens) {
       if (token === 'nozoom') {
         zoomable = false
+      } else if (token === 'noborder') {
+        bordered = false
       } else {
         const widthMatch = token.match(/^(?:width=)?(\d+(?:px|%))$/)
         if (widthMatch) {
@@ -48,6 +53,12 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
     ? { width: customWidth, maxWidth: customWidth }
     : {}
 
+  // `no-border` opts out of the default image border/radius (useful for logos,
+  // icons, or images with their own visual boundary). The class pairs with the
+  // `:not(.no-border)` guard on `.prose img` in globals.css to override the
+  // blanket rule cleanly.
+  const borderClasses = bordered ? 'border border-[var(--border)] rounded-[5px]' : 'no-border'
+
   if (!zoomable) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
@@ -56,7 +67,7 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
         alt={alt || ''}
         title={displayTitle}
         {...props}
-        className="border border-[var(--border)] rounded-[5px] h-auto mt-4"
+        className={`${borderClasses} h-auto mt-4`}
         style={style}
       />
     )
@@ -70,7 +81,7 @@ export function ImageLightbox({ src, alt, title, ...props }: ImageLightboxProps)
         alt={alt || ''}
         title={displayTitle}
         {...props}
-        className="cursor-zoom-in border border-[var(--border)] rounded-[5px] h-auto mt-4"
+        className={`cursor-zoom-in ${borderClasses} h-auto mt-4`}
         style={style}
         onClick={() => setOpen(true)}
       />

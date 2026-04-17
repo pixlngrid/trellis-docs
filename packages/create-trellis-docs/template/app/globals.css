@@ -183,11 +183,16 @@
   }
 
   .prose img {
-    border: 1px solid var(--border);
-    border-radius: 5px;
     max-width: 60%;
     height: auto;
     margin-top: 1rem;
+  }
+  /* Default border/radius — opted out by `noborder` title directive (which
+     applies `.no-border` to the <img>) for logos, icons, or images that
+     already have their own visual boundary. */
+  .prose img:not(.no-border) {
+    border: 1px solid var(--border);
+    border-radius: 5px;
   }
 
   .prose table {

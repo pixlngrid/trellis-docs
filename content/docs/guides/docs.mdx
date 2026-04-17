@@ -517,6 +517,20 @@ You can combine `nozoom` with a width value:
 ![Badge](/img/badge.png "nozoom 120px")
 ```
 
+### Removing the image border
+
+By default, every image in docs content renders with a 1px border and 5px corner radius — that looks right for screenshots but visually awkward for logos, icons, illustrations with transparent backgrounds, or any image that already has its own visual boundary. Add `noborder` in the title position to drop the border for those:
+
+```md
+![Company logo](/img/logo.svg "noborder")
+```
+
+Combine with other directives:
+
+```md
+![Badge](/img/badge.svg "noborder nozoom 120px")
+```
+
 ### Image sizing
 
 Unlike Docusaurus, {vars.productName} lets you control image width directly in markdown — no HTML or custom components needed. By default, images render at 60% of the content width. To override the size, add a width value in the title position of the markdown image syntax:
@@ -535,9 +549,10 @@ Supported formats:
 | Pixels | `"400px"` | Fixed 400px width |
 | `width=` prefix | `"width=75%"` | Same as `"75%"` — explicit prefix is optional |
 | `nozoom` | `"nozoom"` | Disables the lightbox for this image |
-| Combined | `"nozoom 50%"` | No zoom + custom width |
+| `noborder` | `"noborder"` | Drops the default image border and corner radius |
+| Combined | `"noborder nozoom 50%"` | Any combination is supported |
 
-When a custom width is set, it replaces the default 60% max-width. Directives like `nozoom` and width values are parsed from the title and do not appear as tooltips. Any remaining text in the title is preserved as the tooltip.
+When a custom width is set, it replaces the default 60% max-width. Directives (`nozoom`, `noborder`, width values) are parsed from the title and do not appear as tooltips. Any remaining text in the title is preserved as the tooltip.
 
 ## Variables
 
