@@ -216,6 +216,14 @@
     border-bottom: 1px solid var(--border);
   }
 
+  /* Zebra striping — every other body row gets a subtle background so rows
+     are easier to track horizontally on wide tables. Scoped to tbody so
+     the header row is never banded. Uses `--muted` (a slate-100 token
+     with a dark-mode counterpart) to stay readable in both themes. */
+  .prose tbody tr:nth-child(even) {
+    background-color: var(--muted);
+  }
+
   .prose hr {
     border-color: var(--border);
     margin: 2rem 0;
