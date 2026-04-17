@@ -1,6 +1,18 @@
 import { mainSidebar, SidebarItem } from '@/config/sidebar'
+import * as sidebarConfig from '@/config/sidebar'
 import { getAllDocsMeta, DocMeta } from '@/lib/content'
 import { DocCard } from './doc-card'
+
+// Collect every sidebar registered in config/sidebar.ts. Checks the
+// `sidebars` registry first (multi-sidebar projects) and falls back to the
+// legacy single-export `mainSidebar` for projects on older configs.
+function getAllRegisteredSidebars(): SidebarItem[][] {
+  const registry = (sidebarConfig as Record<string, unknown>).sidebars as
+    | Record<string, SidebarItem[]>
+    | undefined
+  if (registry) return Object.values(registry)
+  return [mainSidebar]
+}
 
 interface DocCardListItem {
   title: string
@@ -66,7 +78,13 @@ export async function DocCardList({ items, category }: DocCardListProps) {
     cards = items
   } else if (category) {
     const allMeta = await getAllDocsMeta()
-    const node = findCategory(mainSidebar, category)
+    // Search every registered sidebar — the category may live in a
+    // non-main sidebar (e.g., contributing guide, software templates).
+    let node: ReturnType<typeof findCategory> = null
+    for (const sb of getAllRegisteredSidebars()) {
+      node = findCategory(sb, category)
+      if (node) break
+    }
     cards = node ? resolveCards(node.items, allMeta) : []
   } else {
     cards = []
