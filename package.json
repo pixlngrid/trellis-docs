@@ -1,6 +1,6 @@
 {
   "name": "create-trellis-docs",
-  "version": "1.12.8",
+  "version": "1.12.9",
   "license": "MIT",
   "scripts": {
     "dev": "node scripts/build-tokens.js && node scripts/build-sidebar-map.js && cross-env NODE_ENV=development next dev",

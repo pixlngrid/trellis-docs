@@ -122,6 +122,16 @@
     margin: 0.5rem 0;
   }
 
+  /* Doc page title — rendered from frontmatter in page.tsx, OUTSIDE the
+     .prose wrapper. Override its size/spacing here instead of editing the
+     JSX class list. The `.doc-title` class is applied in the page component
+     alongside the Tailwind utilities; anything set here takes precedence. */
+  .doc-title {
+    font-size: 2.25rem;     /* tune freely — overrides text-3xl (1.875rem) */
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
   /* Lead paragraph — if the MDX content opens with a paragraph, style it as
      a summary/subtitle. The <h1> is rendered outside .prose from frontmatter,
      so :first-child here targets the first element of the MDX body. */
