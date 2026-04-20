@@ -1,0 +1,24 @@
+# Relationship Table (opt-in)
+#
+# DITA-style relationship table. Each "family" groups a set of mutually
+# related topics. Within a family, each "row" is a relationship across the
+# topic types: overview, concept, task, reference, troubleshooting.
+#
+# On any page, <RelatedTopics /> renders the other topics in the same
+# row(s), grouped by type — the current page is automatically excluded.
+#
+# Reference docs by slug with a leading slash (no file extension).
+# A cell may be a single slug or a list. All columns are optional.
+#
+# Uncomment an entry below to start using it, or delete this file
+# entirely if you don't want relationship tables.
+
+# - family: Getting started
+#   rows:
+#     - overview: /introduction
+#       concept: /core-concepts
+#       task:
+#         - /install
+#         - /quickstart
+#       reference: /api
+#       troubleshooting: /troubleshooting

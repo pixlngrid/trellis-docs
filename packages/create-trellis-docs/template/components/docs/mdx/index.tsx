@@ -11,6 +11,7 @@ import { Tooltip } from '@/components/docs/tooltip'
 import { DocCard } from '@/components/custom/doc-card'
 import { DocCardList } from '@/components/custom/doc-card-list'
 import { Chip } from '@/components/custom/chip'
+import { RelatedTopics } from '@/components/custom/related-topics'
 
 // Colored symbols for comparison tables
 function Check() {
@@ -57,4 +58,5 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   Cross,
   Partial,
   Chip,
+  RelatedTopics,
 }

@@ -1,0 +1,215 @@
+---
+title: RelatedTopics
+description: Generate a "Related topics" block on any page from a central DITA-style relationship table.
+keywords: [related topics, reltable, relationship table, dita, navigation, related links]
+last_update:
+  date: 04/20/2026
+  author: Trellis
+---
+
+The `RelatedTopics` component renders a "Related topics" block at the bottom of a page, pulling its links from a central relationship table (`content/reltable.yml`) instead of hardcoded "See also" lists in each file.
+
+This is the {vars.productName} equivalent of a DITA **reltable**: one author maintains the relationships in a single place, and every affected page stays in sync automatically.
+
+## When to use a reltable
+
+Use a reltable when the same set of pages is related in both directions and you don't want to maintain symmetric "See also" lists by hand. Typical cases:
+
+- A **concept** page that should link to its associated **task** and **reference** pages (and vice versa)
+- A **task** that commonly fails with a specific **troubleshooting** page
+- An **overview** that gathers all pages in a topic area
+
+If you only need a one-off "see also" link, use a regular Markdown link — don't reach for the reltable.
+
+## How it works
+
+1. You describe relationships once in `content/reltable.yml`.
+2. `scripts/build-reltable.js` runs during `npm run build` (and on demand) and emits `public/reltable.json` — a flat, per-slug lookup keyed by locale and version.
+3. Anywhere you drop `<RelatedTopics />` in an MDX file, the component reads the JSON, finds the current page's entry by its URL, and renders the co-related topics grouped by type. Pages without an entry render nothing.
+
+The feature is **opt-in**. If `content/reltable.yml` doesn't exist, the build script emits an empty index and `<RelatedTopics />` renders nothing — no errors, no configuration required.
+
+## Topic types
+
+The schema uses the five DITA 2.0 topic types, plus `overview` for landing-style pages:
+
+| Type | Purpose |
+|------|---------|
+| `overview` | Landing page that orients the reader to a topic area |
+| `concept` | Explains what something is and why it matters |
+| `task` | Step-by-step procedure for accomplishing a goal |
+| `reference` | Lookup material — API, config schema, CLI flags |
+| `troubleshooting` | Diagnoses a symptom and describes the fix |
+
+Rendered sections appear in that same order, so related content flows naturally from orientation → understanding → doing → looking up → recovering.
+
+## Enabling the reltable
+
+Create `content/reltable.yml` at the root of the `content/` directory. Each top-level entry is a **family** — a logical grouping of related topics. Each family has one or more **rows**, where every topic in a row is considered related to every other topic in that row.
+
+```yaml title="content/reltable.yml"
+- family: Authoring content
+  rows:
+    - overview: /introduction
+      concept: /features
+      task:
+        - /guides/docs
+        - /guides/content-audit
+      reference: /advanced/api-docs
+      troubleshooting: /troubleshooting/content-errors
+```
+
+With this file in place, every page listed above automatically renders a "Related topics" block linking to the other four (minus itself) when `<RelatedTopics />` is embedded.
+
+## Authoring rules
+
+- **Slugs use a leading slash and no extension.** `/guides/docs` resolves to `content/docs/guides/docs.mdx` (or `.md`, or an `index.mdx` inside a matching directory).
+- **Cells accept a single slug or a list.** Any column can hold multiple pages if several tasks/concepts/etc. belong to the same relationship.
+- **All columns are optional.** A row with only `concept` and `task` is valid; empty sections simply don't render.
+- **A page can appear in multiple families.** Its entry aggregates siblings across every row it appears in, de-duplicated.
+- **Broken slugs warn, they don't fail.** The build script prints a warning listing any slug it couldn't resolve, but the build continues.
+
+## Multiple families and rows
+
+Most real projects end up with several families. Each stands on its own:
+
+```yaml title="content/reltable.yml"
+- family: Authoring content
+  rows:
+    - overview: /introduction
+      concept: /features
+      task:
+        - /guides/docs
+        - /guides/content-audit
+      troubleshooting: /troubleshooting/content-errors
+
+- family: Site configuration
+  rows:
+    - concept: /getting-started
+      task: /guides/site-configuration
+      reference: /advanced/architecture
+      troubleshooting: /troubleshooting/build-errors
+
+- family: Deployment
+  rows:
+    - task: /guides/deployment
+      reference: /advanced/static-site-generation
+      troubleshooting: /troubleshooting/build-errors
+```
+
+A family can also have multiple rows — useful when the same topic area has distinct sub-relationships that shouldn't bleed into each other:
+
+```yaml
+- family: Search
+  rows:
+    - concept: /guides/search
+      task: /guides/search#configuring-search
+      reference: /advanced/search-index-format
+    - concept: /guides/search
+      task: /guides/search#customizing-the-ui
+      reference: /advanced/search-component-api
+```
+
+## Using `<RelatedTopics />`
+
+The component is globally registered — no import needed. Drop it wherever the related-links block should appear (typically at the bottom of the page):
+
+```mdx title="content/docs/guides/docs.mdx"
+## Next steps
+
+...
+
+<RelatedTopics />
+```
+
+The component infers the current page from its URL (via `usePathname()`), looks up the entry in `public/reltable.json`, and renders one subsection per non-empty topic type.
+
+### Customizing the title
+
+```mdx
+<RelatedTopics title="See also" />
+```
+
+### Limiting which sections render
+
+Pass `showTypes` with an array of types to render only those:
+
+```mdx
+<RelatedTopics showTypes={['task', 'troubleshooting']} />
+```
+
+This is useful when a reference page should only surface "how do I use this" and "what goes wrong" links, not re-list every concept.
+
+### Forcing a specific slug
+
+If you need the block to render links for a different page — for example, on an index page that aggregates a topic area — pass `slug` explicitly:
+
+```mdx
+<RelatedTopics slug="/introduction" />
+```
+
+## Props
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `title` | `string` | No | `'Related topics'` | Heading shown above the block |
+| `slug` | `string` | No | current URL | Override the lookup slug — use a leading slash (`/guides/docs`) |
+| `showTypes` | `TopicType[]` | No | all types | Restrict rendering to specific columns: `'overview'`, `'concept'`, `'task'`, `'reference'`, `'troubleshooting'` |
+
+If the current page has no entry in the reltable (or all matching sections are empty), the component renders nothing.
+
+## Build output
+
+Running `npm run build` invokes `scripts/build-reltable.js` as part of the pipeline. You'll see something like:
+
+```text
+Reltable built: 11 entries across 1 index(es)
+```
+
+If any slugs can't be resolved, the warnings follow:
+
+```text
+[reltable] warnings:
+[en:current] unresolved slugs:
+  /guides/does-not-exist (in family "Authoring content")
+```
+
+Fix the slug in `reltable.yml` — the build still completes, but unresolved entries are silently dropped from the output so broken links never reach readers.
+
+To run the script on its own:
+
+```bash
+node scripts/build-reltable.js
+```
+
+## i18n and versioning
+
+The reltable file is **language- and version-agnostic** — you maintain one `content/reltable.yml` and the build script resolves titles against each configured locale and version separately, producing one index per combination in `public/reltable.json`:
+
+```json
+{
+  "en:current":  { "/introduction": { ... } },
+  "fr:current":  { "/introduction": { ... } },
+  "en:1.0":      { "/introduction": { ... } }
+}
+```
+
+Titles come from each locale's / version's own frontmatter, so translated pages show translated related-link titles automatically. The component picks the correct index at runtime based on the URL.
+
+## Tips
+
+- **Put `<RelatedTopics />` at the bottom of the page**, after the last `##` section. It renders its own divider and heading.
+- **Not every page needs a reltable entry.** Reserve it for pages that share a strong, bidirectional relationship with others. Noise dilutes the signal.
+- **Prefer reltable over inline "See also" lists** once you have more than two or three bidirectional links — maintaining symmetric hardcoded lists is where reltables pay off.
+- **Keep families small.** A family with 15 entries per row produces an overwhelming "Related topics" block on every member page.
+- **Use anchors sparingly.** Slugs may include `#anchor` fragments (e.g., `/guides/search#configuring-search`), but the build script only resolves the base file — the anchor is appended to the rendered link.
+
+:::tip Migrating from hardcoded "See also" blocks
+
+When converting an existing docs site to reltable, grep for `## See also` and `## Related` headings to find candidates. Each cluster of mutually-linking pages is usually one family.
+
+:::
+
+## Disabling the reltable
+
+Delete `content/reltable.yml` (or empty it). The build script will emit an empty index, and any `<RelatedTopics />` tags in your MDX will render nothing — so you can leave them in place without breaking anything.

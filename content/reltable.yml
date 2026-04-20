@@ -1,0 +1,36 @@
+# Relationship Table (opt-in)
+#
+# DITA-style relationship table. Each "family" groups a set of mutually
+# related topics. Within a family, each "row" is a relationship across the
+# topic types: overview, concept, task, reference, troubleshooting.
+#
+# On any page, <RelatedTopics /> renders the other topics in the same
+# row(s), grouped by type — the current page is automatically excluded.
+#
+# Reference docs by slug with a leading slash (no file extension).
+# A cell may be a single slug or a list. All columns are optional.
+#
+# To disable the reltable entirely, delete this file or comment out all
+# entries. Pages without <RelatedTopics /> are unaffected either way.
+
+- family: Authoring content
+  rows:
+    - overview: /introduction
+      concept: /features
+      task:
+        - /guides/docs
+        - /guides/content-audit
+      troubleshooting: /troubleshooting/content-errors
+
+- family: Site configuration
+  rows:
+    - concept: /getting-started
+      task: /guides/site-configuration
+      reference: /advanced/architecture
+      troubleshooting: /troubleshooting/build-errors
+
+- family: Deployment
+  rows:
+    - task: /guides/deployment
+      reference: /advanced/static-site-generation
+      troubleshooting: /troubleshooting/build-errors

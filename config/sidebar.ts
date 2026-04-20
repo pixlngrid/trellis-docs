@@ -43,6 +43,7 @@ export const mainSidebar: SidebarItem[] = [
           { type: 'doc', id: 'guides/components/glossary', label: 'Glossary' },
           { type: 'doc', id: 'guides/components/feedback', label: 'Feedback' },
           { type: 'doc', id: 'guides/components/flipping-card', label: 'FlippingCard' },
+          { type: 'doc', id: 'guides/components/related-topics', label: 'RelatedTopics' },
         ],
       },
       { type: 'doc', id: 'guides/style-and-layout', label: 'Style and Layout' },

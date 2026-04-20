@@ -1,0 +1,338 @@
+{
+  "en:current": {
+    "/introduction": {
+      "families": [
+        "Authoring content"
+      ],
+      "overview": [],
+      "concept": [
+        {
+          "slug": "/features",
+          "title": "Features",
+          "permalink": "/features"
+        }
+      ],
+      "task": [
+        {
+          "slug": "/guides/docs",
+          "title": "Docs",
+          "permalink": "/guides/docs"
+        },
+        {
+          "slug": "/guides/content-audit",
+          "title": "Content Audit",
+          "permalink": "/guides/content-audit"
+        }
+      ],
+      "reference": [],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/content-errors",
+          "title": "Content & Rendering Errors",
+          "permalink": "/troubleshooting/content-errors"
+        }
+      ]
+    },
+    "/features": {
+      "families": [
+        "Authoring content"
+      ],
+      "overview": [
+        {
+          "slug": "/introduction",
+          "title": "Introduction",
+          "permalink": "/introduction"
+        }
+      ],
+      "concept": [],
+      "task": [
+        {
+          "slug": "/guides/docs",
+          "title": "Docs",
+          "permalink": "/guides/docs"
+        },
+        {
+          "slug": "/guides/content-audit",
+          "title": "Content Audit",
+          "permalink": "/guides/content-audit"
+        }
+      ],
+      "reference": [],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/content-errors",
+          "title": "Content & Rendering Errors",
+          "permalink": "/troubleshooting/content-errors"
+        }
+      ]
+    },
+    "/guides/docs": {
+      "families": [
+        "Authoring content"
+      ],
+      "overview": [
+        {
+          "slug": "/introduction",
+          "title": "Introduction",
+          "permalink": "/introduction"
+        }
+      ],
+      "concept": [
+        {
+          "slug": "/features",
+          "title": "Features",
+          "permalink": "/features"
+        }
+      ],
+      "task": [
+        {
+          "slug": "/guides/content-audit",
+          "title": "Content Audit",
+          "permalink": "/guides/content-audit"
+        }
+      ],
+      "reference": [],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/content-errors",
+          "title": "Content & Rendering Errors",
+          "permalink": "/troubleshooting/content-errors"
+        }
+      ]
+    },
+    "/guides/content-audit": {
+      "families": [
+        "Authoring content"
+      ],
+      "overview": [
+        {
+          "slug": "/introduction",
+          "title": "Introduction",
+          "permalink": "/introduction"
+        }
+      ],
+      "concept": [
+        {
+          "slug": "/features",
+          "title": "Features",
+          "permalink": "/features"
+        }
+      ],
+      "task": [
+        {
+          "slug": "/guides/docs",
+          "title": "Docs",
+          "permalink": "/guides/docs"
+        }
+      ],
+      "reference": [],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/content-errors",
+          "title": "Content & Rendering Errors",
+          "permalink": "/troubleshooting/content-errors"
+        }
+      ]
+    },
+    "/troubleshooting/content-errors": {
+      "families": [
+        "Authoring content"
+      ],
+      "overview": [
+        {
+          "slug": "/introduction",
+          "title": "Introduction",
+          "permalink": "/introduction"
+        }
+      ],
+      "concept": [
+        {
+          "slug": "/features",
+          "title": "Features",
+          "permalink": "/features"
+        }
+      ],
+      "task": [
+        {
+          "slug": "/guides/docs",
+          "title": "Docs",
+          "permalink": "/guides/docs"
+        },
+        {
+          "slug": "/guides/content-audit",
+          "title": "Content Audit",
+          "permalink": "/guides/content-audit"
+        }
+      ],
+      "reference": [],
+      "troubleshooting": []
+    },
+    "/getting-started": {
+      "families": [
+        "Site configuration"
+      ],
+      "overview": [],
+      "concept": [],
+      "task": [
+        {
+          "slug": "/guides/site-configuration",
+          "title": "Site Configuration",
+          "permalink": "/guides/site-configuration"
+        }
+      ],
+      "reference": [
+        {
+          "slug": "/advanced/architecture",
+          "title": "Architecture",
+          "permalink": "/advanced/architecture"
+        }
+      ],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/build-errors",
+          "title": "Build Errors",
+          "permalink": "/troubleshooting/build-errors"
+        }
+      ]
+    },
+    "/guides/site-configuration": {
+      "families": [
+        "Site configuration"
+      ],
+      "overview": [],
+      "concept": [
+        {
+          "slug": "/getting-started",
+          "title": "Getting Started",
+          "permalink": "/getting-started"
+        }
+      ],
+      "task": [],
+      "reference": [
+        {
+          "slug": "/advanced/architecture",
+          "title": "Architecture",
+          "permalink": "/advanced/architecture"
+        }
+      ],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/build-errors",
+          "title": "Build Errors",
+          "permalink": "/troubleshooting/build-errors"
+        }
+      ]
+    },
+    "/advanced/architecture": {
+      "families": [
+        "Site configuration"
+      ],
+      "overview": [],
+      "concept": [
+        {
+          "slug": "/getting-started",
+          "title": "Getting Started",
+          "permalink": "/getting-started"
+        }
+      ],
+      "task": [
+        {
+          "slug": "/guides/site-configuration",
+          "title": "Site Configuration",
+          "permalink": "/guides/site-configuration"
+        }
+      ],
+      "reference": [],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/build-errors",
+          "title": "Build Errors",
+          "permalink": "/troubleshooting/build-errors"
+        }
+      ]
+    },
+    "/troubleshooting/build-errors": {
+      "families": [
+        "Site configuration",
+        "Deployment"
+      ],
+      "overview": [],
+      "concept": [
+        {
+          "slug": "/getting-started",
+          "title": "Getting Started",
+          "permalink": "/getting-started"
+        }
+      ],
+      "task": [
+        {
+          "slug": "/guides/site-configuration",
+          "title": "Site Configuration",
+          "permalink": "/guides/site-configuration"
+        },
+        {
+          "slug": "/guides/deployment",
+          "title": "Deployment",
+          "permalink": "/guides/deployment"
+        }
+      ],
+      "reference": [
+        {
+          "slug": "/advanced/architecture",
+          "title": "Architecture",
+          "permalink": "/advanced/architecture"
+        },
+        {
+          "slug": "/advanced/static-site-generation",
+          "title": "Static Site Generation",
+          "permalink": "/advanced/static-site-generation"
+        }
+      ],
+      "troubleshooting": []
+    },
+    "/guides/deployment": {
+      "families": [
+        "Deployment"
+      ],
+      "overview": [],
+      "concept": [],
+      "task": [],
+      "reference": [
+        {
+          "slug": "/advanced/static-site-generation",
+          "title": "Static Site Generation",
+          "permalink": "/advanced/static-site-generation"
+        }
+      ],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/build-errors",
+          "title": "Build Errors",
+          "permalink": "/troubleshooting/build-errors"
+        }
+      ]
+    },
+    "/advanced/static-site-generation": {
+      "families": [
+        "Deployment"
+      ],
+      "overview": [],
+      "concept": [],
+      "task": [
+        {
+          "slug": "/guides/deployment",
+          "title": "Deployment",
+          "permalink": "/guides/deployment"
+        }
+      ],
+      "reference": [],
+      "troubleshooting": [
+        {
+          "slug": "/troubleshooting/build-errors",
+          "title": "Build Errors",
+          "permalink": "/troubleshooting/build-errors"
+        }
+      ]
+    }
+  }
+}

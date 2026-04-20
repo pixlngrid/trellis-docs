@@ -1,6 +1,6 @@
 {
   "name": "@patriciamcphee/create-trellis-docs",
-  "version": "1.12.9",
+  "version": "1.13.0",
   "description": "Create a new Trellis documentation site",
   "license": "MIT",
   "publishConfig": {
